@@ -1,5 +1,7 @@
-/* Scala service worker — cache-first runtime caching for offline PWA use. */
-const CACHE = "scala-v1";
+/* MyGitHub service worker — cache-first runtime caching for offline PWA use.
+ * All paths are relative so it also works when hosted under a subpath
+ * (e.g. GitHub Pages at /<repo>/). */
+const CACHE = "mygithub-v2";
 const PRECACHE = [
   "./",
   "./index.html",
