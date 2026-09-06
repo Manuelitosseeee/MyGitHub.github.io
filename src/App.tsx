@@ -57,6 +57,7 @@ export default function App() {
       root.dataset.accent = ap.accent;
       root.dataset.fs = ap.fontSize;
       root.dataset.font = ap.font;
+      root.dataset.skin = ap.skin;
       const acc = ACCENTS[ap.accent];
       root.style.setProperty("--acc", acc.main);
       root.style.setProperty("--acc-soft", acc.soft);

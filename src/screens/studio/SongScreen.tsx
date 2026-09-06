@@ -511,8 +511,8 @@ function MetronomePanel({ song }: { song: Song }) {
         <div
           className="metro-stage"
           style={{
-            background:
-              "radial-gradient(120% 130% at 50% -10%, #1c2740 0%, #0d1220 55%, #0a0e17 100%)",
+            /* Skinnable via --stage-bg (Aspetto Totale in Impostazioni) */
+            background: "var(--stage-bg)",
             margin: 0,
             borderRadius: 0,
             boxShadow: "none",

@@ -82,6 +82,20 @@ export type FontChoice = "system" | "serif" | "mono";
 
 export type FontSize = "s" | "m" | "l" | "xl";
 
+/** Whole-app visual designs ("Aspetto Totale"). 9 options: the current look
+ *  (`default`) plus 8 material themes. They change surfaces, textures, radii,
+ *  shadows and backgrounds — never fonts (handled by `FontChoice`). */
+export type AppSkin =
+  | "default"
+  | "ceramica"
+  | "vetro"
+  | "carta"
+  | "metallo"
+  | "argilla"
+  | "analogico"
+  | "editoriale"
+  | "liquido";
+
 export interface Appearance {
   /** Classic light/dark/system mode. */
   mode: AppTheme;
@@ -91,6 +105,8 @@ export interface Appearance {
   fontSize: FontSize;
   /** Font family. */
   font: FontChoice;
+  /** Aspetto Totale design ("default" = current look). */
+  skin: AppSkin;
 }
 
 export interface Settings {

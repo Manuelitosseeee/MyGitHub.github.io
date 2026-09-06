@@ -22,6 +22,7 @@ export const DEFAULT_SETTINGS: Settings = {
     accent: "blue",
     fontSize: "m",
     font: "system",
+    skin: "default",
   },
   metro: {
     bpm: 100,

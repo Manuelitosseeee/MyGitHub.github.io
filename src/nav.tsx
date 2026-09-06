@@ -11,8 +11,8 @@ export type TabId =
 export const TABS: Array<{ id: TabId; label: string }> = [
   { id: "diario", label: "Diario" },
   { id: "studio", label: "Studio" },
-  { id: "metronomo", label: "Metronomo" },
-  { id: "accordatore", label: "Accordatore" },
+  { id: "metronomo", label: "Metro" },
+  { id: "accordatore", label: "Accord" },
   { id: "corde", label: "Corde" },
   { id: "impostazioni", label: "Impost." },
 ];

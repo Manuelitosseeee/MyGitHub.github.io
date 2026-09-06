@@ -10,8 +10,9 @@ import { cx, clamp } from "../lib/utils";
 const MIN = 20;
 const MAX = 400;
 
-const STAGE_GRADIENT =
-  "radial-gradient(130% 140% at 50% -20%, #1b2c50 0%, #0a0f1d 68%)";
+/* Set by the Aspetto Totale skins (skins.css); falls back to the classic
+   dark-blue stage when no skin overrides it. */
+const STAGE_GRADIENT = "var(--stage-bg)";
 
 const SOUNDS: Array<{ id: MetroSound; label: string }> = [
   { id: "classic", label: "Legno" },

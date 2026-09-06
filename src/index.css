@@ -13,6 +13,25 @@
   --bad-soft: rgba(255, 69, 58, 0.16);
   --app-font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
     "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+
+  /* --- Aspetto Totale (skin) variables ---
+     Overridden per skin in skins.css. Radii mirror the current iOS look so
+     the `default` skin stays pixel-identical. */
+  --r-card: 18px;
+  --r-stage: 24px;
+  --r-btn: 13px;
+  --r-field: 13px;
+  --r-sheet: 22px;
+  --r-badge: 10px;
+  --r-cell: 13px;
+  --r-seg: 11px;
+  --card-bg-img: none;
+  --card-bg-size: auto;
+  --card-border-w: 0px;
+  --card-border: transparent;
+  --app-bg-img: none;
+  --app-bg-size: auto;
+  --stage-bg: radial-gradient(130% 140% at 50% -20%, #1b2c50 0%, #0a0f1d 68%);
 }
 
 /* Font personalization: system (default), serif, monospace */
@@ -115,7 +134,9 @@ img {
   height: 100dvh;
   display: flex;
   flex-direction: column;
-  background: var(--bg);
+  background-color: var(--bg);
+  background-image: var(--app-bg-img);
+  background-size: var(--app-bg-size);
 }
 
 .panes {
@@ -131,7 +152,8 @@ img {
   overflow-y: auto;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
-  background: var(--bg);
+  /* Transparent so the skin background (kept static on .app) shows through. */
+  background: transparent;
 }
 
 .pane.active {
@@ -165,6 +187,7 @@ img {
 
 .tab-btn {
   flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -179,15 +202,21 @@ img {
 }
 
 .tab-btn svg {
-  width: 25px;
-  height: 25px;
+  width: 24px;
+  height: 24px;
   stroke-width: 1.8;
 }
 
 .tab-btn .lbl {
   font-size: 10px;
   font-weight: 600;
-  letter-spacing: 0.1px;
+  letter-spacing: 0;
+  line-height: 1.2;
+  max-width: 100%;
+  padding: 0 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .tab-btn.active {
@@ -261,8 +290,11 @@ img {
 /* ---------------- Cards & rows ---------------- */
 
 .card {
-  background: var(--card);
-  border-radius: 18px;
+  background-color: var(--card);
+  background-image: var(--card-bg-img);
+  background-size: var(--card-bg-size);
+  border: var(--card-border-w) solid var(--card-border);
+  border-radius: var(--r-card);
   box-shadow: var(--shadow);
   margin-bottom: 12px;
   overflow: hidden;
@@ -316,7 +348,7 @@ img {
 .icon-badge {
   width: 36px;
   height: 36px;
-  border-radius: 10px;
+  border-radius: var(--r-badge);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -340,7 +372,7 @@ img {
   align-items: center;
   justify-content: center;
   gap: 7px;
-  border-radius: 13px;
+  border-radius: var(--r-btn);
   font-weight: 600;
   font-size: 16px;
   padding: 13px 18px;
@@ -387,7 +419,7 @@ img {
 .btn-sm {
   font-size: 14px;
   padding: 9px 14px;
-  border-radius: 11px;
+  border-radius: calc(var(--r-btn) - 2px);
   width: auto;
 }
 
@@ -458,14 +490,14 @@ img {
 .seg {
   display: flex;
   background: var(--field);
-  border-radius: 11px;
+  border-radius: var(--r-seg);
   padding: 2px;
 }
 
 .seg-item {
   flex: 1;
   padding: 8px 6px;
-  border-radius: 9px;
+  border-radius: calc(var(--r-seg) - 2px);
   font-size: 13.5px;
   font-weight: 600;
   color: var(--text-2);
@@ -509,7 +541,7 @@ img {
   width: 100%;
   background: var(--field);
   border: none;
-  border-radius: 13px;
+  border-radius: var(--r-field);
   padding: 14px 15px;
   font-size: 16px;
   outline: none;
@@ -655,7 +687,7 @@ input[type="range"].rng:active::-webkit-slider-thumb {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  border-radius: 22px 22px 0 0;
+  border-radius: var(--r-sheet) var(--r-sheet) 0 0;
   padding: 8px 0 0;
   animation: sheet-up 0.32s cubic-bezier(0.32, 0.72, 0, 1);
   box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.25);
@@ -898,7 +930,7 @@ input[type="range"].rng:active::-webkit-slider-thumb {
 .stat {
   flex: 1;
   background: var(--card);
-  border-radius: 16px;
+  border-radius: calc(var(--r-card) - 2px);
   padding: 13px 14px;
   box-shadow: var(--shadow);
   margin-bottom: 12px;
@@ -961,7 +993,8 @@ input[type="range"].rng:active::-webkit-slider-thumb {
 /* ---------------- Metronome ---------------- */
 
 .metro-stage {
-  border-radius: 24px;
+  border-radius: var(--r-stage);
+  background: var(--stage-bg);
   padding: 22px 18px 18px;
   text-align: center;
   position: relative;
@@ -1024,7 +1057,7 @@ input[type="range"].rng:active::-webkit-slider-thumb {
 
 .metro-controls {
   background: var(--card);
-  border-radius: 18px;
+  border-radius: var(--r-card);
   box-shadow: var(--shadow);
   padding: 14px 16px 16px;
   margin-bottom: 12px;
@@ -1075,7 +1108,7 @@ input[type="range"].rng:active::-webkit-slider-thumb {
 .pcell {
   width: 44px;
   height: 44px;
-  border-radius: 13px;
+  border-radius: var(--r-cell);
   font-weight: 800;
   font-size: 15px;
   display: flex;
@@ -1145,7 +1178,7 @@ input[type="range"].rng:active::-webkit-slider-thumb {
 /* ---------------- Tuner ---------------- */
 
 .tuner-card {
-  border-radius: 24px;
+  border-radius: var(--r-stage);
   padding: 22px 16px 18px;
   background: var(--card);
   box-shadow: var(--shadow);
@@ -1535,6 +1568,91 @@ html[data-fs="xl"] .string-line .sn { font-size: 16px; }
 html[data-fs="xl"] .string-line .shz { font-size: 13px; }
 html[data-fs="xl"] .tempo-unit { font-size: 17px; }
 html[data-fs="xl"] .tap-hint { font-size: 14.5px; }
+
+/* ---------------- Aspetto Totale (skin picker) ---------------- */
+
+.skin-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.skin-opt {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 7px;
+  padding: 8px;
+  border-radius: 16px;
+  border: 1.5px solid var(--sep);
+  background: transparent;
+  transition: border-color 0.15s ease, transform 0.12s ease;
+  position: relative;
+  text-align: left;
+}
+
+.skin-opt:active {
+  transform: scale(0.97);
+}
+
+.skin-opt.on {
+  border-color: var(--acc);
+}
+
+.skin-prev {
+  height: 58px;
+  border-radius: 11px;
+  overflow: hidden;
+  position: relative;
+  border: 0.5px solid rgba(0, 0, 0, 0.08);
+}
+
+.skin-prev-card {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  top: 9px;
+  height: 26px;
+  border: 0.5px solid rgba(0, 0, 0, 0.08);
+}
+
+.skin-prev-bar {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  bottom: 7px;
+  height: 8px;
+  border: 0.5px solid rgba(0, 0, 0, 0.06);
+}
+
+.skin-name {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.25;
+  min-height: 30px;
+}
+
+.skin-check {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--acc);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+.skin-check svg {
+  width: 13px;
+  height: 13px;
+  stroke-width: 3;
+}
 
 @media (prefers-reduced-motion: reduce) {
   *,
