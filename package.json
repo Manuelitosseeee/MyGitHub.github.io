@@ -1,0 +1,26 @@
+{
+  "name": "mygithub",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "MyGitHub — Metronomo, Studio brani, Accordatore e Corde (PWA iOS)",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0 --port ${PORT:-5173}",
+    "build": "vite build",
+    "preview": "vite preview --host 0.0.0.0 --port ${PORT:-4173}",
+    "typecheck": "tsc -b --noEmit",
+    "icons": "node scripts/gen-icons.mjs"
+  },
+  "dependencies": {
+    "lucide-react": "^0.460.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "~5.6.3",
+    "vite": "^5.4.11"
+  }
+}
