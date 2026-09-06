@@ -17,11 +17,7 @@ async function boot(): Promise<void> {
   });
   if (import.meta.env.PROD && "serviceWorker" in navigator) {
     window.addEventListener("load", () => {
-      // BASE_URL is "./" on GitHub Pages builds, so the worker resolves under
-      // the repo subpath (e.g. /hvactemplate/sw.js) instead of the domain root.
-      navigator.serviceWorker
-        .register(`${import.meta.env.BASE_URL}sw.js`)
-        .catch(() => undefined);
+      navigator.serviceWorker.register("/sw.js").catch(() => undefined);
     });
   }
 }
