@@ -14,14 +14,17 @@ import type {
   Settings,
   CollectionKey,
   AppTheme,
+  FontChoice,
+  AppSkin,
 } from "./types";
+import { VALID_FONTS, VALID_SKINS } from "./skins";
 
 export const DEFAULT_SETTINGS: Settings = {
   appearance: {
     mode: "system",
     accent: "blue",
     fontSize: "m",
-    font: "system",
+    font: "auto",
     skin: "default",
   },
   metro: {
@@ -108,6 +111,15 @@ class Store {
       };
       if (legacyTheme && !stored?.appearance) {
         base.settings.appearance.mode = legacyTheme;
+      }
+      // Sanitize values that may come from older/other builds so an unknown
+      // skin or font never leaves the app unstyled.
+      const ap = base.settings.appearance;
+      if (!(VALID_SKINS as readonly string[]).includes(ap.skin as string)) {
+        ap.skin = "default" as AppSkin;
+      }
+      if (!(VALID_FONTS as readonly string[]).includes(ap.font as string)) {
+        ap.font = "auto" as FontChoice;
       }
       this.state = base;
     } catch {

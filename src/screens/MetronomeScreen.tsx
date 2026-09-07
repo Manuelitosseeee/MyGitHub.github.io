@@ -10,8 +10,8 @@ import { cx, clamp } from "../lib/utils";
 const MIN = 20;
 const MAX = 400;
 
-/* Set by the Aspetto Totale skins (skins.css); falls back to the classic
-   dark-blue stage when no skin overrides it. */
+/* Each Aspetto Totale design restyles the stage via --stage-bg
+   (defined per skin in skins.css; the :root fallback is the classic navy). */
 const STAGE_GRADIENT = "var(--stage-bg)";
 
 const SOUNDS: Array<{ id: MetroSound; label: string }> = [

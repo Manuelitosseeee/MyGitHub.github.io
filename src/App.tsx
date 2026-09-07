@@ -8,6 +8,7 @@ import {
 } from "react";
 import { Home, Music2, Gauge, Timer, Guitar, Settings as SettingsIcon } from "lucide-react";
 import { store, useStore } from "./data/store";
+import { skinBaseFont } from "./data/skins";
 import { NavContext, TABS, type TabId } from "./nav";
 import { cx } from "./lib/utils";
 import { Toaster } from "./ui/primitives";
@@ -56,8 +57,10 @@ export default function App() {
       root.dataset.theme = dark ? "dark" : "light";
       root.dataset.accent = ap.accent;
       root.dataset.fs = ap.fontSize;
-      root.dataset.font = ap.font;
       root.dataset.skin = ap.skin;
+      // "auto" means "follow the active Aspetto Totale design's base font".
+      root.dataset.font =
+        ap.font === "auto" ? skinBaseFont(ap.skin) : ap.font;
       const acc = ACCENTS[ap.accent];
       root.style.setProperty("--acc", acc.main);
       root.style.setProperty("--acc-soft", acc.soft);

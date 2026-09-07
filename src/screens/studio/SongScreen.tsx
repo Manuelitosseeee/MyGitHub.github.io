@@ -511,7 +511,7 @@ function MetronomePanel({ song }: { song: Song }) {
         <div
           className="metro-stage"
           style={{
-            /* Skinnable via --stage-bg (Aspetto Totale in Impostazioni) */
+            /* Each Aspetto Totale design restyles the stage (skins.css). */
             background: "var(--stage-bg)",
             margin: 0,
             borderRadius: 0,

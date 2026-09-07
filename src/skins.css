@@ -1,823 +1,1099 @@
 /* ============================================================
-   Aspetto Totale — 9 whole-app designs (skins)
+   Aspetto Totale — 10 whole-app designs (skins)
    ============================================================
-   `default` needs no rules (index.css holds its values). These 8
-   skins restyle EVERYTHING visual — surfaces, textures, radii,
-   shadows, borders, backgrounds, controls — while leaving the font
-   personalization (data-font) and text sizes untouched.
+   `default` needs no rules (index.css already holds its values).
 
-   Palette variables are defined for light and dark modes. The skin
-   selectors are more specific than the base [data-theme] blocks, so
-   they win; skins.css is also imported after index.css.
+   Each of the other nine designs restyles EVERYTHING visual:
+   palettes (light + dark), the shape language of cards/buttons/
+   fields/sheets/stages/pills (via the --r-* variables), surfaces,
+   borders, shadows and the metronome stage. Layout, texts and
+   functions never change.
+
+   Fonts are deliberately NOT set here: the Carattere setting owns
+   the font. When it is "auto", App.tsx resolves the skin's base
+   font (from data/skins.ts) into html[data-font=...].
+
+   skins.css is imported after index.css and its selectors are
+   more specific, so it always wins.
    ============================================================ */
 
 /* ------------------------------------------------------------
-   1. Ceramica smaltata — soft glossy porcelain, gentle depth,
-   rounded edges, soft shadows, slightly raised elements
+   1. Sabbia — warm Mediterranean sand & terracotta, soft
+   hand-modeled surfaces, pill controls, generous radii
    ------------------------------------------------------------ */
 
-html[data-skin="ceramica"] {
-  --r-card: 26px;
-  --r-stage: 30px;
-  --r-btn: 16px;
+html[data-skin="sabbia"] {
+  --r-card: 24px;
+  --r-card-sm: 22px;
+  --r-btn: 999px;
+  --r-btn-sm: 999px;
+  --r-btn-lg: 999px;
   --r-field: 16px;
-  --r-sheet: 30px;
-  --r-badge: 13px;
-  --r-cell: 15px;
-  --r-seg: 13px;
-  --card-bg-img: linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0) 46%);
-  --card-border-w: 1px;
-  --card-border: rgba(255, 255, 255, 0.65);
-  --stage-bg: radial-gradient(130% 140% at 50% -20%, #8a7a5f 0%, #4e4233 75%);
+  --r-seg: 14px;
+  --r-sheet: 28px;
+  --r-stage: 30px;
+  --r-pill: 12px;
+  --r-badge: 12px;
+  --r-cell: 16px;
+  --r-thumb: 14px;
+  --stage-bg: radial-gradient(130% 140% at 50% -18%, #dcab63 0%, #8a5426 62%, #5c3418 100%);
 }
 
-html[data-skin="ceramica"][data-theme="light"] {
-  --bg: #f0e9dd;
-  --bg-elev: #faf6ee;
-  --card: #fbf7f0;
-  --card-2: #f1e9db;
-  --field: rgba(122, 98, 60, 0.13);
-  --sep: rgba(122, 98, 60, 0.15);
-  --text: #332b20;
-  --text-2: #857763;
-  --text-3: #a3957f;
-  --tabbar: rgba(250, 245, 236, 0.82);
-  --shadow: 0 2px 5px rgba(90, 70, 35, 0.07), 0 12px 30px rgba(90, 70, 35, 0.1);
+html[data-skin="sabbia"][data-theme="light"] {
+  --app-bg-img: radial-gradient(70% 55% at 10% 5%, rgba(226, 170, 100, 0.16), transparent 70%),
+    radial-gradient(60% 45% at 96% 92%, rgba(190, 130, 70, 0.12), transparent 70%);
+  --bg: #f1e6d3;
+  --bg-elev: #fbf5e8;
+  --card: #fdf8ee;
+  --card-2: #f4e9d7;
+  --field: rgba(133, 100, 62, 0.14);
+  --sep: rgba(120, 88, 50, 0.17);
+  --text: #3d3120;
+  --text-2: #867457;
+  --text-3: #ab9a7d;
+  --tabbar: rgba(251, 245, 232, 0.85);
+  --shadow: 0 2px 6px rgba(130, 90, 40, 0.07), 0 14px 32px rgba(130, 90, 40, 0.11);
 }
 
-html[data-skin="ceramica"][data-theme="dark"] {
-  --bg: #221d15;
-  --bg-elev: #2c261d;
-  --card: #312a20;
-  --card-2: #3b3327;
+html[data-skin="sabbia"][data-theme="dark"] {
+  --app-bg-img: radial-gradient(70% 55% at 10% 5%, rgba(220, 160, 90, 0.08), transparent 70%);
+  --bg: #241b11;
+  --bg-elev: #322619;
+  --card: #35291b;
+  --card-2: #3f3221;
   --field: rgba(255, 255, 255, 0.07);
   --sep: rgba(255, 255, 255, 0.09);
-  --text: #f4ede1;
-  --text-2: #a79a85;
-  --text-3: #7d7262;
-  --tabbar: rgba(34, 29, 21, 0.85);
-  --shadow: 0 2px 5px rgba(0, 0, 0, 0.35), 0 14px 34px rgba(0, 0, 0, 0.3);
-  --card-border: rgba(255, 255, 255, 0.09);
+  --text: #f3e9d6;
+  --text-2: #b2a07f;
+  --text-3: #7f7054;
+  --tabbar: rgba(36, 27, 17, 0.86);
+  --shadow: 0 3px 8px rgba(0, 0, 0, 0.32), 0 16px 36px rgba(0, 0, 0, 0.3);
 }
 
-html[data-skin="ceramica"] .card {
-  box-shadow: var(--shadow), inset 0 1px 0 rgba(255, 255, 255, 0.55);
+html[data-skin="sabbia"] .card {
+  box-shadow: var(--shadow), inset 0 1px 0 rgba(255, 255, 255, 0.6);
 }
 
-html[data-skin="ceramica"][data-theme="dark"] .card {
-  box-shadow: var(--shadow), inset 0 1px 0 rgba(255, 255, 255, 0.07);
+html[data-skin="sabbia"][data-theme="dark"] .card {
+  box-shadow: var(--shadow), inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
-html[data-skin="ceramica"] .btn-primary {
-  box-shadow: 0 4px 14px var(--acc-soft), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+html[data-skin="sabbia"] .btn-primary {
+  box-shadow: 0 5px 16px var(--acc-soft), inset 0 1px 0 rgba(255, 255, 255, 0.35);
 }
 
-html[data-skin="ceramica"] .play-fab {
-  box-shadow: 0 10px 28px var(--acc-soft), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+html[data-skin="sabbia"] .play-fab {
+  box-shadow: 0 10px 26px var(--acc-soft), inset 0 1px 0 rgba(255, 255, 255, 0.4);
 }
 
-html[data-skin="ceramica"] .step-btn {
+html[data-skin="sabbia"] .field {
+  box-shadow: inset 0 1px 3px rgba(120, 85, 40, 0.08);
+}
+
+html[data-skin="sabbia"] .step-btn {
   background: var(--card);
   border: 1px solid var(--sep);
-  box-shadow: 0 3px 8px rgba(90, 70, 35, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  box-shadow: 0 3px 8px rgba(130, 90, 40, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.65);
+}
+
+html[data-skin="sabbia"] .seg-item.active {
+  box-shadow: 0 2px 6px rgba(130, 90, 40, 0.12);
 }
 
 /* ------------------------------------------------------------
-   2. Vetro satinato — frosted glass: translucency, blur,
-   subtle reflections, layered depth
+   2. Oceano — frosted aquatic glass: translucency, blur,
+   layered depth, large squircle forms
    ------------------------------------------------------------ */
 
-html[data-skin="vetro"] {
-  --r-card: 22px;
-  --r-stage: 26px;
-  --r-btn: 14px;
-  --r-field: 14px;
-  --r-sheet: 26px;
-  --r-badge: 11px;
-  --r-cell: 14px;
-  --r-seg: 12px;
-  --card-border-w: 1px;
-  --card-border: rgba(255, 255, 255, 0.55);
-  --stage-bg: linear-gradient(160deg, rgba(70, 100, 180, 0.78) 0%, rgba(130, 70, 170, 0.78) 100%);
+html[data-skin="oceano"] {
+  --r-card: 26px;
+  --r-card-sm: 24px;
+  --r-btn: 999px;
+  --r-btn-sm: 999px;
+  --r-btn-lg: 999px;
+  --r-field: 17px;
+  --r-seg: 14px;
+  --r-sheet: 30px;
+  --r-stage: 32px;
+  --r-pill: 13px;
+  --r-badge: 13px;
+  --r-cell: 16px;
+  --r-thumb: 14px;
+  --stage-bg: radial-gradient(130% 140% at 50% -18%, #3fa8cf 0%, #0f5d86 58%, #062c44 100%);
 }
 
-html[data-skin="vetro"][data-theme="light"] {
-  --app-bg-img: radial-gradient(70% 55% at 12% 8%, rgba(90, 150, 255, 0.3), transparent 70%),
-    radial-gradient(65% 50% at 95% 90%, rgba(255, 130, 200, 0.25), transparent 70%),
-    radial-gradient(60% 45% at 85% 10%, rgba(90, 220, 255, 0.2), transparent 70%);
-  --bg: #eef1f8;
-  --bg-elev: rgba(250, 252, 255, 0.72);
-  --card: rgba(255, 255, 255, 0.55);
+html[data-skin="oceano"][data-theme="light"] {
+  --app-bg-img: radial-gradient(60% 50% at 8% 6%, rgba(70, 160, 220, 0.28), transparent 70%),
+    radial-gradient(55% 45% at 94% 90%, rgba(80, 190, 210, 0.24), transparent 70%),
+    radial-gradient(45% 40% at 88% 8%, rgba(160, 130, 230, 0.14), transparent 70%);
+  --bg: #e6f1f4;
+  --bg-elev: rgba(252, 254, 255, 0.7);
+  --card: rgba(255, 255, 255, 0.56);
   --card-2: rgba(255, 255, 255, 0.42);
-  --field: rgba(110, 125, 160, 0.16);
-  --sep: rgba(80, 95, 130, 0.14);
-  --text: #1c2533;
-  --text-2: #5f6b80;
-  --text-3: #8d97ab;
-  --tabbar: rgba(250, 252, 255, 0.55);
-  --shadow: 0 8px 30px rgba(60, 90, 150, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.65);
+  --field: rgba(80, 135, 160, 0.16);
+  --sep: rgba(55, 105, 130, 0.17);
+  --text: #0f2c3a;
+  --text-2: #4e6f7d;
+  --text-3: #83a0aa;
+  --tabbar: rgba(238, 248, 251, 0.58);
+  --shadow: 0 10px 30px rgba(50, 110, 150, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.6);
 }
 
-html[data-skin="vetro"][data-theme="dark"] {
-  --app-bg-img: radial-gradient(70% 55% at 12% 8%, rgba(60, 110, 220, 0.22), transparent 70%),
-    radial-gradient(65% 50% at 95% 90%, rgba(200, 90, 180, 0.18), transparent 70%),
-    radial-gradient(60% 45% at 85% 10%, rgba(60, 200, 240, 0.14), transparent 70%);
-  --bg: #0c1019;
-  --bg-elev: rgba(24, 30, 44, 0.75);
-  --card: rgba(255, 255, 255, 0.07);
-  --card-2: rgba(255, 255, 255, 0.05);
+html[data-skin="oceano"][data-theme="dark"] {
+  --app-bg-img: radial-gradient(60% 50% at 8% 6%, rgba(50, 140, 210, 0.22), transparent 70%),
+    radial-gradient(55% 45% at 94% 90%, rgba(40, 170, 200, 0.16), transparent 70%),
+    radial-gradient(45% 40% at 88% 8%, rgba(130, 100, 220, 0.12), transparent 70%);
+  --bg: #081922;
+  --bg-elev: rgba(20, 40, 52, 0.72);
+  --card: rgba(255, 255, 255, 0.06);
+  --card-2: rgba(255, 255, 255, 0.045);
   --field: rgba(255, 255, 255, 0.1);
-  --sep: rgba(255, 255, 255, 0.12);
-  --text: #eef1f8;
-  --text-2: #9aa4b6;
-  --text-3: #677184;
-  --tabbar: rgba(16, 21, 32, 0.6);
-  --shadow: 0 8px 30px rgba(0, 0, 0, 0.45);
-  --card-border: rgba(255, 255, 255, 0.14);
+  --sep: rgba(255, 255, 255, 0.13);
+  --text: #ddf0f5;
+  --text-2: #90b0bc;
+  --text-3: #5d7d8a;
+  --tabbar: rgba(10, 26, 34, 0.6);
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
 }
 
-html[data-skin="vetro"] .card,
-html[data-skin="vetro"] .stat,
-html[data-skin="vetro"] .tuner-card,
-html[data-skin="vetro"] .metro-controls,
-html[data-skin="vetro"] .sheet,
-html[data-skin="vetro"] .sheet-foot,
-html[data-skin="vetro"] .seg,
-html[data-skin="vetro"] .tabbar {
-  -webkit-backdrop-filter: blur(22px) saturate(170%);
-  backdrop-filter: blur(22px) saturate(170%);
+html[data-skin="oceano"] .card,
+html[data-skin="oceano"] .stat,
+html[data-skin="oceano"] .tuner-card,
+html[data-skin="oceano"] .metro-controls,
+html[data-skin="oceano"] .seg,
+html[data-skin="oceano"] .tabbar,
+html[data-skin="oceano"] .seg-item.active {
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  backdrop-filter: blur(24px) saturate(160%);
 }
 
-html[data-skin="vetro"] .metro-stage {
-  -webkit-backdrop-filter: blur(18px);
-  backdrop-filter: blur(18px);
+html[data-skin="oceano"] .card {
+  border: 1px solid rgba(255, 255, 255, 0.55);
 }
 
-html[data-skin="vetro"] .seg-item.active {
-  background: rgba(255, 255, 255, 0.75);
-  box-shadow: none;
+html[data-skin="oceano"][data-theme="dark"] .card {
+  border-color: rgba(255, 255, 255, 0.12);
 }
 
-html[data-skin="vetro"][data-theme="dark"] .seg-item.active {
+html[data-skin="oceano"] .seg-item.active {
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: 0 4px 12px rgba(50, 110, 150, 0.16);
+}
+
+html[data-skin="oceano"][data-theme="dark"] .seg-item.active {
   background: rgba(255, 255, 255, 0.14);
   box-shadow: none;
 }
 
-html[data-skin="vetro"] .btn-primary {
-  box-shadow: 0 6px 18px var(--acc-soft), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+html[data-skin="oceano"] .btn-primary {
+  box-shadow: 0 8px 22px var(--acc-soft), inset 0 1px 0 rgba(255, 255, 255, 0.45);
 }
 
-html[data-skin="vetro"] .play-fab {
-  box-shadow: 0 10px 26px var(--acc-soft), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+html[data-skin="oceano"] .play-fab {
+  box-shadow: 0 12px 28px var(--acc-soft), inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
-/* ------------------------------------------------------------
-   3. Carta premium — matte paper, soft edges, barely-there
-   shadows, editorial and tactile
-   ------------------------------------------------------------ */
-
-html[data-skin="carta"] {
-  --r-card: 14px;
-  --r-stage: 18px;
-  --r-btn: 10px;
-  --r-field: 10px;
-  --r-sheet: 18px;
-  --r-badge: 8px;
-  --r-cell: 10px;
-  --r-seg: 9px;
-  --card-border-w: 1px;
-  --card-bg-img: radial-gradient(rgba(0, 0, 0, 0.028) 0.6px, transparent 1.1px);
-  --card-bg-size: 7px 7px;
-  --stage-bg: linear-gradient(160deg, #d8c9ac 0%, #b3a07e 100%);
+html[data-skin="oceano"] .chip,
+html[data-skin="oceano"] .step-btn,
+html[data-skin="oceano"] .icon-btn {
+  border: 1px solid rgba(255, 255, 255, 0.45);
 }
 
-html[data-skin="carta"][data-theme="light"] {
-  --bg: #f4f0e6;
-  --bg-elev: #fdfaf2;
-  --card: #fdfaf2;
-  --card-2: #f2ecdf;
-  --field: rgba(120, 104, 72, 0.12);
-  --sep: rgba(100, 88, 60, 0.16);
-  --text: #2e2a1f;
-  --text-2: #7c745f;
-  --text-3: #a29a85;
-  --tabbar: #f8f4ea;
-  --shadow: 0 1px 1px rgba(70, 58, 32, 0.04), 0 2px 6px rgba(70, 58, 32, 0.05);
-  --card-border: rgba(70, 58, 32, 0.1);
+html[data-skin="oceano"][data-theme="dark"] .chip,
+html[data-skin="oceano"][data-theme="dark"] .step-btn,
+html[data-skin="oceano"][data-theme="dark"] .icon-btn {
+  border-color: rgba(255, 255, 255, 0.1);
 }
 
-html[data-skin="carta"][data-theme="dark"] {
-  --bg: #1b1812;
-  --bg-elev: #26221a;
-  --card: #26221a;
-  --card-2: #2e2a20;
-  --field: rgba(255, 255, 255, 0.06);
-  --sep: rgba(255, 255, 255, 0.09);
-  --text: #efe9da;
-  --text-2: #a39985;
-  --text-3: #766e5c;
-  --tabbar: #201c15;
-  --shadow: 0 1px 1px rgba(0, 0, 0, 0.4), 0 2px 6px rgba(0, 0, 0, 0.25);
-  --card-border: rgba(255, 255, 255, 0.07);
-  --card-bg-img: radial-gradient(rgba(255, 255, 255, 0.02) 0.6px, transparent 1.1px);
-}
-
-html[data-skin="carta"] .btn-primary {
-  box-shadow: none;
-}
-
-html[data-skin="carta"] .play-fab {
-  box-shadow: 0 6px 18px var(--acc-soft);
+html[data-skin="oceano"] .field {
+  box-shadow: inset 0 1px 4px rgba(50, 110, 150, 0.08);
 }
 
 /* ------------------------------------------------------------
-   4. Metallo spazzolato — brushed steel, technical details,
-   sharp contrast, machined controls
+   3. Vinile — vintage hi-fi console: warm cream, bordeaux and
+   brass, circular knobs, channel-style segmented controls
    ------------------------------------------------------------ */
 
-html[data-skin="metallo"] {
-  --r-card: 12px;
-  --r-stage: 16px;
-  --r-btn: 9px;
-  --r-field: 9px;
-  --r-sheet: 16px;
-  --r-badge: 7px;
-  --r-cell: 9px;
-  --r-seg: 8px;
-  --card-border-w: 1px;
-  --card-bg-img: linear-gradient(160deg, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0.15) 45%, rgba(0, 0, 0, 0.05) 100%);
-  --stage-bg: repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.04) 0px, rgba(255, 255, 255, 0.04) 1px, transparent 1px, transparent 3px),
-    linear-gradient(160deg, #454a53 0%, #25282e 100%);
-}
-
-html[data-skin="metallo"][data-theme="light"] {
-  --app-bg-img: repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.35) 0px, rgba(255, 255, 255, 0.35) 1px, rgba(0, 0, 0, 0.04) 1px, rgba(0, 0, 0, 0.04) 2px, transparent 2px, transparent 5px);
-  --bg: #d8dbe1;
-  --bg-elev: #e9ebef;
-  --card: #e8eaee;
-  --card-2: #dfe2e8;
-  --field: rgba(255, 255, 255, 0.6);
-  --sep: rgba(30, 35, 45, 0.16);
-  --text: #1f2229;
-  --text-2: #5a606a;
-  --text-3: #828894;
-  --tabbar: #dde0e6;
-  --shadow: 0 1px 2px rgba(0, 0, 0, 0.16), 0 6px 16px rgba(0, 0, 0, 0.1);
-  --card-border: rgba(20, 25, 35, 0.16);
-}
-
-html[data-skin="metallo"][data-theme="dark"] {
-  --app-bg-img: repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.05) 0px, rgba(255, 255, 255, 0.05) 1px, rgba(0, 0, 0, 0.1) 1px, rgba(0, 0, 0, 0.1) 2px, transparent 2px, transparent 5px);
-  --bg: #101216;
-  --bg-elev: #23262c;
-  --card: #23262c;
-  --card-2: #2b2f36;
-  --field: rgba(255, 255, 255, 0.09);
-  --sep: rgba(255, 255, 255, 0.12);
-  --text: #e9ebf0;
-  --text-2: #9aa0aa;
-  --text-3: #656b76;
-  --tabbar: #1a1d22;
-  --shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 8px 20px rgba(0, 0, 0, 0.35);
-  --card-border: rgba(0, 0, 0, 0.4);
-  --card-bg-img: linear-gradient(160deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.02) 45%, rgba(0, 0, 0, 0.12) 100%);
-}
-
-html[data-skin="metallo"] .tabbar {
-  background: linear-gradient(180deg, #eef0f3 0%, #d3d6dd 100%);
-}
-
-html[data-skin="metallo"][data-theme="dark"] .tabbar {
-  background: linear-gradient(180deg, #26292f 0%, #16181d 100%);
-}
-
-html[data-skin="metallo"] .btn-primary {
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), inset 0 -1px 0 rgba(0, 0, 0, 0.18), 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-html[data-skin="metallo"] .btn-soft,
-html[data-skin="metallo"] .btn-ghost,
-html[data-skin="metallo"] .btn-danger {
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6), inset 0 -1px 0 rgba(0, 0, 0, 0.1);
-}
-
-html[data-skin="metallo"] .step-btn {
-  background: linear-gradient(180deg, #f4f5f8 0%, #cfd2d9 100%);
-  color: var(--acc);
-  border: 1px solid rgba(0, 0, 0, 0.14);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 2px 5px rgba(0, 0, 0, 0.18);
-}
-
-html[data-skin="metallo"][data-theme="dark"] .step-btn {
-  background: linear-gradient(180deg, #3a3e46 0%, #23262c 100%);
-  border-color: rgba(0, 0, 0, 0.5);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 2px 5px rgba(0, 0, 0, 0.4);
-}
-
-html[data-skin="metallo"] .seg {
-  background: rgba(30, 35, 45, 0.1);
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.22);
-}
-
-html[data-skin="metallo"] .seg-item.active {
-  background: linear-gradient(180deg, #fdfefe 0%, #e2e5eb 100%);
-  box-shadow: none;
-}
-
-html[data-skin="metallo"][data-theme="dark"] .seg-item.active {
-  background: linear-gradient(180deg, #3c4048 0%, #2a2d34 100%);
-  box-shadow: none;
-}
-
-html[data-skin="metallo"] .field {
-  background: rgba(255, 255, 255, 0.7);
-  border: 1px solid rgba(0, 0, 0, 0.1);
-}
-
-html[data-skin="metallo"][data-theme="dark"] .field {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(0, 0, 0, 0.3);
-}
-
-html[data-skin="metallo"] .play-fab {
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), inset 0 -2px 4px rgba(0, 0, 0, 0.2), 0 6px 16px rgba(0, 0, 0, 0.25);
-}
-
-html[data-skin="metallo"] .icon-btn,
-html[data-skin="metallo"] .chip {
-  border: 1px solid rgba(0, 0, 0, 0.1);
-}
-
-/* ------------------------------------------------------------
-   5. Argilla modellata — soft hand-molded 3D clay: rounded
-   volumes, deep but diffuse shadows, buttons that look pressed
-   ------------------------------------------------------------ */
-
-html[data-skin="argilla"] {
-  --r-card: 30px;
-  --r-stage: 34px;
+html[data-skin="vinile"] {
+  --r-card: 16px;
+  --r-card-sm: 14px;
   --r-btn: 999px;
-  --r-field: 18px;
-  --r-sheet: 32px;
-  --r-badge: 14px;
-  --r-cell: 16px;
-  --r-seg: 16px;
-  --card-border-w: 1px;
-  --card-border: rgba(255, 255, 255, 0.45);
-  --stage-bg: radial-gradient(130% 130% at 50% -10%, #b87a52 0%, #6d4a30 78%);
-}
-
-html[data-skin="argilla"][data-theme="light"] {
-  --bg: #f1e6db;
-  --bg-elev: #f9efe4;
-  --card: #f8eee1;
-  --card-2: #ecdcc9;
-  --field: rgba(150, 96, 60, 0.13);
-  --sep: rgba(150, 96, 60, 0.16);
-  --text: #3a2b20;
-  --text-2: #8c7460;
-  --text-3: #ab9680;
-  --tabbar: rgba(247, 236, 224, 0.85);
-  --shadow: 0 4px 0 rgba(0, 0, 0, 0.05), 0 14px 30px rgba(100, 60, 25, 0.13);
-}
-
-html[data-skin="argilla"][data-theme="dark"] {
-  --bg: #251d17;
-  --bg-elev: #332a21;
-  --card: #352b21;
-  --card-2: #40342a;
-  --field: rgba(255, 255, 255, 0.06);
-  --sep: rgba(255, 255, 255, 0.08);
-  --text: #f3eadd;
-  --text-2: #ab9b88;
-  --text-3: #7d7061;
-  --tabbar: rgba(37, 29, 23, 0.88);
-  --shadow: 0 4px 0 rgba(0, 0, 0, 0.22), 0 16px 36px rgba(0, 0, 0, 0.35);
-  --card-border: rgba(255, 255, 255, 0.1);
-}
-
-html[data-skin="argilla"] .card {
-  box-shadow: var(--shadow), inset 0 2px 0 rgba(255, 255, 255, 0.5), inset 0 -10px 16px rgba(0, 0, 0, 0.04);
-}
-
-html[data-skin="argilla"][data-theme="dark"] .card {
-  box-shadow: var(--shadow), inset 0 1px 0 rgba(255, 255, 255, 0.08), inset 0 -10px 16px rgba(0, 0, 0, 0.18);
-}
-
-html[data-skin="argilla"] .btn-soft,
-html[data-skin="argilla"] .btn-ghost,
-html[data-skin="argilla"] .btn-danger {
-  border-radius: 999px;
-}
-
-html[data-skin="argilla"] .btn-primary {
-  box-shadow: 0 5px 0 rgba(0, 0, 0, 0.18), 0 10px 22px var(--acc-soft);
-}
-
-html[data-skin="argilla"] .btn-primary:active {
-  transform: translateY(3px);
-  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.18), 0 4px 10px var(--acc-soft);
-}
-
-html[data-skin="argilla"] .step-btn {
-  background: var(--card);
-  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.1), 0 6px 12px rgba(100, 60, 25, 0.12);
-}
-
-html[data-skin="argilla"] .step-btn:active {
-  transform: translateY(2px);
-  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.1);
-}
-
-html[data-skin="argilla"] .play-fab {
-  box-shadow: 0 8px 0 rgba(0, 0, 0, 0.15), 0 16px 30px var(--acc-soft);
-}
-
-html[data-skin="argilla"] .play-fab:active {
-  transform: translateY(4px) scale(0.96);
-  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.15);
-}
-
-html[data-skin="argilla"] .chip {
-  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.07);
-}
-
-html[data-skin="argilla"] .seg-item.active {
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
-}
-
-html[data-skin="argilla"] .field {
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-/* ------------------------------------------------------------
-   6. Studio musicale analogico — vintage mixer / amplifier /
-   hi-fi: knobs, VU meters, channel switches, lit buttons
-   ------------------------------------------------------------ */
-
-html[data-skin="analogico"] {
-  --r-card: 14px;
-  --r-stage: 18px;
-  --r-btn: 12px;
+  --r-btn-sm: 999px;
+  --r-btn-lg: 999px;
   --r-field: 12px;
-  --r-sheet: 18px;
-  --r-badge: 8px;
-  --r-cell: 11px;
   --r-seg: 10px;
-  --card-border-w: 1px;
-  --card-border: rgba(0, 0, 0, 0.2);
-  --stage-bg: radial-gradient(130% 140% at 50% -20%, #332e1d 0%, #16130c 78%);
+  --r-sheet: 20px;
+  --r-stage: 20px;
+  --r-pill: 8px;
+  --r-badge: 9px;
+  --r-cell: 11px;
+  --r-thumb: 12px;
+  --stage-bg: radial-gradient(130% 140% at 50% -20%, #5d3a24 0%, #2b1710 68%, #160b06 100%);
 }
 
-html[data-skin="analogico"][data-theme="light"] {
-  --bg: #e7e0cd;
-  --bg-elev: #f7f2e4;
-  --card: #f6f1e2;
-  --card-2: #eae2cd;
-  --field: rgba(0, 0, 0, 0.08);
-  --sep: rgba(0, 0, 0, 0.14);
-  --text: #262117;
-  --text-2: #6f6753;
-  --text-3: #978c72;
-  --tabbar: #efe9d8;
-  --shadow: 0 2px 0 rgba(0, 0, 0, 0.08), 0 10px 24px rgba(70, 58, 25, 0.12);
+html[data-skin="vinile"][data-theme="light"] {
+  --app-bg-img: radial-gradient(55% 45% at 94% 88%, rgba(150, 60, 40, 0.08), transparent 70%);
+  --bg: #ecdfc6;
+  --bg-elev: #f7efdb;
+  --card: #f9f1de;
+  --card-2: #efe3c8;
+  --field: rgba(120, 88, 40, 0.13);
+  --sep: rgba(95, 66, 30, 0.2);
+  --text: #2c2013;
+  --text-2: #7c6a48;
+  --text-3: #a3916d;
+  --tabbar: #f2e9d3;
+  --shadow: 0 2px 4px rgba(90, 62, 25, 0.08), 0 12px 26px rgba(90, 62, 25, 0.12);
 }
 
-html[data-skin="analogico"][data-theme="dark"] {
-  --bg: #17140e;
-  --bg-elev: #231f17;
-  --card: #241f17;
-  --card-2: #2d271d;
+html[data-skin="vinile"][data-theme="dark"] {
+  --bg: #181209;
+  --bg-elev: #241b0e;
+  --card: #2b2112;
+  --card-2: #35291a;
   --field: rgba(255, 255, 255, 0.06);
   --sep: rgba(255, 255, 255, 0.1);
-  --text: #f0e7d2;
-  --text-2: #a2967a;
-  --text-3: #756b53;
-  --tabbar: #1d1912;
-  --shadow: 0 2px 0 rgba(0, 0, 0, 0.3), 0 12px 28px rgba(0, 0, 0, 0.35);
-  --card-border: rgba(255, 255, 255, 0.08);
+  --text: #f0e3c2;
+  --text-2: #b09d76;
+  --text-3: #75684a;
+  --tabbar: #201810;
+  --shadow: 0 2px 5px rgba(0, 0, 0, 0.3), 0 12px 26px rgba(0, 0, 0, 0.32);
 }
 
-/* rotary knobs */
-html[data-skin="analogico"] .step-btn {
+/* rotary knobs for the − / + steppers */
+html[data-skin="vinile"] .step-btn {
   position: relative;
-  background: radial-gradient(circle at 36% 30%, #efe6cd 0%, #9b8f6d 62%, #6f6448 100%);
-  color: #241f15;
-  border: 1px solid rgba(0, 0, 0, 0.3);
-  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(0, 0, 0, 0.28);
+  background: radial-gradient(circle at 35% 28%, #f4e2bb 0%, #c9a45c 55%, #8f6c30 100%);
+  color: #2a1c08;
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.55);
 }
 
-html[data-skin="analogico"] .step-btn::after {
+html[data-skin="vinile"] .step-btn::after {
   content: "";
   position: absolute;
-  top: 8px;
+  top: 7px;
   left: 50%;
   width: 3px;
-  height: 10px;
+  height: 11px;
   margin-left: -1.5px;
   border-radius: 2px;
-  background: rgba(0, 0, 0, 0.55);
+  background: rgba(0, 0, 0, 0.5);
 }
 
-html[data-skin="analogico"][data-theme="dark"] .step-btn {
-  background: radial-gradient(circle at 36% 30%, #5c533a 0%, #332c1e 62%, #1d1810 100%);
-  color: #f0e7d2;
+html[data-skin="vinile"][data-theme="dark"] .step-btn {
+  border-color: rgba(0, 0, 0, 0.6);
+  background: radial-gradient(circle at 35% 28%, #7a6238 0%, #4a3a1c 60%, #2a2010 100%);
+  color: #f0e3c2;
 }
 
-html[data-skin="analogico"][data-theme="dark"] .step-btn::after {
-  background: rgba(240, 231, 210, 0.7);
+html[data-skin="vinile"][data-theme="dark"] .step-btn::after {
+  background: rgba(240, 227, 194, 0.75);
 }
 
-/* VU-meter progress */
-html[data-skin="analogico"] .prog .fill {
-  background: linear-gradient(90deg, #2e9e4f 0%, #e0b832 55%, #d63f26 100%);
+/* channel-style segmented control: inset track, lit underline */
+html[data-skin="vinile"] .seg {
+  background: rgba(60, 42, 18, 0.12);
+  box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.22);
 }
 
-/* channel-switch segmented control */
-html[data-skin="analogico"] .seg {
-  background: rgba(0, 0, 0, 0.09);
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.25);
-  border-radius: 6px;
-}
-
-html[data-skin="analogico"][data-theme="dark"] .seg {
+html[data-skin="vinile"][data-theme="dark"] .seg {
   background: rgba(0, 0, 0, 0.35);
 }
 
-html[data-skin="analogico"] .seg-item {
+html[data-skin="vinile"] .seg-item.active {
+  background: transparent;
+  color: var(--acc);
+  box-shadow: inset 0 -2.5px 0 var(--acc);
   border-radius: 4px;
 }
 
-html[data-skin="analogico"] .seg-item.active {
-  background: transparent;
-  color: var(--acc);
-  box-shadow: inset 0 -2px 0 var(--acc);
-}
-
-html[data-skin="analogico"][data-theme="dark"] .seg-item.active {
+html[data-skin="vinile"][data-theme="dark"] .seg-item.active {
   background: rgba(255, 255, 255, 0.04);
-  color: var(--acc);
-  box-shadow: inset 0 -2px 0 var(--acc);
 }
 
-/* lit equipment buttons */
-html[data-skin="analogico"] .btn-primary {
-  border: 1px solid rgba(0, 0, 0, 0.22);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 2px 4px rgba(0, 0, 0, 0.22);
+/* brass console details */
+html[data-skin="vinile"] .tabbar {
+  border-top: 1px solid rgba(148, 108, 38, 0.35);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.25) 0%, transparent 8%),
+    var(--tabbar);
 }
 
-html[data-skin="analogico"] .btn-soft,
-html[data-skin="analogico"] .btn-ghost,
-html[data-skin="analogico"] .btn-danger {
-  border: 1px solid var(--sep);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+html[data-skin="vinile"] .card {
+  box-shadow: var(--shadow), inset 0 1px 0 rgba(255, 255, 255, 0.55);
 }
 
-html[data-skin="analogico"] .card {
-  box-shadow: var(--shadow), inset 0 1px 0 rgba(255, 255, 255, 0.45);
-}
-
-html[data-skin="analogico"][data-theme="dark"] .card {
+html[data-skin="vinile"][data-theme="dark"] .card {
   box-shadow: var(--shadow), inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
-html[data-skin="analogico"] .play-fab {
-  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.35), inset 0 -2px 4px rgba(0, 0, 0, 0.25), 0 6px 16px rgba(0, 0, 0, 0.3);
+html[data-skin="vinile"] .btn-primary {
+  border: 1px solid rgba(0, 0, 0, 0.18);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 3px 8px var(--acc-soft);
 }
 
-html[data-skin="analogico"] .status-strip {
+html[data-skin="vinile"] .btn-soft,
+html[data-skin="vinile"] .btn-ghost,
+html[data-skin="vinile"] .btn-danger {
   border: 1px solid var(--sep);
 }
 
-html[data-skin="analogico"] .tab-btn.active .lbl {
-  letter-spacing: 0.04em;
+html[data-skin="vinile"] .prog {
+  background: rgba(0, 0, 0, 0.16);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.25);
+  border-radius: 4px;
+}
+
+html[data-skin="vinile"][data-theme="dark"] .prog {
+  background: rgba(0, 0, 0, 0.45);
+}
+
+html[data-skin="vinile"] .prog .fill {
+  border-radius: 3px;
+  background: linear-gradient(90deg, #c9572f 0%, #c9a24e 100%);
 }
 
 /* ------------------------------------------------------------
-   7. Minimalismo editoriale — clean layout, strong hierarchy,
-   geometric edges, hairline borders, zero shadows
+   4. Acciaio — brushed steel instrument: machined surfaces,
+   crisp small radii, visible edges, engraved feel
+   ------------------------------------------------------------ */
+
+html[data-skin="acciaio"] {
+  --r-card: 10px;
+  --r-card-sm: 9px;
+  --r-btn: 8px;
+  --r-btn-sm: 7px;
+  --r-btn-lg: 11px;
+  --r-field: 8px;
+  --r-seg: 8px;
+  --r-sheet: 14px;
+  --r-stage: 14px;
+  --r-pill: 6px;
+  --r-badge: 7px;
+  --r-cell: 8px;
+  --r-thumb: 10px;
+  --stage-bg: repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.05) 0px, rgba(255, 255, 255, 0.05) 1px, transparent 1px, transparent 3px),
+    linear-gradient(160deg, #3f444d 0%, #1e2126 100%);
+}
+
+html[data-skin="acciaio"][data-theme="light"] {
+  --app-bg-img: repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.5) 0px, rgba(255, 255, 255, 0.5) 1px, rgba(0, 0, 0, 0.05) 1px, rgba(0, 0, 0, 0.05) 2px, transparent 2px, transparent 5px);
+  --bg: #d5d8de;
+  --bg-elev: #eceef1;
+  --card: #e7e9ed;
+  --card-2: #dde0e6;
+  --field: rgba(255, 255, 255, 0.65);
+  --sep: rgba(25, 30, 40, 0.2);
+  --text: #20232a;
+  --text-2: #5c626d;
+  --text-3: #878d98;
+  --tabbar: #dcdfe5;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.18), 0 7px 18px rgba(0, 0, 0, 0.12);
+}
+
+html[data-skin="acciaio"][data-theme="dark"] {
+  --app-bg-img: repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.04) 0px, rgba(255, 255, 255, 0.04) 1px, rgba(0, 0, 0, 0.12) 1px, rgba(0, 0, 0, 0.12) 2px, transparent 2px, transparent 5px);
+  --bg: #121419;
+  --bg-elev: #26292f;
+  --card: #26292f;
+  --card-2: #2f333a;
+  --field: rgba(255, 255, 255, 0.09);
+  --sep: rgba(255, 255, 255, 0.13);
+  --text: #eceef2;
+  --text-2: #9ba1ab;
+  --text-3: #656b76;
+  --tabbar: #1b1e23;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 9px 20px rgba(0, 0, 0, 0.38);
+}
+
+html[data-skin="acciaio"] .card,
+html[data-skin="acciaio"] .stat,
+html[data-skin="acciaio"] .tuner-card,
+html[data-skin="acciaio"] .metro-controls {
+  border: 1px solid rgba(20, 25, 35, 0.2);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75), var(--shadow);
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0.08) 46%, rgba(0, 0, 0, 0.05) 100%), var(--card);
+}
+
+html[data-skin="acciaio"][data-theme="dark"] .card,
+html[data-skin="acciaio"][data-theme="dark"] .stat,
+html[data-skin="acciaio"][data-theme="dark"] .tuner-card,
+html[data-skin="acciaio"][data-theme="dark"] .metro-controls {
+  border-color: rgba(0, 0, 0, 0.5);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), var(--shadow);
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0.02) 48%, rgba(0, 0, 0, 0.14) 100%), var(--card);
+}
+
+html[data-skin="acciaio"] .tabbar {
+  background: linear-gradient(180deg, #f0f1f4 0%, #d2d5db 100%);
+}
+
+html[data-skin="acciaio"][data-theme="dark"] .tabbar {
+  background: linear-gradient(180deg, #292c32 0%, #16181d 100%);
+}
+
+html[data-skin="acciaio"] .btn-primary,
+html[data-skin="acciaio"] .btn-soft,
+html[data-skin="acciaio"] .btn-ghost,
+html[data-skin="acciaio"] .btn-danger {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45), inset 0 -1px 0 rgba(0, 0, 0, 0.14), 0 2px 4px rgba(0, 0, 0, 0.16);
+}
+
+html[data-skin="acciaio"] .step-btn {
+  background: linear-gradient(180deg, #f6f7f9 0%, #cbced5 100%);
+  color: var(--acc);
+  border: 1px solid rgba(0, 0, 0, 0.16);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95), 0 2px 4px rgba(0, 0, 0, 0.18);
+}
+
+html[data-skin="acciaio"][data-theme="dark"] .step-btn {
+  background: linear-gradient(180deg, #3d4148 0%, #23262c 100%);
+  border-color: rgba(0, 0, 0, 0.55);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+html[data-skin="acciaio"] .seg {
+  background: rgba(20, 25, 35, 0.12);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.22);
+}
+
+html[data-skin="acciaio"][data-theme="dark"] .seg {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+html[data-skin="acciaio"] .seg-item.active {
+  background: linear-gradient(180deg, #fdfdfe 0%, #dfe2e8 100%);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
+}
+
+html[data-skin="acciaio"][data-theme="dark"] .seg-item.active {
+  background: linear-gradient(180deg, #40444c 0%, #2a2d34 100%);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+html[data-skin="acciaio"] .field,
+html[data-skin="acciaio"] .chip {
+  border: 1px solid rgba(20, 25, 35, 0.14);
+}
+
+html[data-skin="acciaio"][data-theme="dark"] .field,
+html[data-skin="acciaio"][data-theme="dark"] .chip {
+  border-color: rgba(0, 0, 0, 0.4);
+}
+
+html[data-skin="acciaio"] .play-fab {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), inset 0 -2px 4px rgba(0, 0, 0, 0.2), 0 6px 14px rgba(0, 0, 0, 0.25);
+}
+
+/* ------------------------------------------------------------
+   5. Editoriale — premium magazine: pure white/ink, geometric
+   edges, hairline borders, zero shadows, letterspaced titles
    ------------------------------------------------------------ */
 
 html[data-skin="editoriale"] {
-  --r-card: 6px;
-  --r-stage: 10px;
-  --r-btn: 6px;
-  --r-field: 6px;
-  --r-sheet: 10px;
-  --r-badge: 4px;
-  --r-cell: 6px;
-  --r-seg: 5px;
-  --card-border-w: 1px;
-  --stage-bg: linear-gradient(180deg, #1c1c1c 0%, #0c0c0c 100%);
+  --r-card: 4px;
+  --r-card-sm: 3px;
+  --r-btn: 4px;
+  --r-btn-sm: 3px;
+  --r-btn-lg: 5px;
+  --r-field: 3px;
+  --r-seg: 3px;
+  --r-sheet: 8px;
+  --r-stage: 6px;
+  --r-pill: 2px;
+  --r-badge: 3px;
+  --r-cell: 4px;
+  --r-thumb: 4px;
+  --stage-bg: #141412;
 }
 
 html[data-skin="editoriale"][data-theme="light"] {
   --bg: #ffffff;
   --bg-elev: #ffffff;
   --card: #ffffff;
-  --card-2: #f3f3f0;
-  --field: #f0f0ec;
-  --sep: rgba(0, 0, 0, 0.1);
-  --text: #101010;
-  --text-2: #696965;
-  --text-3: #9c9c96;
-  --tabbar: #ffffff;
+  --card-2: #f5f5f1;
+  --field: #f0f0ea;
+  --sep: rgba(0, 0, 0, 0.16);
+  --text: #0f0f0d;
+  --text-2: #666660;
+  --text-3: #9d9d95;
+  --tabbar: rgba(255, 255, 255, 0.92);
   --shadow: none;
-  --card-border: rgba(0, 0, 0, 0.1);
 }
 
 html[data-skin="editoriale"][data-theme="dark"] {
-  --bg: #0b0b0b;
-  --bg-elev: #101010;
-  --card: #101010;
-  --card-2: #181818;
-  --field: #1c1c1c;
-  --sep: rgba(255, 255, 255, 0.13);
-  --text: #f2f2ef;
-  --text-2: #9b9b95;
-  --text-3: #6d6d68;
-  --tabbar: #0b0b0b;
+  --bg: #0b0b09;
+  --bg-elev: #0b0b09;
+  --card: #141412;
+  --card-2: #1d1d1a;
+  --field: #232320;
+  --sep: rgba(255, 255, 255, 0.18);
+  --text: #f5f5ef;
+  --text-2: #9a9a90;
+  --text-3: #6c6c64;
+  --tabbar: rgba(11, 11, 9, 0.94);
   --shadow: none;
-  --card-border: rgba(255, 255, 255, 0.13);
+}
+
+html[data-skin="editoriale"] .card,
+html[data-skin="editoriale"] .stat,
+html[data-skin="editoriale"] .tuner-card,
+html[data-skin="editoriale"] .metro-controls {
+  border: 1px solid var(--sep);
+  box-shadow: none;
 }
 
 html[data-skin="editoriale"] .tabbar {
-  border-top-width: 1px;
+  border-top: 1px solid var(--sep);
 }
 
-html[data-skin="editoriale"] .play-fab {
-  box-shadow: none;
+html[data-skin="editoriale"] .card .card,
+html[data-skin="editoriale"] .card .stat {
+  border-color: var(--sep);
+}
+
+html[data-skin="editoriale"] .section-title {
+  letter-spacing: 0.14em;
+}
+
+html[data-skin="editoriale"] .screen-title {
+  letter-spacing: -0.04em;
+  font-weight: 900;
+}
+
+/* underline-style segmented control */
+html[data-skin="editoriale"] .seg {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  gap: 2px;
+}
+
+html[data-skin="editoriale"] .seg-item {
+  border-radius: 0;
+  padding: 9px 6px;
+  border-bottom: 2px solid transparent;
 }
 
 html[data-skin="editoriale"] .seg-item.active {
+  background: transparent;
   box-shadow: none;
-  border-radius: 0;
+  color: var(--acc);
+  border-bottom-color: var(--acc);
+}
+
+html[data-skin="editoriale"] .chip {
+  border: 1px solid var(--sep);
+  background: transparent;
+}
+
+html[data-skin="editoriale"] .chip.on {
+  background: var(--text);
+  color: var(--bg);
+  border-color: var(--text);
+}
+
+html[data-skin="editoriale"] .btn-primary {
+  border: 1px solid var(--text);
+  background: var(--text);
+  color: var(--bg);
+}
+
+html[data-skin="editoriale"] .btn-soft {
+  background: transparent;
+  border: 1px solid var(--acc);
+}
+
+html[data-skin="editoriale"] .btn-ghost {
+  background: transparent;
+  border: 1px solid var(--sep);
+}
+
+html[data-skin="editoriale"] .btn-danger {
+  background: transparent;
+  border: 1px solid var(--bad);
+}
+
+html[data-skin="editoriale"] .switch {
+  border-radius: 6px;
+  width: 48px;
 }
 
 html[data-skin="editoriale"] .switch::after {
-  box-shadow: none;
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 4px;
+}
+
+html[data-skin="editoriale"] .switch.on::after {
+  transform: translateX(17px);
 }
 
 html[data-skin="editoriale"] .toast {
   box-shadow: none;
-  border-radius: 4px;
-}
-
-html[data-skin="editoriale"] .section-title {
-  letter-spacing: 0.12em;
-}
-
-html[data-skin="editoriale"] .screen-title {
-  letter-spacing: -0.045em;
-  font-weight: 900;
-}
-
-html[data-skin="editoriale"] .btn-primary {
-  border: 1px solid rgba(0, 0, 0, 0.15);
-}
-
-html[data-skin="editoriale"] .bpm-chip {
   border-radius: 3px;
 }
 
 html[data-skin="editoriale"] .dot-color {
   box-shadow: none;
+  border-width: 2px;
+}
+
+html[data-skin="editoriale"] .play-fab {
+  box-shadow: none;
+  border-radius: 14px;
+}
+
+html[data-skin="editoriale"] .bpm-chip.start {
+  background: transparent;
 }
 
 /* ------------------------------------------------------------
-   8. Liquid tactile — fluid, rubbery surfaces, marked depth,
-   glossy highlights, springy press interactions
+   6. Lavagna — chalkboard practice studio: graphite boards in
+   dark, laid paper in light, chalk-dusted surfaces
+   ------------------------------------------------------------ */
+
+html[data-skin="lavagna"] {
+  --r-card: 14px;
+  --r-card-sm: 12px;
+  --r-btn: 999px;
+  --r-btn-sm: 999px;
+  --r-btn-lg: 999px;
+  --r-field: 11px;
+  --r-seg: 11px;
+  --r-sheet: 16px;
+  --r-stage: 18px;
+  --r-pill: 6px;
+  --r-badge: 9px;
+  --r-cell: 12px;
+  --r-thumb: 11px;
+  --stage-bg: radial-gradient(130% 140% at 50% -20%, #35523a 0%, #141c11 72%, #0b100a 100%);
+}
+
+html[data-skin="lavagna"][data-theme="light"] {
+  --app-bg-img: radial-gradient(rgba(60, 55, 40, 0.06) 0.7px, transparent 1.2px);
+  --app-bg-size: 9px 9px;
+  --bg: #f2eee1;
+  --bg-elev: #fbf8ee;
+  --card: #fbf8ee;
+  --card-2: #f1ecdc;
+  --field: rgba(80, 70, 45, 0.12);
+  --sep: rgba(70, 60, 40, 0.2);
+  --text: #37342b;
+  --text-2: #7d7664;
+  --text-3: #a29b87;
+  --tabbar: rgba(248, 244, 232, 0.88);
+  --shadow: 0 1px 1px rgba(0, 0, 0, 0.05), 0 8px 18px rgba(70, 60, 40, 0.08);
+}
+
+html[data-skin="lavagna"][data-theme="dark"] {
+  --app-bg-img: radial-gradient(rgba(255, 255, 255, 0.035) 0.7px, transparent 1.2px);
+  --app-bg-size: 9px 9px;
+  --bg: #1b1b17;
+  --bg-elev: #282822;
+  --card: #2a2a24;
+  --card-2: #33322b;
+  --field: rgba(255, 255, 255, 0.06);
+  --sep: rgba(255, 255, 255, 0.09);
+  --text: #eee6d2;
+  --text-2: #a49d8a;
+  --text-3: #726c5c;
+  --tabbar: rgba(27, 27, 23, 0.88);
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.45), 0 10px 22px rgba(0, 0, 0, 0.3);
+}
+
+html[data-skin="lavagna"] .card,
+html[data-skin="lavagna"] .stat,
+html[data-skin="lavagna"] .tuner-card,
+html[data-skin="lavagna"] .metro-controls {
+  border: 1px solid rgba(90, 80, 60, 0.18);
+  box-shadow: var(--shadow), inset 0 0 0 1px rgba(255, 255, 255, 0.25);
+}
+
+html[data-skin="lavagna"][data-theme="dark"] .card,
+html[data-skin="lavagna"][data-theme="dark"] .stat,
+html[data-skin="lavagna"][data-theme="dark"] .tuner-card,
+html[data-skin="lavagna"][data-theme="dark"] .metro-controls {
+  border-color: rgba(255, 255, 255, 0.07);
+  box-shadow: var(--shadow), inset 0 0 0 1px rgba(0, 0, 0, 0.35);
+}
+
+html[data-skin="lavagna"] .chip {
+  border: 1px dashed var(--sep);
+  background: transparent;
+}
+
+html[data-skin="lavagna"] .chip.on {
+  border-style: solid;
+  border-color: transparent;
+}
+
+html[data-skin="lavagna"] .field {
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+html[data-skin="lavagna"] .seg {
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+html[data-skin="lavagna"][data-theme="dark"] .seg {
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+html[data-skin="lavagna"] .btn-primary {
+  box-shadow: 0 4px 14px var(--acc-soft);
+}
+
+html[data-skin="lavagna"] .section-title {
+  letter-spacing: 0.09em;
+}
+
+/* ------------------------------------------------------------
+   7. Bosco — natural forest retreat: sage greens on warm cream,
+   tactile linen surfaces, chunky rounded volumes
+   ------------------------------------------------------------ */
+
+html[data-skin="bosco"] {
+  --r-card: 24px;
+  --r-card-sm: 22px;
+  --r-btn: 999px;
+  --r-btn-sm: 999px;
+  --r-btn-lg: 999px;
+  --r-field: 15px;
+  --r-seg: 13px;
+  --r-sheet: 28px;
+  --r-stage: 28px;
+  --r-pill: 11px;
+  --r-badge: 12px;
+  --r-cell: 15px;
+  --r-thumb: 13px;
+  --stage-bg: radial-gradient(130% 150% at 50% -20%, #4f7240 0%, #27391e 62%, #151f10 100%);
+}
+
+html[data-skin="bosco"][data-theme="light"] {
+  --app-bg-img: radial-gradient(60% 48% at 90% 6%, rgba(120, 160, 90, 0.12), transparent 70%);
+  --bg: #e8e9d8;
+  --bg-elev: #f6f5e7;
+  --card: #f7f6e9;
+  --card-2: #ebe9d5;
+  --field: rgba(70, 96, 58, 0.13);
+  --sep: rgba(58, 82, 48, 0.16);
+  --text: #242f1d;
+  --text-2: #61705a;
+  --text-3: #8c997f;
+  --tabbar: rgba(246, 245, 232, 0.88);
+  --shadow: 0 3px 8px rgba(50, 75, 40, 0.08), 0 14px 30px rgba(50, 75, 40, 0.1);
+}
+
+html[data-skin="bosco"][data-theme="dark"] {
+  --app-bg-img: radial-gradient(60% 48% at 90% 6%, rgba(120, 170, 90, 0.07), transparent 70%);
+  --bg: #12180e;
+  --bg-elev: #1d2417;
+  --card: #212a19;
+  --card-2: #2a3420;
+  --field: rgba(255, 255, 255, 0.06);
+  --sep: rgba(255, 255, 255, 0.09);
+  --text: #e9ecd9;
+  --text-2: #9cab8c;
+  --text-3: #6d7c61;
+  --tabbar: rgba(18, 24, 14, 0.88);
+  --shadow: 0 3px 8px rgba(0, 0, 0, 0.4), 0 16px 34px rgba(0, 0, 0, 0.3);
+}
+
+html[data-skin="bosco"] .card,
+html[data-skin="bosco"] .stat,
+html[data-skin="bosco"] .tuner-card,
+html[data-skin="bosco"] .metro-controls {
+  background-image: radial-gradient(rgba(60, 80, 45, 0.05) 0.6px, transparent 1.1px);
+  background-size: 8px 8px;
+}
+
+html[data-skin="bosco"][data-theme="dark"] .card,
+html[data-skin="bosco"][data-theme="dark"] .stat,
+html[data-skin="bosco"][data-theme="dark"] .tuner-card,
+html[data-skin="bosco"][data-theme="dark"] .metro-controls {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.03) 0.6px, transparent 1.1px);
+}
+
+html[data-skin="bosco"] .card {
+  box-shadow: var(--shadow), inset 0 1px 0 rgba(255, 255, 255, 0.55);
+}
+
+html[data-skin="bosco"][data-theme="dark"] .card {
+  box-shadow: var(--shadow), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+html[data-skin="bosco"] .btn-primary {
+  box-shadow: 0 6px 18px var(--acc-soft), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+html[data-skin="bosco"] .play-fab {
+  box-shadow: 0 10px 26px var(--acc-soft), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+html[data-skin="bosco"] .step-btn,
+html[data-skin="bosco"] .icon-btn {
+  border: 1px solid var(--sep);
+  background: var(--card);
+}
+
+html[data-skin="bosco"] .seg-item.active {
+  box-shadow: 0 2px 6px rgba(50, 75, 40, 0.14);
+}
+
+/* ------------------------------------------------------------
+   8. Liquido — glossy jelly: fluid translucent volumes, saturated
+   color blobs, huge radii, springy elastic interactions
    ------------------------------------------------------------ */
 
 html[data-skin="liquido"] {
-  --r-card: 30px;
-  --r-stage: 34px;
+  --r-card: 28px;
+  --r-card-sm: 26px;
   --r-btn: 999px;
-  --r-field: 20px;
-  --r-sheet: 34px;
-  --r-badge: 15px;
+  --r-btn-sm: 999px;
+  --r-btn-lg: 999px;
+  --r-field: 19px;
+  --r-seg: 16px;
+  --r-sheet: 32px;
+  --r-stage: 34px;
+  --r-pill: 15px;
+  --r-badge: 14px;
   --r-cell: 17px;
-  --r-seg: 18px;
-  --card-border-w: 1.5px;
-  --card-border: rgba(255, 255, 255, 0.75);
-  --stage-bg: radial-gradient(120% 150% at 50% -30%, #4c6fe3 0%, #2c3b7e 55%, #1f2a5e 100%);
+  --r-thumb: 15px;
+  --stage-bg: radial-gradient(120% 150% at 50% -30%, #7d68e8 0%, #4a3bb0 50%, #2a226e 100%);
 }
 
 html[data-skin="liquido"][data-theme="light"] {
-  --app-bg-img: radial-gradient(55% 45% at 12% 8%, rgba(120, 150, 255, 0.28), transparent 70%),
-    radial-gradient(50% 42% at 92% 88%, rgba(255, 130, 185, 0.24), transparent 70%),
-    radial-gradient(45% 40% at 85% 8%, rgba(110, 220, 255, 0.2), transparent 70%);
-  --bg: #eef0f8;
-  --bg-elev: #ffffff;
-  --card: #ffffff;
-  --card-2: #f0f1f9;
-  --field: rgba(95, 105, 150, 0.12);
-  --sep: rgba(85, 95, 140, 0.14);
-  --text: #1c1e2b;
-  --text-2: #6a7089;
-  --text-3: #9398ae;
-  --tabbar: rgba(255, 255, 255, 0.78);
-  --shadow: 0 18px 40px -14px rgba(60, 70, 130, 0.28), 0 6px 16px rgba(60, 70, 130, 0.1);
+  --app-bg-img: radial-gradient(55% 45% at 10% 6%, rgba(125, 140, 255, 0.26), transparent 70%),
+    radial-gradient(50% 42% at 94% 90%, rgba(255, 120, 190, 0.22), transparent 70%),
+    radial-gradient(42% 38% at 86% 6%, rgba(90, 220, 255, 0.2), transparent 70%);
+  --bg: #eeeffa;
+  --bg-elev: rgba(255, 255, 255, 0.75);
+  --card: rgba(255, 255, 255, 0.68);
+  --card-2: rgba(255, 255, 255, 0.55);
+  --field: rgba(105, 115, 165, 0.13);
+  --sep: rgba(85, 95, 145, 0.15);
+  --text: #1d1e30;
+  --text-2: #686e8c;
+  --text-3: #9297ae;
+  --tabbar: rgba(255, 255, 255, 0.72);
+  --shadow: 0 18px 42px -16px rgba(65, 75, 150, 0.3), 0 6px 16px rgba(65, 75, 150, 0.12);
 }
 
 html[data-skin="liquido"][data-theme="dark"] {
-  --app-bg-img: radial-gradient(55% 45% at 12% 8%, rgba(80, 110, 230, 0.2), transparent 70%),
-    radial-gradient(50% 42% at 92% 88%, rgba(220, 90, 160, 0.16), transparent 70%),
-    radial-gradient(45% 40% at 85% 8%, rgba(80, 200, 240, 0.14), transparent 70%);
-  --bg: #12131d;
-  --bg-elev: #1f2130;
-  --card: #1f2130;
-  --card-2: #272a3c;
-  --field: rgba(255, 255, 255, 0.08);
-  --sep: rgba(255, 255, 255, 0.11);
-  --text: #eef0f9;
-  --text-2: #9aa0b9;
-  --text-3: #6b7088;
-  --tabbar: rgba(20, 21, 33, 0.8);
-  --shadow: 0 18px 40px -14px rgba(0, 0, 0, 0.55), 0 6px 16px rgba(0, 0, 0, 0.3);
-  --card-border: rgba(255, 255, 255, 0.14);
+  --app-bg-img: radial-gradient(55% 45% at 10% 6%, rgba(90, 105, 240, 0.2), transparent 70%),
+    radial-gradient(50% 42% at 94% 90%, rgba(230, 80, 165, 0.16), transparent 70%),
+    radial-gradient(42% 38% at 86% 6%, rgba(60, 200, 245, 0.14), transparent 70%);
+  --bg: #131426;
+  --bg-elev: #232441;
+  --card: rgba(255, 255, 255, 0.07);
+  --card-2: rgba(255, 255, 255, 0.05);
+  --field: rgba(255, 255, 255, 0.09);
+  --sep: rgba(255, 255, 255, 0.12);
+  --text: #eff0fb;
+  --text-2: #9ca2c0;
+  --text-3: #666c8c;
+  --tabbar: rgba(19, 20, 38, 0.78);
+  --shadow: 0 18px 42px -16px rgba(0, 0, 0, 0.55), 0 6px 16px rgba(0, 0, 0, 0.3);
 }
 
-html[data-skin="liquido"] .card {
+html[data-skin="liquido"] .card,
+html[data-skin="liquido"] .stat,
+html[data-skin="liquido"] .tuner-card,
+html[data-skin="liquido"] .metro-controls {
+  border: 1.5px solid rgba(255, 255, 255, 0.75);
   box-shadow: var(--shadow), inset 0 2px 4px rgba(255, 255, 255, 0.85);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  backdrop-filter: blur(20px) saturate(150%);
 }
 
-html[data-skin="liquido"][data-theme="dark"] .card {
-  box-shadow: var(--shadow), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+html[data-skin="liquido"][data-theme="dark"] .card,
+html[data-skin="liquido"][data-theme="dark"] .stat,
+html[data-skin="liquido"][data-theme="dark"] .tuner-card,
+html[data-skin="liquido"][data-theme="dark"] .metro-controls {
+  border-color: rgba(255, 255, 255, 0.14);
+  box-shadow: var(--shadow), inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 
-/* springy press */
-html[data-skin="liquido"] .btn {
-  transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.15s ease;
-}
-
-html[data-skin="liquido"] .btn:active {
-  transform: scale(0.93) translateY(1px);
-}
-
-html[data-skin="liquido"] .btn-primary {
-  box-shadow: 0 10px 24px var(--acc-soft), inset 0 2px 0 rgba(255, 255, 255, 0.45);
-}
-
-html[data-skin="liquido"] .btn-soft,
-html[data-skin="liquido"] .btn-ghost,
-html[data-skin="liquido"] .btn-danger {
-  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.5);
-}
-
-html[data-skin="liquido"][data-theme="dark"] .btn-soft,
-html[data-skin="liquido"][data-theme="dark"] .btn-ghost,
-html[data-skin="liquido"][data-theme="dark"] .btn-danger {
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
-}
-
-html[data-skin="liquido"] .chip {
-  box-shadow: 0 5px 12px rgba(60, 70, 130, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.7);
-}
-
-html[data-skin="liquido"][data-theme="dark"] .chip {
-  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.35);
-}
-
+/* springy press everywhere */
+html[data-skin="liquido"] .btn,
+html[data-skin="liquido"] .chip,
+html[data-skin="liquido"] .icon-btn,
 html[data-skin="liquido"] .step-btn {
-  background: var(--card);
-  box-shadow: 0 6px 14px rgba(60, 70, 130, 0.18), inset 0 2px 0 rgba(255, 255, 255, 0.85);
+  transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.15s ease,
+    box-shadow 0.18s ease, background 0.18s ease;
 }
 
-html[data-skin="liquido"][data-theme="dark"] .step-btn {
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.4);
-}
-
+html[data-skin="liquido"] .btn:active,
+html[data-skin="liquido"] .chip:active,
+html[data-skin="liquido"] .icon-btn:active,
 html[data-skin="liquido"] .step-btn:active {
-  transform: scale(0.88);
-}
-
-html[data-skin="liquido"] .play-fab {
-  box-shadow: 0 14px 30px var(--acc-soft), inset 0 3px 0 rgba(255, 255, 255, 0.45),
-    inset 0 -4px 8px rgba(0, 0, 0, 0.15);
-}
-
-html[data-skin="liquido"] .play-fab:active {
   transform: scale(0.9);
 }
 
+html[data-skin="liquido"] .btn-primary {
+  box-shadow: 0 12px 26px var(--acc-soft), inset 0 2px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.12);
+}
+
+html[data-skin="liquido"] .play-fab {
+  box-shadow: 0 14px 32px var(--acc-soft), inset 0 3px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -5px 10px rgba(0, 0, 0, 0.18);
+}
+
+html[data-skin="liquido"] .play-fab:active {
+  transform: scale(0.88);
+}
+
+html[data-skin="liquido"] .chip,
+html[data-skin="liquido"] .icon-btn,
+html[data-skin="liquido"] .step-btn {
+  box-shadow: 0 6px 14px rgba(85, 95, 170, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+html[data-skin="liquido"][data-theme="dark"] .chip,
+html[data-skin="liquido"][data-theme="dark"] .icon-btn,
+html[data-skin="liquido"][data-theme="dark"] .step-btn {
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.35);
+}
+
+html[data-skin="liquido"] .seg {
+  background: rgba(255, 255, 255, 0.45);
+}
+
+html[data-skin="liquido"][data-theme="dark"] .seg {
+  background: rgba(255, 255, 255, 0.06);
+}
+
 html[data-skin="liquido"] .seg-item.active {
-  box-shadow: 0 4px 10px rgba(60, 70, 130, 0.16);
+  box-shadow: 0 6px 14px rgba(85, 95, 170, 0.18);
+  background: var(--bg-elev);
 }
 
 html[data-skin="liquido"] .field {
-  box-shadow: inset 0 2px 5px rgba(60, 70, 130, 0.08);
+  box-shadow: inset 0 2px 6px rgba(85, 95, 170, 0.08);
 }
 
 html[data-skin="liquido"][data-theme="dark"] .field {
   box-shadow: none;
 }
 
-html[data-skin="liquido"] .icon-btn {
-  box-shadow: 0 4px 10px rgba(60, 70, 130, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+html[data-skin="liquido"] .tabbar {
+  -webkit-backdrop-filter: blur(24px) saturate(170%);
+  backdrop-filter: blur(24px) saturate(170%);
 }
 
-html[data-skin="liquido"][data-theme="dark"] .icon-btn {
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+/* ------------------------------------------------------------
+   9. Rinascimento — antique manuscript: parchment and ink with
+   gold hairlines, double-framed panels, scholarly details
+   ------------------------------------------------------------ */
+
+html[data-skin="rinascimento"] {
+  --r-card: 10px;
+  --r-card-sm: 10px;
+  --r-btn: 999px;
+  --r-btn-sm: 999px;
+  --r-btn-lg: 999px;
+  --r-field: 9px;
+  --r-seg: 9px;
+  --r-sheet: 12px;
+  --r-stage: 16px;
+  --r-pill: 6px;
+  --r-badge: 8px;
+  --r-cell: 9px;
+  --r-thumb: 10px;
+  --stage-bg: radial-gradient(130% 150% at 50% -20%, #6f4330 0%, #33200f 70%, #180e06 100%);
+}
+
+html[data-skin="rinascimento"][data-theme="light"] {
+  --app-bg-img: radial-gradient(80% 70% at 50% -10%, rgba(255, 255, 255, 0.45), transparent 70%);
+  --bg: #e9dfc6;
+  --bg-elev: #f4ecd9;
+  --card: #f4ecd9;
+  --card-2: #eae0c6;
+  --field: rgba(80, 62, 25, 0.1);
+  --sep: rgba(95, 72, 30, 0.22);
+  --text: #33291a;
+  --text-2: #7b6b4b;
+  --text-3: #a1916c;
+  --tabbar: #efe6d0;
+  --shadow: 0 1px 2px rgba(90, 70, 30, 0.1), 0 10px 22px rgba(90, 70, 30, 0.12);
+}
+
+html[data-skin="rinascimento"][data-theme="dark"] {
+  --bg: #0e0c06;
+  --bg-elev: #1a1609;
+  --card: #1c170b;
+  --card-2: #262011;
+  --field: rgba(255, 255, 255, 0.05);
+  --sep: rgba(204, 172, 92, 0.18);
+  --text: #ede1bf;
+  --text-2: #a29363;
+  --text-3: #6f6342;
+  --tabbar: #161208;
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.5), 0 12px 26px rgba(0, 0, 0, 0.4);
+}
+
+/* double hairline frame */
+html[data-skin="rinascimento"] .card,
+html[data-skin="rinascimento"] .stat,
+html[data-skin="rinascimento"] .tuner-card,
+html[data-skin="rinascimento"] .metro-controls {
+  border: 1px solid rgba(122, 92, 40, 0.32);
+  box-shadow: inset 0 0 0 1px rgba(160, 126, 60, 0.22), var(--shadow);
+}
+
+html[data-skin="rinascimento"][data-theme="dark"] .card,
+html[data-skin="rinascimento"][data-theme="dark"] .stat,
+html[data-skin="rinascimento"][data-theme="dark"] .tuner-card,
+html[data-skin="rinascimento"][data-theme="dark"] .metro-controls {
+  border-color: rgba(190, 160, 90, 0.2);
+  box-shadow: inset 0 0 0 1px rgba(190, 160, 90, 0.1), var(--shadow);
+}
+
+html[data-skin="rinascimento"] .section-title {
+  letter-spacing: 0.13em;
+  font-weight: 800;
+}
+
+html[data-skin="rinascimento"] .tabbar {
+  border-top: 1px solid rgba(148, 116, 52, 0.35);
+}
+
+html[data-skin="rinascimento"] .btn-primary,
+html[data-skin="rinascimento"] .btn-soft,
+html[data-skin="rinascimento"] .btn-ghost,
+html[data-skin="rinascimento"] .btn-danger {
+  border: 1px solid rgba(122, 92, 40, 0.3);
+}
+
+html[data-skin="rinascimento"] .chip {
+  border: 1px solid rgba(122, 92, 40, 0.25);
+  background: transparent;
+}
+
+html[data-skin="rinascimento"] .chip.on {
+  border-color: transparent;
+}
+
+html[data-skin="rinascimento"] .play-fab {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+html[data-skin="rinascimento"] .field {
+  box-shadow: inset 0 1px 2px rgba(90, 70, 30, 0.08);
+}
+
+/* shared helper: skins that add a textured page background must let
+   the pane paint it (the base .pane only paints --bg) */
+html[data-skin="sabbia"] .pane,
+html[data-skin="oceano"] .pane,
+html[data-skin="vinile"] .pane,
+html[data-skin="acciaio"] .pane,
+html[data-skin="lavagna"] .pane,
+html[data-skin="bosco"] .pane,
+html[data-skin="liquido"] .pane,
+html[data-skin="rinascimento"] .pane {
+  background-color: var(--bg);
+  background-image: var(--app-bg-img, none);
+  background-size: var(--app-bg-size, auto);
 }

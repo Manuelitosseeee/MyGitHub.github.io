@@ -77,24 +77,36 @@ export type AppTheme = "system" | "light" | "dark";
 /** Accent presets for the whole-app personalization (5 colors). */
 export type ThemeAccent = "blue" | "violet" | "green" | "amber" | "rose";
 
-/** 3 font families: system (classic), serif (elegant), mono (technical). */
-export type FontChoice = "system" | "serif" | "mono";
+/**
+ * Font families. `auto` follows the base font of the active Aspetto Totale
+ * design; picking any concrete family overrides it for every design.
+ */
+export type FontChoice =
+  | "auto"
+  | "system"
+  | "rounded"
+  | "serif"
+  | "mono"
+  | "sans";
 
 export type FontSize = "s" | "m" | "l" | "xl";
 
-/** Whole-app visual designs ("Aspetto Totale"). 9 options: the current look
- *  (`default`) plus 8 material themes. They change surfaces, textures, radii,
- *  shadows and backgrounds — never fonts (handled by `FontChoice`). */
+/**
+ * Whole-app designs ("Aspetto Totale", in Impostazioni). `default` is the
+ * current MyGitHub look; the other nine restyle colors, shapes and the base
+ * font. Layout, texts and functions never change.
+ */
 export type AppSkin =
   | "default"
-  | "ceramica"
-  | "vetro"
-  | "carta"
-  | "metallo"
-  | "argilla"
-  | "analogico"
+  | "sabbia"
+  | "oceano"
+  | "vinile"
+  | "acciaio"
   | "editoriale"
-  | "liquido";
+  | "lavagna"
+  | "bosco"
+  | "liquido"
+  | "rinascimento";
 
 export interface Appearance {
   /** Classic light/dark/system mode. */
@@ -103,9 +115,9 @@ export interface Appearance {
   accent: ThemeAccent;
   /** Text size scale. */
   fontSize: FontSize;
-  /** Font family. */
+  /** Font family: "auto" follows the active skin's base font. */
   font: FontChoice;
-  /** Aspetto Totale design ("default" = current look). */
+  /** Aspetto Totale design ("default" = the current look). */
   skin: AppSkin;
 }
 

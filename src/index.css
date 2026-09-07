@@ -14,23 +14,23 @@
   --app-font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
     "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
 
-  /* --- Aspetto Totale (skin) variables ---
-     Overridden per skin in skins.css. Radii mirror the current iOS look so
-     the `default` skin stays pixel-identical. */
+  /* Shape language — Aspetto Totale designs override these to change the
+     forms of cards, buttons, sheets, stages and pills across the app. */
   --r-card: 18px;
-  --r-stage: 24px;
+  --r-card-sm: 16px;
   --r-btn: 13px;
+  --r-btn-sm: 11px;
+  --r-btn-lg: 17px;
   --r-field: 13px;
+  --r-seg: 11px;
   --r-sheet: 22px;
+  --r-stage: 24px;
+  --r-pill: 8px;
   --r-badge: 10px;
   --r-cell: 13px;
-  --r-seg: 11px;
-  --card-bg-img: none;
-  --card-bg-size: auto;
-  --card-border-w: 0px;
-  --card-border: transparent;
-  --app-bg-img: none;
-  --app-bg-size: auto;
+  --r-thumb: 12px;
+
+  /* Classic dark stage behind the tempo display; skins may replace it. */
   --stage-bg: radial-gradient(130% 140% at 50% -20%, #1b2c50 0%, #0a0f1d 68%);
 }
 
@@ -43,6 +43,16 @@ html[data-font="serif"] {
 html[data-font="mono"] {
   --app-font: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Monaco,
     "Cascadia Code", "Roboto Mono", monospace;
+}
+
+html[data-font="rounded"] {
+  --app-font: ui-rounded, "SF Pro Rounded", "Hiragino Maru Gothic ProN",
+    -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", sans-serif;
+}
+
+html[data-font="sans"] {
+  --app-font: "Avenir Next", Avenir, "Century Gothic", "Trebuchet MS",
+    -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", sans-serif;
 }
 
 [data-theme="light"] {
@@ -134,9 +144,7 @@ img {
   height: 100dvh;
   display: flex;
   flex-direction: column;
-  background-color: var(--bg);
-  background-image: var(--app-bg-img);
-  background-size: var(--app-bg-size);
+  background: var(--bg);
 }
 
 .panes {
@@ -152,8 +160,7 @@ img {
   overflow-y: auto;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
-  /* Transparent so the skin background (kept static on .app) shows through. */
-  background: transparent;
+  background: var(--bg);
 }
 
 .pane.active {
@@ -187,7 +194,6 @@ img {
 
 .tab-btn {
   flex: 1;
-  min-width: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -202,21 +208,15 @@ img {
 }
 
 .tab-btn svg {
-  width: 24px;
-  height: 24px;
+  width: 25px;
+  height: 25px;
   stroke-width: 1.8;
 }
 
 .tab-btn .lbl {
   font-size: 10px;
   font-weight: 600;
-  letter-spacing: 0;
-  line-height: 1.2;
-  max-width: 100%;
-  padding: 0 2px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  letter-spacing: 0.1px;
 }
 
 .tab-btn.active {
@@ -290,10 +290,7 @@ img {
 /* ---------------- Cards & rows ---------------- */
 
 .card {
-  background-color: var(--card);
-  background-image: var(--card-bg-img);
-  background-size: var(--card-bg-size);
-  border: var(--card-border-w) solid var(--card-border);
+  background: var(--card);
   border-radius: var(--r-card);
   box-shadow: var(--shadow);
   margin-bottom: 12px;
@@ -419,12 +416,12 @@ img {
 .btn-sm {
   font-size: 14px;
   padding: 9px 14px;
-  border-radius: calc(var(--r-btn) - 2px);
+  border-radius: var(--r-btn-sm);
   width: auto;
 }
 
 .btn-lg {
-  border-radius: 17px;
+  border-radius: var(--r-btn-lg);
   padding: 16px 20px;
   font-size: 17px;
   font-weight: 700;
@@ -834,7 +831,7 @@ input[type="range"].rng:active::-webkit-slider-thumb {
   background: var(--card-2);
   color: var(--text);
   padding: 4px 10px;
-  border-radius: 8px;
+  border-radius: var(--r-pill);
 }
 
 .bpm-chip.start {
@@ -899,7 +896,7 @@ input[type="range"].rng:active::-webkit-slider-thumb {
   color: var(--text-2);
   background: var(--field);
   padding: 3px 8px;
-  border-radius: 7px;
+  border-radius: var(--r-pill);
   flex: none;
   font-variant-numeric: tabular-nums;
 }
@@ -915,7 +912,7 @@ input[type="range"].rng:active::-webkit-slider-thumb {
   color: var(--warn);
   background: var(--warn-soft);
   padding: 3px 8px;
-  border-radius: 7px;
+  border-radius: var(--r-pill);
   flex: none;
   font-variant-numeric: tabular-nums;
 }
@@ -930,7 +927,7 @@ input[type="range"].rng:active::-webkit-slider-thumb {
 .stat {
   flex: 1;
   background: var(--card);
-  border-radius: calc(var(--r-card) - 2px);
+  border-radius: var(--r-card-sm);
   padding: 13px 14px;
   box-shadow: var(--shadow);
   margin-bottom: 12px;
@@ -994,7 +991,6 @@ input[type="range"].rng:active::-webkit-slider-thumb {
 
 .metro-stage {
   border-radius: var(--r-stage);
-  background: var(--stage-bg);
   padding: 22px 18px 18px;
   text-align: center;
   position: relative;
@@ -1217,7 +1213,7 @@ input[type="range"].rng:active::-webkit-slider-thumb {
 .string-num {
   width: 24px;
   height: 24px;
-  border-radius: 7px;
+  border-radius: var(--r-pill);
   background: var(--field);
   display: flex;
   align-items: center;
@@ -1286,7 +1282,7 @@ input[type="range"].rng:active::-webkit-slider-thumb {
 .photo-thumb {
   width: 58px;
   height: 58px;
-  border-radius: 12px;
+  border-radius: var(--r-thumb);
   object-fit: cover;
   background: var(--field);
   flex: none;
@@ -1296,7 +1292,7 @@ input[type="range"].rng:active::-webkit-slider-thumb {
 .photo-add {
   width: 58px;
   height: 58px;
-  border-radius: 12px;
+  border-radius: var(--r-thumb);
   background: var(--field);
   color: var(--text-3);
   display: flex;
@@ -1313,7 +1309,7 @@ input[type="range"].rng:active::-webkit-slider-thumb {
 .photo-ph {
   width: 46px;
   height: 46px;
-  border-radius: 11px;
+  border-radius: var(--r-thumb);
   background: var(--field);
   color: var(--text-3);
   display: flex;
@@ -1567,28 +1563,28 @@ html[data-fs="xl"] .note-sub { font-size: 16px; }
 html[data-fs="xl"] .string-line .sn { font-size: 16px; }
 html[data-fs="xl"] .string-line .shz { font-size: 13px; }
 html[data-fs="xl"] .tempo-unit { font-size: 17px; }
-html[data-fs="xl"] .tap-hint { font-size: 14.5px; }
-
-/* ---------------- Aspetto Totale (skin picker) ---------------- */
+/* ============================================================
+   Aspetto Totale — picker (10 design options)
+   ============================================================ */
 
 .skin-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
 }
 
 .skin-opt {
+  position: relative;
   display: flex;
   flex-direction: column;
-  align-items: stretch;
-  gap: 7px;
-  padding: 8px;
-  border-radius: 16px;
-  border: 1.5px solid var(--sep);
-  background: transparent;
-  transition: border-color 0.15s ease, transform 0.12s ease;
-  position: relative;
+  gap: 8px;
   text-align: left;
+  border-radius: 16px;
+  border: 2px solid var(--sep);
+  background: var(--card-2);
+  padding: 8px;
+  transition: border-color 0.15s ease, transform 0.12s ease;
+  overflow: hidden;
 }
 
 .skin-opt:active {
@@ -1599,46 +1595,100 @@ html[data-fs="xl"] .tap-hint { font-size: 14.5px; }
   border-color: var(--acc);
 }
 
-.skin-prev {
-  height: 58px;
-  border-radius: 11px;
-  overflow: hidden;
+/* Miniature preview tile drawn with inline colors from the skin catalog */
+.skin-tile {
   position: relative;
-  border: 0.5px solid rgba(0, 0, 0, 0.08);
+  height: 88px;
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  align-items: stretch;
+  padding: 10px;
+  gap: 8px;
 }
 
-.skin-prev-card {
-  position: absolute;
-  left: 8px;
-  right: 8px;
-  top: 9px;
-  height: 26px;
-  border: 0.5px solid rgba(0, 0, 0, 0.08);
+.skin-tile .st-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 7px 8px;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
 }
 
-.skin-prev-bar {
-  position: absolute;
-  left: 8px;
-  right: 8px;
-  bottom: 7px;
-  height: 8px;
-  border: 0.5px solid rgba(0, 0, 0, 0.06);
+.skin-tile .st-title {
+  height: 6px;
+  width: 60%;
+  border-radius: 3px;
+  background: rgba(127, 127, 127, 0.35);
 }
 
-.skin-name {
-  font-size: 12.5px;
+.skin-tile .st-line {
+  height: 5px;
+  border-radius: 3px;
+  background: rgba(127, 127, 127, 0.18);
+}
+
+.skin-tile .st-bar {
+  height: 5px;
+  border-radius: 3px;
+  background: var(--acc);
+  width: 45%;
+  margin-top: 4px;
+}
+
+/* Big font specimen, shown in the design's base font */
+.skin-tile .st-font {
+  width: 44%;
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.5);
+  color: inherit;
+}
+
+.skin-tile .st-font b {
+  font-size: 21px;
   font-weight: 700;
-  color: var(--text);
-  line-height: 1.25;
-  min-height: 30px;
+  letter-spacing: -0.01em;
+  line-height: 1;
+}
+
+.skin-tile .st-font i {
+  font-style: normal;
+  font-size: 10.5px;
+  font-weight: 700;
+  line-height: 1;
+  opacity: 0.62;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.08em;
+}
+
+.skin-opt .skin-name {
+  font-size: 14px;
+  font-weight: 700;
+  padding: 0 2px 2px;
+}
+
+.skin-opt .skin-tag {
+  font-size: 11.5px;
+  line-height: 1.3;
+  color: var(--text-2);
+  margin-top: -4px;
+  padding: 0 2px 4px;
 }
 
 .skin-check {
   position: absolute;
-  top: 12px;
-  right: 12px;
-  width: 20px;
-  height: 20px;
+  top: 14px;
+  right: 14px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   background: var(--acc);
   color: #fff;
@@ -1646,11 +1696,12 @@ html[data-fs="xl"] .tap-hint { font-size: 14.5px; }
   align-items: center;
   justify-content: center;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  z-index: 2;
 }
 
 .skin-check svg {
-  width: 13px;
-  height: 13px;
+  width: 15px;
+  height: 15px;
   stroke-width: 3;
 }
 
