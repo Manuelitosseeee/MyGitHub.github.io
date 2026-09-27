@@ -132,6 +132,41 @@ export interface Appearance {
   skinRevision: number;
 }
 
+/** Tipologie di esercizio dell'orecchio. */
+export type EarMode = "intervalli" | "accordi" | "progressioni";
+
+/** Una risposta data in Allena l'Orecchio. */
+export interface EarAnswer {
+  id: string;
+  /** Modo di allenamento. */
+  mode: EarMode;
+  /** Risposta data (etichetta: "M3", "Maggiore", "I-V-vi-IV"). */
+  answer: string;
+  /** Risposta corretta. */
+  expected: string;
+  correct: boolean;
+  /** Millisecondi impiegati per rispondere. */
+  ms: number;
+  at: number;
+  /** Dettaglio utile al Diario: tonalità o accordo dell'esercizio. */
+  detail?: string;
+}
+
+/** Progressione armonica salvata tra i preferiti. */
+export interface ProgressionFav {
+  id: string;
+  name: string;
+  keyPc: number;
+  minor: boolean;
+  character: string;
+  /** Gradi romani, es. ["I", "V", "vi", "IV"]. */
+  degrees: string[];
+  /** Accordi, es. ["C", "G", "Am", "F"]. */
+  chords: string[];
+  bpm: number;
+  createdAt: number;
+}
+
 export interface Settings {
   appearance: Appearance;
   metro: MetroPrefs;
@@ -155,6 +190,10 @@ export interface DBState {
   sessions: StudySession[];
   sheets: SheetMeta[];
   stringChanges: StringChange[];
+  /** Risposte di Allena l'Orecchio (unico strumento con tracker). */
+  earAnswers: EarAnswer[];
+  /** Progressioni salvate da Allena Armonie. */
+  progressionFavs: ProgressionFav[];
   settings: Settings;
 }
 

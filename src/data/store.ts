@@ -11,6 +11,9 @@ import type {
   SheetMeta,
   SheetKind,
   StringChange,
+  EarAnswer,
+  EarMode,
+  ProgressionFav,
   Settings,
   CollectionKey,
   AppTheme,
@@ -63,6 +66,8 @@ function emptyState(): DBState {
     sessions: [],
     sheets: [],
     stringChanges: [],
+    earAnswers: [],
+    progressionFavs: [],
     settings: { ...DEFAULT_SETTINGS, metro: { ...DEFAULT_SETTINGS.metro } },
   };
 }
@@ -84,6 +89,8 @@ class Store {
         "sessions",
         "sheets",
         "stringChanges",
+        "earAnswers",
+        "progressionFavs",
       ];
       const base = emptyState();
       const storedSettings = await idbGet<Settings>("settings");
@@ -94,6 +101,8 @@ class Store {
         StudySession[],
         SheetMeta[],
         StringChange[],
+        EarAnswer[],
+        ProgressionFav[],
       ];
       base.songs = (s[0] ?? []) as Song[];
       base.events = (s[1] ?? []) as BpmEvent[];
@@ -101,6 +110,8 @@ class Store {
       base.sessions = (s[3] ?? []) as StudySession[];
       base.sheets = (s[4] ?? []) as SheetMeta[];
       base.stringChanges = (s[5] ?? []) as StringChange[];
+      base.earAnswers = (s[6] ?? []) as EarAnswer[];
+      base.progressionFavs = (s[7] ?? []) as ProgressionFav[];
       const stored = storedSettings as Partial<Settings> | undefined;
       base.settings = { ...DEFAULT_SETTINGS, ...(stored ?? {}) };
       base.settings.metro = {
@@ -438,6 +449,67 @@ class Store {
     this.commit(
       "stringChanges",
       this.state.stringChanges.filter((c) => c.id !== id)
+    );
+  }
+
+  /* ---------- Allena l'Orecchio (unico strumento con tracker) ---------- */
+
+  /** Registra una risposta. Il Diario la mostra insieme al resto dell'attivita. */
+  addEarAnswer(input: {
+    mode: EarMode;
+    answer: string;
+    expected: string;
+    ms: number;
+    detail?: string;
+  }): EarAnswer {
+    const rec: EarAnswer = {
+      id: uid("ear"),
+      mode: input.mode,
+      answer: input.answer,
+      expected: input.expected,
+      correct: input.answer === input.expected,
+      ms: Math.max(0, Math.round(input.ms)),
+      at: Date.now(),
+      detail: input.detail,
+    };
+    this.commit("earAnswers", [...this.state.earAnswers, rec]);
+    return rec;
+  }
+
+  clearEarAnswers(): void {
+    this.commit("earAnswers", []);
+  }
+
+  /* ---------- Allena Armonie: preferiti ---------- */
+
+  addProgressionFav(input: {
+    name: string;
+    keyPc: number;
+    minor: boolean;
+    character: string;
+    degrees: string[];
+    chords: string[];
+    bpm: number;
+  }): ProgressionFav {
+    const rec: ProgressionFav = {
+      id: uid("prg"),
+      name: input.name.trim() || "Progressione",
+      keyPc: input.keyPc,
+      minor: input.minor,
+      character: input.character,
+      degrees: [...input.degrees],
+      chords: [...input.chords],
+      bpm: input.bpm,
+      createdAt: Date.now(),
+    };
+    this.commit("progressionFavs", [rec, ...this.state.progressionFavs]);
+    return rec;
+  }
+
+  deleteProgressionFav(id: string): void {
+    this.commit(
+      "progressionFavs",
+      this.state.progressionFavs.filter((p) => p.id !== id)
     );
   }
 

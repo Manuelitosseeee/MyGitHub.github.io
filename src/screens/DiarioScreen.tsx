@@ -3,6 +3,7 @@ import { ChevronRight, Home, Music2, Sparkles } from "lucide-react";
 import { AppGlyph, type AppGlyphName } from "../ui/AppGlyph";
 import { useStore } from "../data/store";
 import { buildDays, type DayEntry, type SongDayEntry } from "../data/selectors";
+import { earSummary } from "../data/earStats";
 import { useNav } from "../nav";
 import { Card, Empty, SectionTitle } from "../ui/primitives";
 import { relativeDayLabel, todayKey, addDays, formatDuration } from "../lib/time";
@@ -20,6 +21,7 @@ export default function DiarioScreen() {
   const totalTodaySec = todayEntry?.totalSeconds ?? 0;
   const streak = calcStreak(days);
   const week = weekBars(st, 7);
+  const ear = useMemo(() => earSummary(st), [st]);
 
   const empty = days.length === 0;
   const anyToday = !!todayEntry;
@@ -61,6 +63,7 @@ export default function DiarioScreen() {
       <div className="quick-grid">
         {([
           { id: "studio", label: "Studio", icon: "studio" },
+          { id: "allenamento", label: "Allenamento", icon: "training" },
           { id: "metronomo", label: "Metronomo", icon: "metronome" },
           { id: "accordatore", label: "Accordatore", icon: "tuner" },
           { id: "corde", label: "Corde", icon: "strings-coil" },
@@ -73,6 +76,55 @@ export default function DiarioScreen() {
           </button>
         ))}
       </div>
+
+      {ear.total > 0 ? (
+        <>
+          <SectionTitle>Orecchio</SectionTitle>
+          <Card className="card-pad">
+            <div className="stat-row" style={{ margin: 0 }}>
+              <div className="stat" style={{ padding: "14px 12px" }}>
+                <div className="v" style={{ fontSize: 22 }}>{ear.total}</div>
+                <div className="k">esercizi</div>
+              </div>
+              <div className="stat" style={{ padding: "14px 12px" }}>
+                <div className="v" style={{ fontSize: 22 }}>{ear.percent}%</div>
+                <div className="k">corretti</div>
+              </div>
+              <div className="stat" style={{ padding: "14px 12px" }}>
+                <div className="v" style={{ fontSize: 22 }}>{ear.avgSeconds}s</div>
+                <div className="k">tempo medio</div>
+              </div>
+            </div>
+            {ear.days.length ? (
+              <div className="ear-row" style={{ marginTop: 14 }}>
+                <div className="ear-row-top">
+                  <span className="tiny text3">Ultimi giorni con esercizi</span>
+                  <span className="tiny text3">
+                    {ear.days[0].date} · {ear.days[0].correct}/{ear.days[0].total}
+                  </span>
+                </div>
+                <div className="ear-bar">
+                  <i
+                    style={{
+                      width: `${Math.round(
+                        (ear.days.reduce((a, d) => a + d.correct, 0) /
+                          Math.max(1, ear.days.reduce((a, d) => a + d.total, 0))) * 100
+                      )}%`,
+                    }}
+                  />
+                </div>
+              </div>
+            ) : null}
+            <button
+              className="btn btn-ghost btn-sm"
+              style={{ marginTop: 14 }}
+              onClick={() => nav.openTab("allenamento")}
+            >
+              Continua l&apos;allenamento
+            </button>
+          </Card>
+        </>
+      ) : null}
 
       {empty ? (
         <Empty
