@@ -21,7 +21,7 @@ import {
   toast,
 } from "../../ui/primitives";
 import { ChordDiagram } from "../../training/ChordDiagram";
-import { bestShape } from "../../training/chords";
+import { bestShape, shapesFor } from "../../training/chords";
 import {
   CHARACTERS,
   COMPLEXITIES,
@@ -31,7 +31,13 @@ import {
   type Complexity,
   type ProgressionChord,
 } from "../../training/harmony";
-import { noteName, CHORDS, type ChordQuality } from "../../training/theory";
+import {
+  noteName,
+  letterName,
+  CHORDS,
+  chordNameIT,
+  type ChordQuality,
+} from "../../training/theory";
 import { playChord, unlockAudio } from "../../training/audio";
 import { store, useStore } from "../../data/store";
 
@@ -64,6 +70,7 @@ export default function ArmonieScreen() {
   const [playing, setPlaying] = useState(false);
   const [cursor, setCursor] = useState(-1);
   const [editing, setEditing] = useState<number | null>(null);
+  const [inspect, setInspect] = useState<number | null>(null);
   const [showNotes, setShowNotes] = useState(true);
 
   const generate = useCallback(
@@ -219,25 +226,39 @@ export default function ArmonieScreen() {
         <>
           <div className="harmony-strip">
             {chords.map((c, i) => {
-              const shape = bestShape(c.notes[0] % 12, c.quality);
+              const rootPc = ((c.notes[0] % 12) + 12) % 12;
+              const shape = bestShape(rootPc, c.quality);
               const isCursor = i === cursor;
               return (
                 <div
                   key={i}
                   className={`harmony-card${locked[i] || isCursor ? " locked" : ""}`}
                 >
-                  <div className="harmony-card-name">{c.name}</div>
-                  <div className="harmony-card-degree">{c.degree}</div>
-                  {shape ? (
-                    <div className="harmony-card-diagram">
-                      <ChordDiagram shape={shape} compact />
-                    </div>
-                  ) : null}
-                  {showNotes ? (
-                    <div className="harmony-card-notes">
-                      {c.notes.map((n) => noteName(n % 12)).join(" · ")}
-                    </div>
-                  ) : null}
+                  <button
+                    className="harmony-card-main"
+                    onClick={() => {
+                      setCursor(i);
+                      setInspect(i);
+                    }}
+                    aria-label={`Dettagli accordo ${c.name}`}
+                  >
+                    <div className="harmony-card-name">{c.name}</div>
+                    <div className="harmony-card-degree">{c.degree}</div>
+
+                    {shape ? (
+                      <div className="harmony-card-diagram">
+                        <ChordDiagram shape={shape} compact />
+                      </div>
+                    ) : null}
+                    {shape?.hasBarre ? (
+                      <div className="harmony-card-barre">barrè</div>
+                    ) : null}
+                    {showNotes ? (
+                      <div className="harmony-card-notes">
+                        {c.notes.map((n) => noteName(n % 12)).join(" · ")}
+                      </div>
+                    ) : null}
+                  </button>
                   <div className="harmony-card-actions">
                     <button
                       className={`harmony-act${locked[i] ? " on" : ""}`}
@@ -420,6 +441,17 @@ export default function ArmonieScreen() {
           />
         ) : null}
       </Sheet>
+
+      {/* Dettaglio dell'accordo: tutte le diteggiature disponibili */}
+      <Sheet
+        open={inspect !== null}
+        onClose={() => setInspect(null)}
+        title={inspect !== null ? chords[inspect]?.name ?? "" : ""}
+      >
+        {inspect !== null && chords[inspect] ? (
+          <ChordDetail chord={chords[inspect]} />
+        ) : null}
+      </Sheet>
     </div>
   );
 }
@@ -432,10 +464,77 @@ function manualChord(rootPc: number, quality: ChordQuality, degree: string): Pro
     degree,
     quality,
     inversion: 0,
-    name: `${noteName(rootPc)}${CHORDS[quality].suffix}`,
+    name: `${letterName(rootPc)}${CHORDS[quality].suffix}`,
     notes: steps.map((s) => root + s),
     slash: null,
   };
+}
+
+/**
+ * Dettaglio di un accordo: nome per esteso, note, gradi e tutte le
+ * diteggiature disponibili, barrè compresi. È la risposta al fatto che
+ * la scheda mostrava sempre la posizione più facile e i barrè sparivano.
+ */
+function ChordDetail({ chord }: { chord: ProgressionChord }) {
+  const rootPc = ((chord.notes[0] % 12) + 12) % 12;
+  const shapes = shapesFor(rootPc, chord.quality);
+  const barres = shapes.filter((s) => s.hasBarre);
+  const open = shapes.filter((s) => !s.hasBarre);
+  const [shapeIdx, setShapeIdx] = useState(0);
+  const current = shapes[shapeIdx] ?? shapes[0];
+
+  return (
+    <div>
+      <p className="tiny text3" style={{ marginBottom: 4 }}>
+        {chordNameIT(rootPc, chord.quality)} · grado {chord.degree}
+        {chord.slash ? ` · basso ${chord.slash}` : ""}
+      </p>
+      <p className="tiny text3" style={{ marginBottom: 14 }}>
+        Note: {chord.notes.map((n) => noteName(n % 12)).join(" · ")}
+      </p>
+
+      {shapes.length === 0 ? (
+        <p className="tiny text3">Nessuna diteggiatura disponibile per questo accordo.</p>
+      ) : (
+        <>
+          <div className="train-diagram">
+            {current ? <ChordDiagram shape={current} /> : null}
+          </div>
+          {shapes.length > 1 ? (
+            <div className="accordi-controls" style={{ marginTop: 10 }}>
+              <button
+                className="btn btn-soft"
+                onClick={() => setShapeIdx((i) => (i - 1 + shapes.length) % shapes.length)}
+              >
+                Precedente
+              </button>
+              <button
+                className="btn btn-soft"
+                onClick={() => setShapeIdx((i) => (i + 1) % shapes.length)}
+              >
+                Successiva
+              </button>
+            </div>
+          ) : null}
+          <p className="tiny text3" style={{ marginTop: 10, textAlign: "center" }}>
+            Diteggiatura {shapeIdx + 1} di {shapes.length}
+            {barres.length ? ` · ${barres.length} con barrè` : ""}
+          </p>
+        </>
+      )}
+
+      <button
+        className="btn btn-primary"
+        style={{ width: "100%", marginTop: 14 }}
+        onClick={() => {
+          void unlockAudio();
+          playChord(chord.notes, { voice: "guitar", gain: 0.42, duration: 1.4 });
+        }}
+      >
+        <Play size={16} /> Ascolta l&apos;accordo
+      </button>
+    </div>
+  );
 }
 
 function EditChord({

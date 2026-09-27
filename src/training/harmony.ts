@@ -11,6 +11,7 @@
 import {
   CHORDS,
   chordName,
+  letterName,
   noteName,
   type ChordQuality,
 } from "./theory";
@@ -65,7 +66,8 @@ function buildChord(keyPc: number, spec: ChordSpec, base = 48): ProgressionChord
   const notes = steps.map((s) => root + s);
   const ordered = notes.slice(inv).concat(notes.slice(0, inv));
   const baseName = chordName((keyPc + spec.semi) % 12, spec.quality);
-  const slashNote = inv > 0 ? noteName(ordered[0] % 12) : null;
+  // Il basso dell'inversione si scrive con la lettera, come nei manuali.
+  const slashNote = inv > 0 ? letterName(ordered[0] % 12) : null;
   return {
     degree: spec.degree ?? "",
     quality: spec.quality,

@@ -9,6 +9,7 @@ import {
   CHORDS,
   INTERVALS,
   chordName,
+  chordNameIT,
   intervalBySemitones,
   noteName,
   type ChordQuality,
@@ -130,16 +131,17 @@ export function makeIntervalQuestion(
     s.direction === "entrambi" ? (rng() > 0.5 ? "su" : "giu") : s.direction;
   // Al livello difficile la nota bassa è un semitone sopra la nota acuta.
   const rootMidi = dir === "su" ? midNote(rng) : midNote(rng) + semi;
-  const pool = INTERVALS.map((i) => i.short);
+  // Le risposte sono i nomi per esteso: "Quarta giusta", non "P4".
+  const pool = INTERVALS.map((i) => i.label);
   return {
     kind: "intervalli",
     rootMidi,
     semitones: semi,
     melodic: s.melodic,
     direction: dir,
-    expected: interval.short,
-    expectedLong: `${interval.label} (${interval.short})`,
-    options: optionsFor(rng, interval.short, pool, s.level === 0 ? 4 : s.level === 1 ? 5 : 6),
+    expected: interval.label,
+    expectedLong: `${interval.label} · ${noteName(rootMidi % 12)} → ${noteName((rootMidi + semi) % 12)}`,
+    options: optionsFor(rng, interval.label, pool, s.level === 0 ? 4 : s.level === 1 ? 5 : 6),
     detail: `${noteName(rootMidi % 12)} → ${noteName((rootMidi + semi) % 12)}`,
   };
 }
@@ -175,7 +177,7 @@ export function makeChordQuestion(s: ChordSettings, seed: number): ChordQuestion
     quality,
     inversion,
     expected: label,
-    expectedLong: `${chordName(rootPc, quality)}${inversionLabel} · ${label}${inversionLabel}`,
+    expectedLong: `${chordNameIT(rootPc, quality)}${inversionLabel} · ${chordName(rootPc, quality)}`,
     options: optionsFor(rng, label, allLabels, s.level === 0 ? 4 : 5),
     detail: `tonica ${noteName(rootPc)}`,
   };

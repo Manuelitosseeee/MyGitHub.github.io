@@ -182,7 +182,7 @@ export default function OrecchioScreen() {
         {kind === "intervalli" ? (
           <>
             <label className="train-label">Intervalli da includere</label>
-            <div className="train-chips">
+            <div className="train-chips train-chips-stack">
               {INTERVALS.map((i) => {
                 const on = intervalPool.includes(i.semitones);
                 const forced =
@@ -201,7 +201,7 @@ export default function OrecchioScreen() {
                     }}
                     title={i.label}
                   >
-                    {i.short}
+                    {i.label}
                   </button>
                 );
               })}

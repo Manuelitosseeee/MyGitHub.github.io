@@ -183,8 +183,29 @@ export const CHORDS: Record<ChordQuality, ChordDef> = {
 
 export const CHORD_QUALITIES = Object.values(CHORDS);
 
+/** Nome della nota in lettere internazionali, usato nei nomi degli accordi. */
+export const NOTE_LETTER = [
+  "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B",
+] as const;
+
+export function letterName(pc: number): string {
+  return NOTE_LETTER[((pc % 12) + 12) % 12];
+}
+
+/**
+ * Nome dell'accordo in notazione chitarristica (Dm, Am, C#7, Bb).
+ *
+ * Non si usa il nome solfeggiato italiano perche accostato al suffisso
+ * minore diventa ambiguo: "Do" + "m" si legge "Do minor" invece di
+ * "Re minore". Con la letteraintonazionale non c'e equivoco.
+ */
 export function chordName(rootPc: number, quality: ChordQuality): string {
-  return `${noteName(rootPc)}${CHORDS[quality].suffix}`;
+  return `${letterName(rootPc)}${CHORDS[quality].suffix}`;
+}
+
+/** Nome dell'accordo per esteso, in italiano: "Re minore". */
+export function chordNameIT(rootPc: number, quality: ChordQuality): string {
+  return `${noteName(rootPc)} ${CHORDS[quality].label.toLowerCase()}`;
 }
 
 export function chordNotes(rootPc: number, quality: ChordQuality): number[] {
@@ -213,13 +234,17 @@ export const INTERVALS: IntervalDef[] = [
   { semitones: 9, label: "Sesta maggiore", short: "M6", quality: "maggiore" },
   { semitones: 10, label: "Settima minore", short: "b7", quality: "minore" },
   { semitones: 11, label: "Settima maggiore", short: "M7", quality: "maggiore" },
+  { semitones: 12, label: "Ottava giusta", short: "P8", quality: "giusta" },
 ];
+
+/** Etichette complete usate come risposte: "Quarta giusta", non "P4". */
+export const INTERVAL_LABELS = INTERVALS.map((i) => i.label);
 
 export function intervalBySemitones(n: number): IntervalDef {
   return (
     INTERVALS.find((i) => i.semitones === n) ?? {
       semitones: n,
-      label: "Ottava",
+      label: "Ottava giusta",
       short: "P8",
       quality: "giusta",
     }

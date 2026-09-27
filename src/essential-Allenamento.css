@@ -455,7 +455,7 @@ html[data-skin="liquidglass"][data-theme="light"] .ear-question { color: #1b1b1b
 
 .ear-answers {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   gap: 9px;
   margin-top: 18px;
 }
@@ -466,8 +466,23 @@ html[data-skin="liquidglass"][data-theme="light"] .ear-question { color: #1b1b1b
   background: var(--card-2);
   border: 1px solid var(--sep);
   color: var(--text);
-  font-size: 14px;
+  font-size: 13.5px;
   font-weight: 580;
+  line-height: 1.3;
+}
+
+/* Le etichette lunghe degli intervalli vanno a capo su due colonne. */
+.train-chips-stack {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
+  gap: 8px;
+}
+
+.train-chips-stack .chip {
+  width: 100%;
+  text-align: center;
+  font-size: 12.5px;
+  font-weight: 550;
 }
 
 .ear-answer.right { background: var(--text); color: var(--bg); border-color: var(--text); }
@@ -697,6 +712,24 @@ html[data-skin="liquidglass"][data-theme="light"] .ear-question { color: #1b1b1b
 }
 
 .harmony-card.locked { border-color: var(--text); }
+
+/* Il corpo della scheda è un pulsante: apre il dettaglio dell'accordo. */
+.harmony-card-main {
+  display: block;
+  width: 100%;
+  text-align: center;
+  border-radius: var(--r-card-sm);
+}
+
+.harmony-card-barre {
+  text-align: center;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin-top: 2px;
+}
 
 .harmony-card-name {
   text-align: center;
