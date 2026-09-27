@@ -376,6 +376,7 @@ function MetroStage({
       </div>
       <div className="tempo-num">{bpm}</div>
       <div className="tempo-unit">BPM</div>
+      <div className="tempo-name">{bpm < 60 ? "LARGO" : bpm < 76 ? "ADAGIO" : bpm < 108 ? "ANDANTE" : bpm < 120 ? "MODERATO" : bpm < 168 ? "ALLEGRO" : "PRESTO"}</div>
       <BeatDots flash={flash} beats={weights.length} weights={weights} running={running} />
       <div className="tap-hint">
         {running ? "in esecuzione" : "premi play per avviare"}

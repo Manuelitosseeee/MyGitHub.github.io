@@ -80,6 +80,7 @@ export default function TunerScreen() {
   return (
     <div className="screen">
       <div className="screen-title">Accordatore</div>
+      <div className="tuning-preset">Chitarra standard <span>Mi · La · Re · Sol · Si · Mi</span></div>
       <p className="screen-sub">
         Accordatura standard della chitarra (Mi–La–Re–Sol–Si–Mi). Rileva nota,
         ottava e la corda corrispondente.

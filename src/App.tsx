@@ -62,12 +62,16 @@ export default function App() {
       // "auto" means "follow the active Aspetto Totale design's base font".
       root.dataset.font =
         ap.font === "auto" ? skinBaseFont(ap.skin) : ap.font;
-      const acc = ACCENTS[ap.accent];
+      const acc = ap.skin === "liquidglass"
+        ? dark
+          ? { main: "#f4f4f4", soft: "rgba(255, 255, 255, 0.12)", hi: "#ffffff" }
+          : { main: "#242424", soft: "rgba(0, 0, 0, 0.09)", hi: "#111111" }
+        : ACCENTS[ap.accent];
       root.style.setProperty("--acc", acc.main);
       root.style.setProperty("--acc-soft", acc.soft);
       root.style.setProperty("--acc-2", acc.hi);
       const meta = document.querySelector('meta[name="theme-color"]');
-      meta?.setAttribute("content", dark ? "#000000" : "#f2f2f7");
+      meta?.setAttribute("content", dark ? "#080808" : "#f2f2f7");
     };
     apply();
     media.addEventListener("change", apply);

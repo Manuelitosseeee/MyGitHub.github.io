@@ -98,7 +98,7 @@ export default function SettingsScreen() {
         </div>
       </Card>
 
-      <SectionTitle>Colore</SectionTitle>
+      {ap.skin !== "liquidglass" ? <><SectionTitle>Colore</SectionTitle>
       <Card className="card-pad">
         <div className="chip-row">
           {ACCENTS.map((accent) => (
@@ -120,7 +120,7 @@ export default function SettingsScreen() {
             </button>
           ))}
         </div>
-      </Card>
+      </Card></> : null}
 
       <SectionTitle>Testo</SectionTitle>
       <Card className="card-pad">

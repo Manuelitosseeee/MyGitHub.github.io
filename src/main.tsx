@@ -1,6 +1,7 @@
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import "./skins.css";
+import "./essential.css";
 import App from "./App";
 import { store } from "./data/store";
 
