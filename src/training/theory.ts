@@ -21,22 +21,6 @@ export const NOTE_IT = [
   "Si",
 ] as const;
 
-/** Nomi per VexFlow (accidentali sharp,Armatura 0..7). */
-export const VEX_KEYS = [
-  "C",
-  "C#",
-  "D",
-  "D#",
-  "E",
-  "F",
-  "F#",
-  "G",
-  "G#",
-  "A",
-  "A#",
-  "B",
-] as const;
-
 export const TONIC_NAMES = NOTE_IT;
 
 export function noteName(pc: number): string {

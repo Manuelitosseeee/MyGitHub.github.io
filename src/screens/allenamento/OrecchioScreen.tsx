@@ -18,7 +18,7 @@ import {
   type EarKind,
   type EarQuestion,
 } from "../../training/ear";
-import { playChord, playInterval, playNote, unlockAudio } from "../../training/audio";
+import { playChord, playInterval, unlockAudio } from "../../training/audio";
 
 /** Intervalli proposti per livello, in semitoni. */
 const EASY_INTERVALS = [2, 3, 4, 5, 7, 9, 12];
@@ -446,10 +446,4 @@ export default function OrecchioScreen() {
       />
     </div>
   );
-}
-
-/** Suona la tonica di riferimento: usato dai pulsanti secondari. */
-export function playTonic(midi: number): void {
-  void unlockAudio();
-  playNote(midi, { voice: "piano", gain: 0.4, duration: 0.8 });
 }

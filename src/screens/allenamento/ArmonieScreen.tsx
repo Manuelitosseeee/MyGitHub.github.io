@@ -21,7 +21,7 @@ import {
   toast,
 } from "../../ui/primitives";
 import { ChordDiagram } from "../../training/ChordDiagram";
-import { bestShape, shapeNotes } from "../../training/chords";
+import { bestShape } from "../../training/chords";
 import {
   CHARACTERS,
   COMPLEXITIES,
@@ -422,15 +422,6 @@ export default function ArmonieScreen() {
       </Sheet>
     </div>
   );
-}
-
-/** Note del diagramma dell'accordo, mostrate sotto la lista. */
-export function chordNoteList(c: ProgressionChord): string {
-  const shape = bestShape(c.notes[0] % 12, c.quality);
-  if (!shape) return "";
-  return shapeNotes(shape)
-    .map((n) => noteName(n % 12))
-    .join(" · ");
 }
 
 /** Costruisce un accordo da una scelta manuale, mantenendo il grado. */

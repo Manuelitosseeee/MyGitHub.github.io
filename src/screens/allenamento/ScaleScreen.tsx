@@ -6,7 +6,6 @@ import {
   SectionTitle,
   Seg,
   Switch,
-  toast,
 } from "../../ui/primitives";
 import { StaffView } from "../../training/StaffView";
 import {
@@ -329,8 +328,4 @@ export default function ScaleScreen() {
       </p>
     </div>
   );
-}
-
-export function scaleToast(): void {
-  toast("Scala aggiornata");
 }

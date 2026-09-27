@@ -82,24 +82,26 @@ export function StaffView({
       return note;
     });
 
+    // Le travi devono essere assegnate alle note PRIMA della formattazione:
+    // e cosi che VexFlow calcoli le steli sulla posizione definitiva.
+    const beams: Beam[] = [];
+    for (let i = 0; i + 1 < staveNotes.length; i += 2) {
+      beams.push(new Beam([staveNotes[i], staveNotes[i + 1]]));
+    }
+
     const voice = new Voice({ numBeats: notes.length, beatValue: 4 });
     voice.setStrict(false);
     voice.addTickables(staveNotes);
 
-    new Formatter()
-      .joinVoices([voice])
-      .format([voice], width - PADDING * 2 - (clef === "treble" ? 40 : 46));
-    voice.draw(ctx, stave);
-
-    // Collega le note in coppie quando sono pari (semicreste), per un aspetto
-    // più leggibile delle scale.
-    for (let i = 0; i + 1 < staveNotes.length; i += 2) {
-      const a = staveNotes[i];
-      const b = staveNotes[i + 1];
-      if (Math.abs(a.getYs().at(-1)! - b.getYs().at(-1)!) > 1) {
-        const beam = new Beam([a, b]);
-        beam.setContext(ctx).draw();
-      }
+    try {
+      new Formatter()
+        .joinVoices([voice])
+        .format([voice], width - PADDING * 2 - (clef === "treble" ? 40 : 46));
+      voice.draw(ctx, stave);
+      for (const beam of beams) beam.setContext(ctx).draw();
+    } catch {
+      // Se la formattazione fallisce resta comunque il pentagramma vuoto:
+      // non deve mai lasciare lo schermo bianco.
     }
   }, [notes, keyPc, currentIndex, compact]);
 
