@@ -765,6 +765,12 @@ html[data-skin="liquidglass"][data-theme="light"] .ear-question { color: #1b1b1b
 
 .fav-row + .fav-row { border-top: .5px solid var(--sep); }
 
+.fav-open {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+}
+
 .fav-name { font-size: 14.5px; font-weight: 600; color: var(--text); }
 
 .fav-sub {
