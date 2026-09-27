@@ -21,12 +21,14 @@ import MetronomeScreen from "./screens/MetronomeScreen";
 import TunerScreen from "./screens/TunerScreen";
 import CordeScreen from "./screens/CordeScreen";
 import SettingsScreen from "./screens/SettingsScreen";
+import AllenamentoScreen from "./screens/allenamento/AllenamentoScreen";
 
 const WELCOME_KEY = "mygithub.welcome-complete";
 
 const TAB_ICONS: Record<TabId, AppGlyphName> = {
   diario: "home",
   studio: "studio",
+  allenamento: "training",
   metronomo: "metronome-tab",
   accordatore: "tuner",
   corde: "strings",
@@ -145,6 +147,9 @@ export default function App() {
           </Pane>
           <Pane key={`studio-${songId ?? "list"}`} id="studio" active={tab === "studio"}>
             {songId ? <SongScreen songId={songId} /> : <BraniScreen />}
+          </Pane>
+          <Pane id="allenamento" active={tab === "allenamento"}>
+            <AllenamentoScreen />
           </Pane>
           <Pane id="metronomo" active={tab === "metronomo"}>
             <MetronomeScreen />
@@ -286,7 +291,7 @@ function TabBar({ active, onSelect }: { active: TabId; onSelect: (t: TabId) => v
         return (
           <button
             key={t.id}
-            className={cx("tab-btn", active === t.id && "active")}
+            className={cx("tab-btn", t.center && "tab-center", active === t.id && "active")}
             onClick={() => onSelect(t.id)}
             aria-current={active === t.id ? "page" : undefined}
           >

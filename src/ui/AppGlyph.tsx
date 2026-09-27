@@ -3,6 +3,7 @@ import type { SVGProps } from "react";
 export type AppGlyphName =
   | "home"
   | "studio"
+  | "training"
   | "metronome-tab"
   | "metronome"
   | "tuner"
@@ -48,6 +49,14 @@ export function AppGlyph({
           <path d="m14.5 6.2 6-1.4v11.1" />
           <ellipse cx="11.7" cy="17.8" rx="2.8" ry="1.9" transform="rotate(-18 11.7 17.8)" />
           <ellipse cx="17.8" cy="16.4" rx="2.8" ry="1.9" transform="rotate(-18 17.8 16.4)" />
+        </>
+      ) : null}
+      {name === "training" ? (
+        <>
+          <circle cx="10.9" cy="13.1" r="7.1" />
+          <circle cx="10.9" cy="13.1" r="2.9" />
+          <path d="m15.3 8.7 4.6-4.6" />
+          <path d="M16.5 4.1h3.4v3.4" />
         </>
       ) : null}
       {name === "metronome-tab" ? (

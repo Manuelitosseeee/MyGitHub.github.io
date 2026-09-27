@@ -3,14 +3,23 @@ import { createContext, useContext } from "react";
 export type TabId =
   | "diario"
   | "studio"
+  | "allenamento"
   | "metronomo"
   | "accordatore"
   | "corde"
   | "impostazioni";
 
-export const TABS: Array<{ id: TabId; label: string }> = [
+/** `center: true` = voce centrale della barra, resa leggermente più grande. */
+export interface TabDef {
+  id: TabId;
+  label: string;
+  center?: boolean;
+}
+
+export const TABS: TabDef[] = [
   { id: "diario", label: "Diario" },
   { id: "studio", label: "Studio" },
+  { id: "allenamento", label: "Allenam.", center: true },
   { id: "metronomo", label: "Metronomo" },
   { id: "accordatore", label: "Accordatore" },
   { id: "corde", label: "Corde" },
