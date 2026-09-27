@@ -11,7 +11,8 @@ import { store, useStore } from "./data/store";
 import { skinBaseFont } from "./data/skins";
 import { NavContext, TABS, type TabId } from "./nav";
 import { cx } from "./lib/utils";
-import { Toaster } from "./ui/primitives";
+import { Toaster, UpdateBanner } from "./ui/primitives";
+import { applyUpdate, checkForUpdate, hasPendingUpdate, watchForUpdates } from "./lib/updater";
 import DiarioScreen from "./screens/DiarioScreen";
 import BraniScreen from "./screens/studio/BraniScreen";
 import SongScreen from "./screens/studio/SongScreen";
@@ -90,6 +91,11 @@ export default function App() {
     store.setTab("studio");
   }, []);
 
+  // A new version is downloaded in the background but applied only on request.
+  const [updateReady, setUpdateReady] = useState(false);
+  const [updateDismissed, setUpdateDismissed] = useState(false);
+  useEffect(() => watchForUpdates(() => setUpdateReady(hasPendingUpdate())), []);
+
   const api = useMemo(
     () => ({ tab, songId, openTab, openSong, back }),
     [tab, songId, openTab, openSong, back]
@@ -120,6 +126,18 @@ export default function App() {
         </div>
         <TabBar active={tab} onSelect={openTab} />
       </div>
+      {updateReady && !updateDismissed ? (
+        <UpdateBanner
+          onApply={() => {
+            setUpdateDismissed(true);
+            applyUpdate();
+          }}
+          onDismiss={() => {
+            setUpdateDismissed(true);
+            void checkForUpdate();
+          }}
+        />
+      ) : null}
       <Toaster />
     </NavContext.Provider>
   );

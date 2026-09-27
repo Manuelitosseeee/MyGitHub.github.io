@@ -1,5 +1,11 @@
-/* Scala service worker — cache-first runtime caching for offline PWA use. */
-const CACHE = "scala-v1";
+/* Scala service worker — cache-first runtime caching for offline PWA use.
+ *
+ * Update policy: a new version is downloaded in the background but it NEVER
+ * takes over on its own. The new worker stays in "waiting" until the app asks
+ * for it (message SKIP_WAITING), so the running metronome is never interrupted
+ * by an update the user did not request.
+ */
+const CACHE = "scala-v2";
 const PRECACHE = [
   "./",
   "./index.html",
@@ -15,7 +21,7 @@ self.addEventListener("install", (event) => {
     caches
       .open(CACHE)
       .then((cache) => cache.addAll(PRECACHE))
-      .then(() => self.skipWaiting())
+    // No skipWaiting(): the update waits until the user applies it.
   );
 });
 
@@ -26,8 +32,11 @@ self.addEventListener("activate", (event) => {
       .then((keys) =>
         Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k)))
       )
-      .then(() => self.clients.claim())
   );
+});
+
+self.addEventListener("message", (event) => {
+  if (event.data === "SKIP_WAITING") self.skipWaiting();
 });
 
 self.addEventListener("fetch", (event) => {
@@ -50,7 +59,8 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Stale-while-revalidate for the rest.
+  // Stale-while-revalidate for the rest: the page keeps running on the assets
+  // it loaded, and the fresh ones are stored for the next launch.
   event.respondWith(
     caches.match(req).then((cached) => {
       const fetchPromise = fetch(req)

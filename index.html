@@ -26,7 +26,7 @@
       html,
       body {
         margin: 0;
-        background: #0b0e13;
+        background: #050608;
       }
       #boot {
         position: fixed;
@@ -36,7 +36,7 @@
         align-items: center;
         justify-content: center;
         gap: 14px;
-        background: radial-gradient(120% 90% at 50% 0%, #161c26 0%, #0b0e13 70%);
+        background: radial-gradient(90% 60% at 50% 0%, #22262c 0%, #050608 74%);
         z-index: 9999;
         transition: opacity 0.4s ease;
       }
@@ -47,20 +47,21 @@
       #boot .mark {
         width: 92px;
         height: 92px;
-        border-radius: 24px;
-        background: linear-gradient(160deg, #2c3848 0%, #10151d 100%);
-        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+        border-radius: 28px;
+        background: linear-gradient(145deg, rgba(255,255,255,.2), rgba(255,255,255,.025) 55%), #101216;
+        border: 1px solid rgba(255,255,255,.48);
+        box-shadow: 0 12px 40px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.48), 1px 0 rgba(42,211,255,.4), -1px 0 rgba(255,164,89,.28);
         display: flex;
         align-items: center;
         justify-content: center;
-        color: #e8edf3;
+        color: #f7f8fa;
         font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
         font-size: 46px;
         font-weight: 700;
         letter-spacing: -2px;
       }
       #boot .name {
-        color: #e8edf3;
+        color: #f7f8fa;
         font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
         font-size: 15px;
         font-weight: 600;
@@ -79,7 +80,7 @@
         height: 100%;
         width: 40%;
         border-radius: 2px;
-        background: #3b82f6;
+        background: linear-gradient(90deg, #57deff, #fff 52%, #ffbf68);
         animation: bootload 1.1s ease-in-out infinite;
       }
       @keyframes bootload {
@@ -94,7 +95,13 @@
   </head>
   <body>
     <div id="boot">
-      <div class="mark">M</div>
+      <div class="mark" aria-label="MyGitHub">
+        <svg viewBox="0 0 64 64" width="48" height="48" aria-hidden="true">
+          <path d="M32 8 13 47h38L32 8Z" fill="none" stroke="currentColor" stroke-width="4" stroke-linejoin="round"/>
+          <path d="m32 8 10 34" fill="none" stroke="#aeeeff" stroke-width="3" stroke-linecap="round"/>
+          <circle cx="44" cy="47" r="3.5" fill="#fff"/>
+        </svg>
+      </div>
       <div class="name">MyGitHub</div>
       <div class="bar"></div>
     </div>

@@ -21,11 +21,14 @@ import { VALID_FONTS, VALID_SKINS } from "./skins";
 
 export const DEFAULT_SETTINGS: Settings = {
   appearance: {
-    mode: "system",
+    mode: "dark",
     accent: "blue",
     fontSize: "m",
     font: "auto",
-    skin: "default",
+    skin: "liquidglass",
+    previousSkin: "default",
+    previousMode: "system",
+    skinRevision: 2,
   },
   metro: {
     bpm: 100,
@@ -34,6 +37,10 @@ export const DEFAULT_SETTINGS: Settings = {
     subdivision: "none",
     beats: 4,
     weights: [2, 1, 1, 1],
+    autoIncrease: false,
+    autoIntervalSeconds: 60,
+    autoBpmStep: 1,
+    wasRunning: false,
   },
   tunerUi: "needle",
   lastTab: "diario",
@@ -121,7 +128,30 @@ class Store {
       if (!(VALID_FONTS as readonly string[]).includes(ap.font as string)) {
         ap.font = "auto" as FontChoice;
       }
+      const needsSkinMigration = Boolean(stored) && ap.skinRevision !== 2;
+      // Sanitize metronome prefs: a corrupt or out-of-range volume must never
+      // leave the app permanently silent.
+      const mp = base.settings.metro;
+      if (!Number.isFinite(mp.volume)) mp.volume = DEFAULT_SETTINGS.metro.volume;
+      mp.volume = Math.max(0, Math.min(1, mp.volume));
+      if (!Number.isFinite(mp.bpm)) mp.bpm = DEFAULT_SETTINGS.metro.bpm;
+      if (!Array.isArray(mp.weights) || mp.weights.length === 0) {
+        mp.weights = [...DEFAULT_SETTINGS.metro.weights];
+      }
+      // Audio can never survive a reload: the flag is only a "was playing"
+      // hint so the app can offer to resume, and the screen clears it.
+      mp.wasRunning = Boolean(mp.wasRunning);
+      if (needsSkinMigration) {
+        ap.previousSkin = ap.skin;
+        ap.previousMode = ap.mode;
+        ap.skin = "liquidglass" as AppSkin;
+        ap.mode = "dark";
+        ap.skinRevision = 2;
+      }
       this.state = base;
+      if (needsSkinMigration) {
+        await idbSet("settings", base.settings).catch(() => undefined);
+      }
     } catch {
       this.state = emptyState();
     }

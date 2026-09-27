@@ -30,7 +30,7 @@ export const SKINS: SkinInfo[] = [
   {
     id: "default",
     name: "Default",
-    tagline: "L'aspetto attuale di MyGitHub",
+    tagline: "L'aspetto originale di MyGitHub",
     baseFont: "system",
     prev: { bg: "#eef0f4", card: "#ffffff", text: "#1c1c1e", radius: 18 },
   },
@@ -89,6 +89,13 @@ export const SKINS: SkinInfo[] = [
     tagline: "Superfici gommose, lucide ed elastiche",
     baseFont: "rounded",
     prev: { bg: "#dfe0f6", card: "#ffffff", text: "#232447", radius: 30 },
+  },
+  {
+    id: "liquidglass",
+    name: "Liquid Glass",
+    tagline: "Vetro nero, riflessi prismatici e profondità luminosa",
+    baseFont: "rounded",
+    prev: { bg: "#050608", card: "rgba(255,255,255,0.14)", text: "#ffffff", radius: 28 },
   },
   {
     id: "rinascimento",

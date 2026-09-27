@@ -642,3 +642,33 @@ export function CloseX({ onClose }: { onClose: () => void }) {
     </button>
   );
 }
+
+/* ---------------- Update banner ---------------- */
+
+/**
+ * Shown only when a new version has been downloaded and is waiting: the app
+ * never reloads on its own, so applying the update is always a deliberate tap.
+ */
+export function UpdateBanner({
+  onApply,
+  onDismiss,
+}: {
+  onApply: () => void;
+  onDismiss: () => void;
+}) {
+  return (
+    <div className="update-banner" role="status">
+      <div className="update-banner-text">
+        <b>C'è una nuova versione</b>
+        <span>Si installa solo quando lo decidi tu.</span>
+      </div>
+      <button className="btn btn-primary update-banner-apply" onClick={onApply}>
+        Aggiorna
+      </button>
+      <button className="icon-btn" onClick={onDismiss} aria-label="Chiudi">
+        <X />
+      </button>
+    </div>
+  );
+}
+

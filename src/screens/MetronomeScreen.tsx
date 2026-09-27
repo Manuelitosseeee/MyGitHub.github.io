@@ -3,7 +3,8 @@ import { Play, Square, Plus, Minus, Volume2 } from "lucide-react";
 import { useStore, store } from "../data/store";
 import { useMetronome } from "../engine/useMetronome";
 import type { MetronomeConfig, BeatWeight, MetroSound, Subdivision } from "../engine/metronome";
-import { BpmSlider, HoldBtn, SectionTitle, Card, toast } from "../ui/primitives";
+import { previewClick } from "../engine/metronome";
+import { BpmSlider, HoldBtn, SectionTitle, Card, Switch, toast } from "../ui/primitives";
 import { BeatDots } from "./studio/SongScreen";
 import { cx, clamp } from "../lib/utils";
 
@@ -37,7 +38,31 @@ export default function MetronomeScreen() {
   const [volume, setVolume] = useState(p.volume);
   const met = useMetronome("standard", () => makeCfg(bpm, weights, sub, sound, volume));
   const running = met.running;
+
   const commitTimer = useDebounceCommit();
+  const latestBpm = useRef(bpm);
+  latestBpm.current = bpm;
+
+  useEffect(() => {
+    if (!running || !p.autoIncrease) return;
+    const startedAt = Date.now();
+    let lastStep = 0;
+    const timer = window.setInterval(() => {
+      const dueStep = Math.floor((Date.now() - startedAt) / (p.autoIntervalSeconds * 1000));
+      if (dueStep <= lastStep) return;
+      const increments = dueStep - lastStep;
+      lastStep = dueStep;
+      const nextBpm = clamp(latestBpm.current + increments * p.autoBpmStep, MIN, MAX);
+      if (nextBpm === latestBpm.current) return;
+      latestBpm.current = nextBpm;
+      setBpmState(nextBpm);
+      met.engine?.setBpm(nextBpm);
+      store.updateSettings({ metro: { ...store.state.settings.metro, bpm: nextBpm } });
+    }, 250);
+    return () => window.clearInterval(timer);
+  }, [running, p.autoIncrease, p.autoIntervalSeconds, p.autoBpmStep, met.engine]);
+
+  const updateAuto = (patch: Partial<typeof p>) => persist(patch);
 
   const persist = (patch: Partial<typeof p>) => {
     store.updateSettings({ metro: { ...st.settings.metro, ...patch } });
@@ -68,8 +93,27 @@ export default function MetronomeScreen() {
 
   const start = async () => {
     const ok = await met.start();
-    if (!ok) toast("Avvia l'audio: controlla che il volume non sia muto");
+    if (!ok) {
+      toast("Audio bloccato: tocca lo schermo e riprova");
+    } else if (volume <= 0.001) {
+      toast("Volume a zero: alzalo con lo slider qui sotto");
+    } else {
+      persist({ wasRunning: true });
+    }
   };
+
+  const stop = () => {
+    met.stop();
+    persist({ wasRunning: false });
+  };
+
+  // A reload (or a platform restart) always stops the audio: offer to resume.
+  useEffect(() => {
+    if (!p.wasRunning) return;
+    persist({ wasRunning: false });
+    toast("Il metronomo si era fermato: premi Play per riprenderlo");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="screen" style={{ paddingBottom: 40 }}>
@@ -116,13 +160,56 @@ export default function MetronomeScreen() {
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", marginTop: 10 }}>
             <button
               className={cx("play-fab", running && "is-playing")}
-              onClick={() => (running ? met.stop() : void start())}
+              onClick={() => (running ? stop() : void start())}
               aria-label={running ? "Ferma" : "Avvia"}
             >
               {running ? <Square /> : <Play />}
             </button>
           </div>
         </div>
+      </Card>
+
+      <SectionTitle>Incremento automatico</SectionTitle>
+      <Card className="card-pad auto-tempo-card">
+        <div className="auto-tempo-heading">
+          <div>
+            <div className="row-title">Accelerazione graduale</div>
+            <div className="row-sub">Aumenta il tempo mentre il metronomo è in esecuzione.</div>
+          </div>
+          <Switch
+            on={p.autoIncrease}
+            onChange={(enabled) => updateAuto({ autoIncrease: enabled })}
+          />
+        </div>
+        <div className="auto-tempo-fields">
+          <label className="auto-tempo-field">
+            <span>Ogni</span>
+            <AutoTempoNumberField
+              value={p.autoIntervalSeconds}
+              min={1}
+              max={3600}
+              label="Intervallo incremento in secondi"
+              onCommit={(value) => updateAuto({ autoIntervalSeconds: value })}
+            />
+            <span>secondi</span>
+          </label>
+          <label className="auto-tempo-field">
+            <span>Aumenta di</span>
+            <AutoTempoNumberField
+              value={p.autoBpmStep}
+              min={1}
+              max={100}
+              label="Incremento automatico in BPM"
+              onCommit={(value) => updateAuto({ autoBpmStep: value })}
+            />
+            <span>BPM</span>
+          </label>
+        </div>
+        <p className="tiny text3 auto-tempo-note">
+          {p.autoIncrease
+            ? `Da ${bpm} BPM: +${p.autoBpmStep} ogni ${p.autoIntervalSeconds} secondi, fino a ${MAX} BPM.`
+            : "Attiva per allenare il tempo aumentando i BPM a intervalli regolari."}
+        </p>
       </Card>
 
       <SectionTitle>Suddivisione</SectionTitle>
@@ -214,6 +301,7 @@ export default function MetronomeScreen() {
                 setSound(s.id);
                 met.engine?.update({ sound: s.id });
                 persist({ sound: s.id });
+                previewClick(s.id, volume > 0.001 ? volume : 0.85);
               }}
             >
               {s.label}
@@ -238,7 +326,28 @@ export default function MetronomeScreen() {
               }}
             />
           </div>
+          <span className="tiny text3" style={{ width: 38, textAlign: "right" }}>
+            {Math.round(volume * 100)}%
+          </span>
         </div>
+        {volume <= 0.001 ? (
+          <button
+            className="btn btn-ghost"
+            style={{ marginTop: 10, width: "100%" }}
+            onClick={() => {
+              setVolume(0.85);
+              met.engine?.update({ volume: 0.85 });
+              persist({ volume: 0.85 });
+              previewClick(sound, 0.85);
+            }}
+          >
+            <Volume2 size={18} /> Volume a zero: ripristinalo
+          </button>
+        ) : null}
+        <p className="tiny text3" style={{ marginTop: 10 }}>
+          Tocca un suono per sentirlo. Se non senti nulla, controlla il interruttore
+          silenzioso del telefono: su iPhone l'audio esce solo con la campana attiva.
+        </p>
       </Card>
     </div>
   );
@@ -276,6 +385,42 @@ function MetroStage({
 }
 
 
+
+function AutoTempoNumberField({
+  value,
+  min,
+  max,
+  label,
+  onCommit,
+}: {
+  value: number;
+  min: number;
+  max: number;
+  label: string;
+  onCommit: (value: number) => void;
+}) {
+  const [text, setText] = useState(String(value));
+  useEffect(() => setText(String(value)), [value]);
+  return (
+    <input
+      type="number"
+      className="field"
+      min={min}
+      max={max}
+      value={text}
+      onChange={(event) => setText(event.target.value)}
+      onBlur={() => {
+        const parsed = Number(text);
+        const next = Number.isFinite(parsed) && text !== ""
+          ? clamp(Math.round(parsed), min, max)
+          : value;
+        setText(String(next));
+        if (next !== value) onCommit(next);
+      }}
+      aria-label={label}
+    />
+  );
+}
 
 function resizeWeights(weights: BeatWeight[], n: number): BeatWeight[] {
   if (n === weights.length) return [...weights];

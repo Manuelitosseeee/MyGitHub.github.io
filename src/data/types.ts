@@ -70,6 +70,11 @@ export interface MetroPrefs {
   subdivision: Subdivision;
   beats: number;
   weights: BeatWeight[];
+  autoIncrease: boolean;
+  autoIntervalSeconds: number;
+  autoBpmStep: number;
+  /** The metronome was playing when the page was last reloaded. */
+  wasRunning: boolean;
 }
 
 export type AppTheme = "system" | "light" | "dark";
@@ -106,6 +111,7 @@ export type AppSkin =
   | "lavagna"
   | "bosco"
   | "liquido"
+  | "liquidglass"
   | "rinascimento";
 
 export interface Appearance {
@@ -119,6 +125,11 @@ export interface Appearance {
   font: FontChoice;
   /** Aspetto Totale design ("default" = the current look). */
   skin: AppSkin;
+  /** Preserve the pre-redesign look so it can be restored with one tap. */
+  previousSkin: AppSkin;
+  previousMode: AppTheme;
+  /** Migrate existing installs to the new reversible Liquid Glass skin once. */
+  skinRevision: number;
 }
 
 export interface Settings {

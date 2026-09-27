@@ -129,6 +129,13 @@ export class MetronomeEngine {
     }
   }
 
+  /** One-shot click for the UI (sound preview) without starting the scheduler. */
+  preview(): void {
+    const c = getAudioContext();
+    if (!c) return;
+    this.click(c, c.currentTime + 0.01, "accent", Math.max(0.35, this.cfg.volume));
+  }
+
   /** Stop because another metronome started; notifies the owning UI. */
   forceStop(): void {
     const was = this._running;
@@ -283,4 +290,16 @@ export function releaseExclusive(e: MetronomeEngine): void {
 
 export function getActiveEngine(): MetronomeEngine | null {
   return exclusive;
+}
+
+/** Short one-shot click so the user can hear a sound preset while choosing it. */
+export function previewClick(sound: MetroSound, volume: number): void {
+  const engine = new MetronomeEngine("preview", {
+    bpm: 100,
+    volume,
+    sound,
+    subdivision: "none",
+    weights: [1],
+  });
+  engine.preview();
 }

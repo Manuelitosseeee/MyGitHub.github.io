@@ -28,6 +28,7 @@ import type {
   MetroSound,
   Subdivision,
 } from "../../engine/metronome";
+import { previewClick } from "../../engine/metronome";
 import {
   Sheet,
   Confirm,
@@ -434,6 +435,7 @@ function MetronomePanel({ song }: { song: Song }) {
   const setSoundSafe = (s: MetroSound) => {
     setSound(s);
     met.engine?.update({ sound: s });
+    previewClick(s, volume > 0.001 ? volume : 0.85);
   };
 
   const setWeightsSafe = (w: BeatWeight[]) => {
@@ -705,6 +707,9 @@ function MetronomePanel({ song }: { song: Song }) {
                   }}
                 />
               </div>
+              <span className="tiny text3" style={{ width: 38, textAlign: "right" }}>
+                {Math.round(volume * 100)}%
+              </span>
             </div>
           </div>
         </div>

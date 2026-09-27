@@ -3,8 +3,8 @@
  *
  *   bun run icons
  *
- * Renders the favicon design — dark rounded square with a metronome triangle
- * and pendulum — at every size the app needs, with 2x supersampling for
+ * Renders the Liquid Glass mark — dark glass tile with a minimal metronome
+ * silhouette and prismatic rim — at every size the app needs, with 2x supersampling for
  * antialiasing. The maskable variant fills the whole canvas and keeps the
  * glyph inside the safe zone.
  */
@@ -171,22 +171,26 @@ function makeDraw(safe) {
   const cy = safe ? 0.52 : 0.54;
 
   return (ux, uy) => {
-    // background gradient #1e2634 -> #0b0e13
-    const t = Math.max(0, Math.min(1, (uy - 0) / 1));
-    const r = 0x1e + (0x0b - 0x1e) * t;
-    const g = 0x26 + (0x0e - 0x26) * t;
-    const b = 0x34 + (0x13 - 0x34) * t;
+    // Black liquid-glass body with a restrained prismatic cyan / amber rim.
+    const t = Math.max(0, Math.min(1, uy));
+    const d = sdRoundBox(ux - 0.5, uy - 0.5, 0.5 - margin, 0.5 - margin, 0.22);
+    const rim = Math.exp(-Math.pow(d / 0.014, 2));
+    const topGlint = Math.exp(-Math.pow((ux - 0.34) / 0.27, 2) - Math.pow((uy - 0.08) / 0.11, 2));
+    const cyan = rim * Math.max(0, Math.min(1, (0.54 - ux) * 5));
+    const amber = rim * Math.max(0, Math.min(1, (ux - 0.48) * 5));
+    let r = 5 + 13 * t + 24 * topGlint + 42 * amber;
+    let g = 6 + 12 * t + 21 * topGlint + 115 * cyan + 67 * amber;
+    let b = 9 + 14 * t + 26 * topGlint + 155 * cyan + 25 * amber;
 
     let bgA = 1;
     if (!safe) {
-      // rounded-square mask with 2px-ish soft edge
-      const d = sdRoundBox(ux - 0.5, uy - 0.5, 0.5 - margin, 0.5 - margin, 0.22);
+      // Rounded-square mask with a thin refractive edge.
       bgA = Math.max(0, Math.min(1, 0.5 - d / 0.008));
       if (bgA <= 0) return [0, 0, 0, 0];
     }
 
     const cov = glyphCoverage(ux, uy, cx, cy, glyphScale);
-    // composite white glyph over the gradient background
+    // Minimal white metronome mark over the translucent glass surface.
     const gr = r / 255, gg = g / 255, gb = b / 255;
     const out = [gr, gg, gb, bgA];
     if (cov > 0) {

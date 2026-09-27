@@ -7,6 +7,7 @@ export default defineConfig({
   server: {
     host: true,
     hmr: false,
+    allowedHosts: [".e2b.app"],
   },
   build: {
     target: "es2022",
