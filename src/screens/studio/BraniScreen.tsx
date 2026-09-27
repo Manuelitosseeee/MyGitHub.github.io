@@ -13,7 +13,7 @@ export default function BraniScreen() {
 
   return (
     <div className="screen">
-      <div className="screen-title">Brani</div>
+      <div className="screen-title">Studio</div>
       <p className="screen-sub">
         La tua libreria di studio. Ogni brano ha un metronomo dedicato che
         registra automaticamente i BPM che provi.
