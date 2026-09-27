@@ -92,10 +92,10 @@ export const SKINS: SkinInfo[] = [
   },
   {
     id: "liquidglass",
-    name: "Liquid Glass",
-    tagline: "Vetro nero, riflessi prismatici e profondità luminosa",
-    baseFont: "rounded",
-    prev: { bg: "#050608", card: "rgba(255,255,255,0.14)", text: "#ffffff", radius: 28 },
+    name: "Essenziale",
+    tagline: "Nero profondo, vetro discreto e dettagli monocromatici",
+    baseFont: "system",
+    prev: { bg: "#080808", card: "#1a1a1a", text: "#ffffff", radius: 22 },
   },
   {
     id: "rinascimento",
