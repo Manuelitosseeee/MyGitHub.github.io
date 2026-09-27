@@ -11,7 +11,7 @@
       name="description"
       content="Metronomo avanzato, libreria di brani con tracking automatico del BPM, accordatore per chitarra e registro delle corde."
     />
-    <meta name="theme-color" content="#0B0E13" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#080808" media="(prefers-color-scheme: dark)" />
     <meta name="theme-color" content="#F5F5F7" media="(prefers-color-scheme: light)" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -26,7 +26,7 @@
       html,
       body {
         margin: 0;
-        background: #050608;
+        background: #080808;
       }
       #boot {
         position: fixed;
@@ -36,7 +36,7 @@
         align-items: center;
         justify-content: center;
         gap: 14px;
-        background: radial-gradient(90% 60% at 50% 0%, #22262c 0%, #050608 74%);
+        background: #080808;
         z-index: 9999;
         transition: opacity 0.4s ease;
       }
@@ -47,10 +47,10 @@
       #boot .mark {
         width: 92px;
         height: 92px;
-        border-radius: 28px;
-        background: linear-gradient(145deg, rgba(255,255,255,.2), rgba(255,255,255,.025) 55%), #101216;
-        border: 1px solid rgba(255,255,255,.48);
-        box-shadow: 0 12px 40px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.48), 1px 0 rgba(42,211,255,.4), -1px 0 rgba(255,164,89,.28);
+        border-radius: 24px;
+        background: #1b1b1b;
+        border: 1px solid rgba(255,255,255,.15);
+        box-shadow: 0 12px 40px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.07);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -80,7 +80,7 @@
         height: 100%;
         width: 40%;
         border-radius: 2px;
-        background: linear-gradient(90deg, #57deff, #fff 52%, #ffbf68);
+        background: #f1f1f1;
         animation: bootload 1.1s ease-in-out infinite;
       }
       @keyframes bootload {
@@ -98,7 +98,7 @@
       <div class="mark" aria-label="MyGitHub">
         <svg viewBox="0 0 64 64" width="48" height="48" aria-hidden="true">
           <path d="M32 8 13 47h38L32 8Z" fill="none" stroke="currentColor" stroke-width="4" stroke-linejoin="round"/>
-          <path d="m32 8 10 34" fill="none" stroke="#aeeeff" stroke-width="3" stroke-linecap="round"/>
+          <path d="m32 8 10 34" fill="none" stroke="#a5a5a5" stroke-width="3" stroke-linecap="round"/>
           <circle cx="44" cy="47" r="3.5" fill="#fff"/>
         </svg>
       </div>
