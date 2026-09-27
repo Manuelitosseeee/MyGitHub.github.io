@@ -509,93 +509,80 @@ function MetronomePanel({ song }: { song: Song }) {
   return (
     <>
       <SectionTitle>Metronomo del brano</SectionTitle>
-      <Card>
-        <div
-          className="metro-stage"
-          style={{
-            /* Each Aspetto Totale design restyles the stage (skins.css). */
-            background: "var(--stage-bg)",
-            margin: 0,
-            borderRadius: 0,
-            boxShadow: "none",
-          }}
-        >
-          <div
-            className="tiny"
-            style={{
-              color: "var(--ok)",
-              fontWeight: 700,
-              letterSpacing: 0.5,
-              textTransform: "uppercase",
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 5,
-            }}
-          >
-            <span
-              style={{
-                width: 7,
-                height: 7,
-                borderRadius: "50%",
-                background: "var(--ok)",
-                display: "inline-block",
-              }}
-            />
-            Tracking attivo
+      <Card className="metro-study-card">
+        <div className="metro-study-stage">
+          <div className="metro-study-status">
+            <span className="metro-study-status-dot" />
+            <span>Tracking attivo</span>
+            <span className="metro-study-signature">{weights.length}/4</span>
           </div>
-          <div className="tempo-num">{bpm}</div>
-          <div className="tempo-unit">BPM</div>
-          <BeatDots flash={met.flash} beats={weights.length} weights={weights} running={running} />
-          <div style={{ display: "flex", justifyContent: "center", gap: 22, marginTop: 12 }}>
-            <div className="text3" style={{ fontSize: 12.5 }}>
+          <div className="metro-beat-pills" aria-label={`${weights.length} battiti`}>
+            {weights.map((weight, index) => (
+              <span
+                key={index}
+                className={cx(
+                  "metro-beat-pill",
+                  index === 0 && "downbeat",
+                  weight === 0 && "silent",
+                  met.flash?.beat === index && running && "flashing"
+                )}
+                aria-label={`Battito ${index + 1}${weight === 0 ? ", silenzioso" : weight === 2 ? ", accentato" : ""}`}
+              />
+            ))}
+          </div>
+          <div className="metro-study-tempo">
+            <div className="metro-study-number">{bpm}</div>
+            <div className="metro-study-unit">BPM</div>
+            <div className="metro-tempo-name">{tempoName(bpm)}</div>
+          </div>
+          <SongTempoTicks bpm={bpm} />
+          <div className="metro-study-context">
+            <span>
               {song.lastBpm !== null && song.lastBpm !== bpm
-                ? `Ripresa da ${song.lastBpm}`
-                : ""}
-            </div>
+                ? `Ripresa da ${song.lastBpm} BPM`
+                : "Metronomo del brano"}
+            </span>
+            {running ? (
+              <span className="metro-study-running"><Clock size={12} /> pratica in corso</span>
+            ) : null}
           </div>
-          {running ? (
-            <div className="tiny" style={{ color: "var(--ok)", marginTop: 6, fontWeight: 700 }}>
-              <Clock size={11} style={{ verticalAlign: "-1px" }} /> pratica in corso
-            </div>
-          ) : null}
         </div>
 
-        <div style={{ padding: "12px 16px 14px" }}>
-          <div className="stepper-wrap">
-            <HoldBtn
-              className="step-btn"
-              onPress={() => setBpm(bpm - 1, { commit: "now" })}
-              disabled={bpm <= METRO_MIN}
-              label="Rallenta"
-            >
-              <Minus />
-            </HoldBtn>
-            <BpmSlider
-              value={bpm}
-              min={METRO_MIN}
-              max={METRO_MAX}
-              onChange={(v) => setBpm(v)}
-              onChangeEnd={() => setBpm(bpmRef.current, { commit: "now" })}
-            />
-            <HoldBtn
-              className="step-btn"
-              onPress={() => setBpm(bpm + 1, { commit: "now" })}
-              disabled={bpm >= METRO_MAX}
-              label="Accelera"
-            >
-              <Plus />
-            </HoldBtn>
-          </div>
-
-          <div style={{ display: "flex", justifyContent: "center", marginTop: 10 }}>
+        <div className="metro-study-controls">
+          <div className="metro-study-adjust">
             <button
-              className={cx("play-fab", running && "is-playing")}
-              onClick={() => (running ? stop() : void start())}
-              aria-label={running ? "Ferma" : "Avvia"}
+              className="metro-round-button"
+              onClick={() => setBpm(bpm - 1, { commit: "now" })}
+              disabled={bpm <= METRO_MIN}
+              aria-label="Rallenta di un BPM"
             >
-              {running ? <Square /> : <Play />}
+              <Minus size={19} />
+            </button>
+            <div className="metro-study-range">
+              <BpmSlider
+                value={bpm}
+                min={METRO_MIN}
+                max={METRO_MAX}
+                onChange={(v) => setBpm(v)}
+                onChangeEnd={() => setBpm(bpmRef.current, { commit: "now" })}
+              />
+            </div>
+            <button
+              className="metro-round-button"
+              onClick={() => setBpm(bpm + 1, { commit: "now" })}
+              disabled={bpm >= METRO_MAX}
+              aria-label="Accelera di un BPM"
+            >
+              <Plus size={19} />
             </button>
           </div>
+          <button
+            className={cx("metro-glass-play", "metro-study-play", running && "is-playing")}
+            onClick={() => (running ? stop() : void start())}
+            aria-label={running ? "Ferma il metronomo" : "Avvia il metronomo"}
+          >
+            {running ? <Square size={25} fill="currentColor" /> : <Play size={27} fill="currentColor" />}
+          </button>
 
           <div className="divider" style={{ margin: "16px 0 12px" }} />
 
@@ -738,6 +725,21 @@ function MetronomePanel({ song }: { song: Song }) {
       </Card>
     </>
   );
+}
+
+function SongTempoTicks({ bpm }: { bpm: number }) {
+  const active = Math.round(((bpm - METRO_MIN) / (METRO_MAX - METRO_MIN)) * 24);
+  return (
+    <div className="metro-tempo-ticks metro-study-ticks" aria-hidden="true">
+      {Array.from({ length: 25 }, (_, index) => (
+        <span key={index} className={cx(index <= active && "lit", index % 4 === 0 && "major")} />
+      ))}
+    </div>
+  );
+}
+
+function tempoName(bpm: number): string {
+  return bpm < 60 ? "LARGO" : bpm < 76 ? "ADAGIO" : bpm < 108 ? "ANDANTE" : bpm < 120 ? "MODERATO" : bpm < 168 ? "ALLEGRO" : "PRESTO";
 }
 
 function makeConfig(

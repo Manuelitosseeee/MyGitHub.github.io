@@ -1,5 +1,6 @@
 import { useMemo } from "react";
-import { ChevronRight, Home, Music2, Sparkles, Timer, Gauge, Guitar, Settings2 } from "lucide-react";
+import { ChevronRight, Home, Music2, Sparkles } from "lucide-react";
+import { AppGlyph, type AppGlyphName } from "../ui/AppGlyph";
 import { useStore } from "../data/store";
 import { buildDays, type DayEntry, type SongDayEntry } from "../data/selectors";
 import { useNav } from "../nav";
@@ -59,14 +60,14 @@ export default function DiarioScreen() {
       <SectionTitle>Accesso rapido</SectionTitle>
       <div className="quick-grid">
         {([
-          { id: "studio", label: "Studio", icon: Music2 },
-          { id: "metronomo", label: "Metronomo", icon: Timer },
-          { id: "accordatore", label: "Accordatore", icon: Gauge },
-          { id: "corde", label: "Corde", icon: Guitar },
-          { id: "impostazioni", label: "Impostazioni", icon: Settings2 },
+          { id: "studio", label: "Studio", icon: "studio" },
+          { id: "metronomo", label: "Metronomo", icon: "metronome" },
+          { id: "accordatore", label: "Accordatore", icon: "tuner" },
+          { id: "corde", label: "Corde", icon: "strings-coil" },
+          { id: "impostazioni", label: "Impostazioni", icon: "settings" },
         ] as const).map(({ id, label, icon: Icon }) => (
           <button key={id} className="quick-link" onClick={() => nav.openTab(id)}>
-            <Icon size={22} strokeWidth={1.7} aria-hidden="true" />
+            <AppGlyph name={Icon as AppGlyphName} size={24} strokeWidth={1.65} />
             <span>{label}</span>
             <ChevronRight size={15} aria-hidden="true" />
           </button>

@@ -8,15 +8,18 @@ import {
   type PointerEvent as RPointerEvent,
   type TouchEvent as RTouchEvent,
 } from "react";
+import { createPortal } from "react-dom";
 import { Smile, Meh, Frown, X, ZoomIn, ZoomOut, Download } from "lucide-react";
 import { clamp, cx } from "../lib/utils";
 import type { Mood } from "../data/types";
 
-/** Height (px) of the on-screen keyboard, 0 when closed. On iOS Safari the
- *  layout viewport keeps its full height when the keyboard opens, so fixed
- *  sheets would hide behind it without this offset. */
-function useKeyboardInset(): number {
-  const [inset, setInset] = useState(0);
+/** Track the visible viewport so a sheet remains above the iOS keyboard,
+ *  even when it is opened from inside a scrolling pane. */
+function useVisibleViewport(): { top: number; height: number } {
+  const [frame, setFrame] = useState(() => ({
+    top: 0,
+    height: window.visualViewport?.height ?? window.innerHeight,
+  }));
   useEffect(() => {
     const vv = window.visualViewport;
     if (!vv) return;
@@ -24,19 +27,21 @@ function useKeyboardInset(): number {
     const update = () => {
       cancelAnimationFrame(raf);
       raf = requestAnimationFrame(() => {
-        setInset(Math.max(0, window.innerHeight - vv.height));
+        setFrame({ top: Math.max(0, vv.offsetTop), height: Math.max(0, vv.height) });
       });
     };
     vv.addEventListener("resize", update);
     vv.addEventListener("scroll", update);
+    window.addEventListener("resize", update);
     update();
     return () => {
       cancelAnimationFrame(raf);
       vv.removeEventListener("resize", update);
       vv.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
     };
   }, []);
-  return inset;
+  return frame;
 }
 
 /* ---------------- Sheet (bottom modal) ---------------- */
@@ -56,7 +61,7 @@ export function Sheet({
    *  Annulla/Salva actions) so it never hides behind the keyboard. */
   footer?: ReactNode;
 }) {
-  const kb = useKeyboardInset();
+  const viewport = useVisibleViewport();
   const bodyRef = useRef<HTMLDivElement | null>(null);
   const focusTarget = useRef<HTMLElement | null>(null);
 
@@ -83,24 +88,17 @@ export function Sheet({
   };
 
   if (!open) return null;
-  return (
-    <div className="sheet-mask" onClick={onClose}>
+  return createPortal(
+    <div
+      className="sheet-mask"
+      style={{ top: viewport.top, bottom: "auto", height: viewport.height }}
+      onClick={onClose}
+    >
       <div
         className="sheet"
         role="dialog"
         aria-modal="true"
-        style={
-          kb > 0
-            ? {
-                // iOS Safari keeps the layout viewport full height under the
-                // keyboard, so a bottom-anchored sheet would hide behind it.
-                // Lift the whole sheet above the keys and cap its height to
-                // the remaining visible space.
-                marginBottom: kb,
-                maxHeight: `calc(100dvh - ${kb}px - 10px)`,
-              }
-            : undefined
-        }
+        style={{ maxHeight: `${Math.max(0, Math.min(viewport.height * 0.88, viewport.height - 10))}px` }}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="sheet-grab" />
@@ -110,7 +108,8 @@ export function Sheet({
         </div>
         {footer ? <div className="sheet-foot">{footer}</div> : null}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 

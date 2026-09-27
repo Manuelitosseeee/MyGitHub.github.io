@@ -129,6 +129,7 @@ class Store {
         ap.font = "auto" as FontChoice;
       }
       const needsSkinMigration = Boolean(stored) && ap.skinRevision !== 2;
+      const needsEssentialLock = ap.skin !== "liquidglass";
       // Sanitize metronome prefs: a corrupt or out-of-range volume must never
       // leave the app permanently silent.
       const mp = base.settings.metro;
@@ -148,8 +149,12 @@ class Store {
         ap.mode = "dark";
         ap.skinRevision = 2;
       }
+      // Essenziale is the only supported design; keep older saved selections
+      // on their data-compatible settings while enforcing the current skin.
+      ap.skin = "liquidglass" as AppSkin;
+      ap.skinRevision = 2;
       this.state = base;
-      if (needsSkinMigration) {
+      if (needsSkinMigration || needsEssentialLock) {
         await idbSet("settings", base.settings).catch(() => undefined);
       }
     } catch {
@@ -442,6 +447,12 @@ class Store {
     const next: Settings = {
       ...this.state.settings,
       ...patch,
+      appearance: {
+        ...this.state.settings.appearance,
+        ...(patch.appearance ?? {}),
+        skin: "liquidglass",
+        skinRevision: 2,
+      },
       metro: { ...this.state.settings.metro, ...(patch.metro ?? {}) },
       reminder: { ...this.state.settings.reminder, ...(patch.reminder ?? {}) },
     };

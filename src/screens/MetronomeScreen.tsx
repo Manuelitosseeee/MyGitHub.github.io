@@ -1,6 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Play, Square, Plus, Minus, Volume2 } from "lucide-react";
+import {
+  ChevronLeft,
+  Music2,
+  Play,
+  Plus,
+  Minus,
+  Square,
+  Volume2,
+} from "lucide-react";
 import { useStore, store } from "../data/store";
+import { useNav } from "../nav";
 import { useMetronome } from "../engine/useMetronome";
 import type { MetronomeConfig, BeatWeight, MetroSound, Subdivision } from "../engine/metronome";
 import { previewClick } from "../engine/metronome";
@@ -30,7 +39,9 @@ const SUBS: Array<{ id: Subdivision; label: string }> = [
 
 export default function MetronomeScreen() {
   const st = useStore();
+  const nav = useNav();
   const p = st.settings.metro;
+  const isEssential = st.settings.appearance.skin === "liquidglass";
   const [bpm, setBpmState] = useState(p.bpm);
   const [weights, setWeights] = useState<BeatWeight[]>([...p.weights]);
   const [sub, setSub] = useState<Subdivision>(p.subdivision);
@@ -116,59 +127,149 @@ export default function MetronomeScreen() {
   }, []);
 
   return (
-    <div className="screen" style={{ paddingBottom: 40 }}>
-      <div className="screen-title">Metronomo</div>
-      <p className="screen-sub">
-        Metronomo standard, del tutto indipendente dallo Studio: non registra e
-        non modifica nulla nei tuoi brani.
-      </p>
+    <div className={cx("screen", isEssential && "metro-immersive")} style={{ paddingBottom: isEssential ? 24 : 40 }}>
+      {isEssential ? (
+        <div className="metro-essential-header">
+          <button className="metro-round-button" onClick={() => nav.openTab("diario")} aria-label="Torna al diario">
+            <ChevronLeft size={23} />
+          </button>
+          <h1>Metronomo</h1>
+          <span className="metro-header-spacer" aria-hidden="true" />
+        </div>
+      ) : (
+        <>
+          <div className="screen-title">Metronomo</div>
+          <p className="screen-sub">
+            Metronomo standard, del tutto indipendente dallo Studio: non registra e
+            non modifica nulla nei tuoi brani.
+          </p>
+        </>
+      )}
 
-      <Card>
-        <MetroStage
-          bpm={bpm}
-          weights={weights}
-          running={running}
-          flash={met.flash}
-          timeSig={`${weights.length}/4`}
-        />
-        <div style={{ padding: "10px 16px 14px" }}>
-          <div className="stepper-wrap">
-            <HoldBtn
-              className="step-btn"
-              onPress={() => setBpm(bpm - 1, { commit: true })}
-              disabled={bpm <= MIN}
-              label="Rallenta"
-            >
-              <Minus />
-            </HoldBtn>
-            <BpmSlider
-              value={bpm}
-              min={MIN}
-              max={MAX}
-              onChange={(v) => setBpm(v)}
-              onChangeEnd={() => setBpm(bpm, { commit: true })}
-            />
-            <HoldBtn
-              className="step-btn"
-              onPress={() => setBpm(bpm + 1, { commit: true })}
-              disabled={bpm >= MAX}
-              label="Accelera"
-            >
-              <Plus />
-            </HoldBtn>
-          </div>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", marginTop: 10 }}>
+      {isEssential ? (
+        <section className="metro-essential-stage" aria-label="Controlli del metronomo">
+          <div className="metro-essential-meter">
             <button
-              className={cx("play-fab", running && "is-playing")}
-              onClick={() => (running ? stop() : void start())}
-              aria-label={running ? "Ferma" : "Avvia"}
+              className="metro-round-button"
+              onClick={() => previewClick(sound, volume > 0.001 ? volume : 0.85)}
+              aria-label="Ascolta il suono del metronomo"
+              title="Ascolta il suono"
             >
-              {running ? <Square /> : <Play />}
+              <Music2 size={21} />
+            </button>
+            <div className="metro-signature" aria-label={`${weights.length} quarti per battuta`}>
+              <span>{weights.length}</span><i>/</i><span>4</span><b>♩</b>
+            </div>
+            <span className="metro-meter-spacer" aria-hidden="true" />
+          </div>
+
+          <div className="metro-beat-pills" aria-label={`${weights.length} battiti`}>
+            {weights.map((weight, index) => (
+              <span
+                key={index}
+                className={cx(
+                  "metro-beat-pill",
+                  index === 0 && "downbeat",
+                  weight === 0 && "silent",
+                  met.flash?.beat === index && running && "flashing"
+                )}
+                aria-label={`Battito ${index + 1}${weight === 0 ? ", silenzioso" : weight === 2 ? ", accentato" : ""}`}
+              />
+            ))}
+          </div>
+
+          <div className="metro-tempo-display" aria-live="polite">
+            <div className="metro-tempo-number">{bpm}</div>
+            <div className="metro-tempo-name">{tempoName(bpm)}</div>
+          </div>
+
+          <TempoTicks bpm={bpm} />
+
+          <button
+            className={cx("metro-glass-play", running && "is-playing")}
+            onClick={() => (running ? stop() : void start())}
+            aria-label={running ? "Ferma il metronomo" : "Avvia il metronomo"}
+          >
+            {running ? <Square size={31} fill="currentColor" /> : <Play size={34} fill="currentColor" />}
+          </button>
+
+          <div className="metro-essential-adjust">
+            <button
+              className="metro-round-button"
+              onClick={() => setBpm(bpm - 1, { commit: true })}
+              disabled={bpm <= MIN}
+              aria-label="Rallenta di un BPM"
+            >
+              <Minus size={20} />
+            </button>
+            <div className="metro-essential-range">
+              <BpmSlider
+                value={bpm}
+                min={MIN}
+                max={MAX}
+                onChange={(value) => setBpm(value)}
+                onChangeEnd={() => setBpm(bpm, { commit: true })}
+              />
+            </div>
+            <button
+              className="metro-round-button"
+              onClick={() => setBpm(bpm + 1, { commit: true })}
+              disabled={bpm >= MAX}
+              aria-label="Accelera di un BPM"
+            >
+              <Plus size={20} />
             </button>
           </div>
-        </div>
-      </Card>
+        </section>
+      ) : (
+        <Card>
+          <MetroStage
+            bpm={bpm}
+            weights={weights}
+            running={running}
+            flash={met.flash}
+            timeSig={`${weights.length}/4`}
+          />
+          <div style={{ padding: "10px 16px 14px" }}>
+            <div className="stepper-wrap">
+              <HoldBtn
+                className="step-btn"
+                onPress={() => setBpm(bpm - 1, { commit: true })}
+                disabled={bpm <= MIN}
+                label="Rallenta"
+              >
+                <Minus />
+              </HoldBtn>
+              <BpmSlider
+                value={bpm}
+                min={MIN}
+                max={MAX}
+                onChange={(value) => setBpm(value)}
+                onChangeEnd={() => setBpm(bpm, { commit: true })}
+              />
+              <HoldBtn
+                className="step-btn"
+                onPress={() => setBpm(bpm + 1, { commit: true })}
+                disabled={bpm >= MAX}
+                label="Accelera"
+              >
+                <Plus />
+              </HoldBtn>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", marginTop: 10 }}>
+              <button
+                className={cx("play-fab", running && "is-playing")}
+                onClick={() => (running ? stop() : void start())}
+                aria-label={running ? "Ferma" : "Avvia"}
+              >
+                {running ? <Square /> : <Play />}
+              </button>
+            </div>
+          </div>
+        </Card>
+      )}
 
+      <div className="metro-options">
       <SectionTitle>Incremento automatico</SectionTitle>
       <Card className="card-pad auto-tempo-card">
         <div className="auto-tempo-heading">
@@ -349,8 +450,24 @@ export default function MetronomeScreen() {
           silenzioso del telefono: su iPhone l'audio esce solo con la campana attiva.
         </p>
       </Card>
+      </div>
     </div>
   );
+}
+
+function TempoTicks({ bpm }: { bpm: number }) {
+  const active = Math.round(((bpm - MIN) / (MAX - MIN)) * 24);
+  return (
+    <div className="metro-tempo-ticks" aria-hidden="true">
+      {Array.from({ length: 25 }, (_, index) => (
+        <span key={index} className={cx(index <= active && "lit", index % 4 === 0 && "major")} />
+      ))}
+    </div>
+  );
+}
+
+function tempoName(bpm: number): string {
+  return bpm < 60 ? "LARGO" : bpm < 76 ? "ADAGIO" : bpm < 108 ? "ANDANTE" : bpm < 120 ? "MODERATO" : bpm < 168 ? "ALLEGRO" : "PRESTO";
 }
 
 function MetroStage({
