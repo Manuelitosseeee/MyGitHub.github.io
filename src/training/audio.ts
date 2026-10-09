@@ -66,46 +66,62 @@ export function playNote(midi: number, opts: NoteOptions = {}): number {
   const env = ctx.createGain();
   env.gain.setValueAtTime(0.0001, t0);
   env.gain.exponentialRampToValueAtTime(Math.max(0.0002, gain), t0 + 0.012);
-  env.gain.exponentialRampToValueAtTime(gain * 0.35, t0 + Math.min(0.18, duration * 0.4));
-  env.gain.exponentialRampToValueAtTime(0.0001, t0 + duration);
+  env.gain.exponentialRampToValueAtTime(gain * 0.4, t0 + Math.min(0.2, duration * 0.35));
+  env.gain.setTargetAtTime(0.0001, t0 + Math.max(0.1, duration * 0.7), 0.08);
 
+  // Per il pianoforte: filtro più aperto e morbido, senza esagerare col lowpass.
   const filter = ctx.createBiquadFilter();
   filter.type = "lowpass";
-  filter.Q.value = 0.9;
-  filter.frequency.setValueAtTime(
-    voice === "bell" ? 5200 : voice === "guitar" ? 3600 : 2600,
-    t0
-  );
-  filter.frequency.exponentialRampToValueAtTime(700, t0 + duration);
+  filter.Q.value = 0.5;
+  if (voice === "bell") {
+    filter.frequency.value = 5200;
+  } else if (voice === "guitar") {
+    filter.frequency.value = 3400;
+  } else {
+    // piano: più brillante all'attacco, poi si chiude dolcemente
+    filter.frequency.setValueAtTime(4200, t0);
+    filter.frequency.exponentialRampToValueAtTime(900, t0 + duration);
+  }
 
   env.connect(filter);
   filter.connect(out);
 
-  // Oscillatore principale più due parziali: un timbro pieno ma non asciutto.
+  // Oscillatore principale: piano usa triangle con più corpi, chitarra usa sawtooth.
   const main = ctx.createOscillator();
   main.type = voice === "guitar" ? "sawtooth" : "triangle";
   main.frequency.value = freq;
   const mainGain = ctx.createGain();
-  mainGain.gain.value = voice === "guitar" ? 0.42 : 0.6;
+  mainGain.gain.value = voice === "guitar" ? 0.38 : 0.55;
   main.connect(mainGain);
   mainGain.connect(env);
 
+  // Parziali: il pianoforte ha armoniche più ricche nei primi tempi.
   const partials: Array<[number, number, OscillatorType]> =
     voice === "bell"
       ? [
           [2, 0.18, "sine"],
           [3.01, 0.07, "sine"],
         ]
-      : [
-          [2, 0.16, "sine"],
-          [3, 0.06, "sine"],
-        ];
+      : voice === "guitar"
+        ? [
+            [2, 0.14, "sawtooth"],
+            [3, 0.05, "sine"],
+          ]
+        : [
+            [2, 0.18, "triangle"],
+            [3, 0.10, "sine"],
+            [4.01, 0.04, "sine"],
+          ];
   for (const [mult, amount, type] of partials) {
     const o = ctx.createOscillator();
     o.type = type;
     o.frequency.value = freq * mult;
     const g = ctx.createGain();
-    g.gain.value = amount;
+    // I parziali più alti decadono prima, come nel pianoforte reale.
+    g.gain.setValueAtTime(amount, t0);
+    if (mult > 2.5) {
+      g.gain.exponentialRampToValueAtTime(0.0001, t0 + duration * 0.6);
+    }
     o.connect(g);
     g.connect(env);
     o.start(t0);

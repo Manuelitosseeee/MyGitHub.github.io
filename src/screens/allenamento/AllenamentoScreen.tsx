@@ -14,11 +14,11 @@ import { Card, Empty, SectionTitle } from "../../ui/primitives";
 import AccordiScreen from "./AccordiScreen";
 import ArmonieScreen from "./ArmonieScreen";
 import BranoScreen from "./BranoScreen";
+import ManoDestraScreen from "./ManoDestraScreen";
 import OrecchioScreen from "./OrecchioScreen";
 import ScaleScreen from "./ScaleScreen";
 
-export type ToolId = "accordi" | "scale" | "orecchio" | "brano" | "armonie";
-
+export type ToolId = "accordi" | "scale" | "orecchio" | "brano" | "armonie" | "mano-destra";
 export interface ToolDef {
   id: ToolId;
   title: string;
@@ -46,6 +46,12 @@ export const TOOLS: ToolDef[] = [
     icon: Ear,
   },
   {
+    id: "mano-destra",
+    title: "Mano Destra",
+    subtitle: "Pattern con p-i-m-a per allenare l'indipendenza delle dita (Villalobos style)",
+    icon: Gauge,
+  },
+  {
     id: "brano",
     title: "Allena un Brano",
     subtitle: "Rallenta un passaggio del tuo file audio e ripetilo a passo sicuro",
@@ -63,6 +69,7 @@ const SCREENS: Record<ToolId, () => JSX.Element> = {
   accordi: AccordiScreen,
   scale: ScaleScreen,
   orecchio: OrecchioScreen,
+  "mano-destra": ManoDestraScreen,
   brano: BranoScreen,
   armonie: ArmonieScreen,
 };

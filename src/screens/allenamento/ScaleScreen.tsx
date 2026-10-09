@@ -78,6 +78,7 @@ export default function ScaleScreen() {
   // Cambiando scala o tonalità l'esercizio precedente non ha più senso.
   useEffect(() => {
     setExercise([]);
+    stopPlayback();
   }, [scaleId, keyPc, octave, patternLen]);
 
   /* ---------------- Metronomo ---------------- */
@@ -113,8 +114,6 @@ export default function ScaleScreen() {
     setPlaying(false);
     setCursor(-1);
   }, []);
-
-  useEffect(() => stopPlayback, [stopPlayback]);
 
   const play = async () => {
     await unlockAudio();

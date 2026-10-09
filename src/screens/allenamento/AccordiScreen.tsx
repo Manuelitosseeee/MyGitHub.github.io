@@ -58,6 +58,7 @@ export default function AccordiScreen() {
   const [diagram, setDiagram] = useState(false);
   const [showExcluded, setShowExcluded] = useState(false);
   const [finished, setFinished] = useState(false);
+  const [progressionMode, setProgressionMode] = useState(false);
 
   const archive = useMemo(
     () =>
@@ -70,6 +71,83 @@ export default function AccordiScreen() {
     [level, barreOnly, excluded]
   );
 
+  /** Progressione logica: gira tra accordi diatonici coerenti.
+   *  Tipo: La min → Mi min → Fa maj → Sol maj → Do maj (putami di girare).
+   *  Si basa sui gradi della scala maggiore: vi - ii - IV - V - I. */
+  const progressionArchive = useMemo(() => {
+    if (archive.length === 0) return [];
+    // Raggruppa per root per facilitare la progressione.
+    const byRoot = new Map<number, ChordEntry[]>();
+    for (const e of archive) {
+      const list = byRoot.get(e.rootPc) ?? [];
+      list.push(e);
+      byRoot.set(e.rootPc, list);
+    }
+    return byRoot;
+  }, [archive]);
+
+  /** Scegli il prossimo accordo in progressione logica.
+   *  La progressione segue: vi → ii → IV → V → I (in maggiore)
+   *  oppure gradi corrispondenti in minore.
+   *  Se non ci sono accordi per quel grado, si prende il più vicino. */
+  const pickInProgression = useCallback(
+    (currentEntry?: ChordEntry) => {
+      if (archive.length === 0) return archive[0] ?? null;
+      // Gradi target nella scala maggiore (0 = tonic, 5 = ii, 9 = iii, 5 = IV...)
+      // Usiamo la progressione: I - V - vi - IV (molto comune)
+      // oppure vi - ii - IV - V - I per più varietà
+      const progressionSteps = [9, 2, 5, 7, 0]; // vi, ii, IV, V, I (semintoni dalla tonica)
+      
+      // Se non c'è un accordo corrente, parte da un grado a caso
+      if (!currentEntry) {
+        const firstGrade = progressionSteps[0];
+        const candidates = archive.filter((e) => e.rootPc === firstGrade);
+        if (candidates.length > 0) {
+          return candidates[Math.floor(Math.random() * candidates.length)];
+        }
+        // Se non c'è, cerca l'accordo con root più vicina
+        const pool = archive;
+        if (pool.length === 0) return null;
+        return pool[Math.floor(Math.random() * pool.length)];
+      }
+      
+      // Trova il prossimo grado nella progressione
+      const currentIdx = progressionSteps.indexOf(currentEntry.rootPc);
+      let nextGrade: number;
+      if (currentIdx >= 0) {
+        // Continua la progressione
+        nextGrade = progressionSteps[(currentIdx + 1) % progressionSteps.length];
+      } else {
+        // Accordo non nella progressione: salta a un grado a caso
+        nextGrade = progressionSteps[Math.floor(Math.random() * progressionSteps.length)];
+      }
+      
+      // Cerca accordi con quella root
+      const candidates = archive.filter((e) => e.rootPc === nextGrade);
+      if (candidates.length > 0) {
+        return candidates[Math.floor(Math.random() * candidates.length)];
+      }
+      
+      // Se non c'è, cerca accordi con root vicina (entro 2 semitoni)
+      const nearby = archive.filter(
+        (e) => Math.min(
+          Math.abs((e.rootPc - nextGrade + 12) % 12),
+          Math.abs((e.rootPc - nextGrade - 12) % 12)
+        ) <= 2
+      );
+      if (nearby.length > 0) {
+        return nearby[Math.floor(Math.random() * nearby.length)];
+      }
+      
+      // Fallback: pick casuale
+      const pool = archive;
+      if (pool.length === 0) return null;
+      return pool[Math.floor(Math.random() * pool.length)];
+    },
+    [archive]
+  );
+
+  /** Pick casuale normale (per modalità libera tradizionale). */
   const pick = useCallback(
     (excludeId?: string) => {
       const pool = archive.filter((e) => e.shape.id !== excludeId);
@@ -86,12 +164,22 @@ export default function AccordiScreen() {
       setCurrent((c) => (c?.shape.id === pair[0]!.shape.id ? pair[1]! : pair[0]!));
       return;
     }
+    if (progressionMode) {
+      setCurrent((c) => pickInProgression(c ?? undefined));
+      return;
+    }
     setCurrent((c) => pick(c?.shape.id));
-  }, [pair, pairMode, pick]);
+  }, [pair, pairMode, progressionMode, pick, pickInProgression]);
 
   useEffect(() => {
-    if (mode === "libero" && !current) setCurrent(pick());
-  }, [mode, current, pick]);
+    if (mode === "libero" && !current) {
+      if (progressionMode) {
+        setCurrent(pickInProgression());
+      } else {
+        setCurrent(pick());
+      }
+    }
+  }, [mode, current, progressionMode, pick, pickInProgression]);
 
   /* ---------------- Sfida a tempo ---------------- */
 
@@ -327,6 +415,14 @@ export default function AccordiScreen() {
             <em>Un click per ogni accordo</em>
           </span>
           <Switch on={useMetro} onChange={setUseMetro} />
+        </div>
+
+        <div className="train-switch-row">
+          <span className="train-switch-label">
+            Progressione logica
+            <em>Gira tra accordi coerenti: La min → Mi min → Fa → Sol → Do</em>
+          </span>
+          <Switch on={progressionMode} onChange={setProgressionMode} />
         </div>
 
         {useMetro ? (
