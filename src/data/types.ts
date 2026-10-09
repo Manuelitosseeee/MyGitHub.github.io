@@ -32,6 +32,7 @@ export interface PracticeDay {
 
 /** An optional, explicit study session tied to a song. */
 export interface StudySession {
+  activeSeconds?: number;
   id: string;
   songId: string;
   start: number;
@@ -168,6 +169,7 @@ export interface ProgressionFav {
 }
 
 export interface Settings {
+  pixelStory?: boolean;
   appearance: Appearance;
   metro: MetroPrefs;
   tunerUi: "needle" | "line";

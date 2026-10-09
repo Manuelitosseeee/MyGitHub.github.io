@@ -37,7 +37,11 @@ const SUBS: Array<{ id: Subdivision; label: string }> = [
   { id: "sixteenth", label: "Sedicesimi" },
 ];
 
-export default function MetronomeScreen() {
+export default function MetronomeScreen({ embedded = false, onState, stopSignal = 0 }: {
+  embedded?: boolean;
+  onState?: (running: boolean, bpm: number, flash: number) => void;
+  stopSignal?: number;
+} = {}) {
   const st = useStore();
   const nav = useNav();
   const p = st.settings.metro;
@@ -49,6 +53,8 @@ export default function MetronomeScreen() {
   const [volume, setVolume] = useState(p.volume);
   const met = useMetronome("standard", () => makeCfg(bpm, weights, sub, sound, volume));
   const running = met.running;
+  useEffect(() => { onState?.(running, bpm, met.flash?.key ?? 0); }, [running, bpm, met.flash?.key, onState]);
+  useEffect(() => { if (stopSignal > 0) met.stop(); }, [stopSignal]);
 
   const commitTimer = useDebounceCommit();
   const latestBpm = useRef(bpm);
@@ -128,7 +134,7 @@ export default function MetronomeScreen() {
 
   return (
     <div className={cx("screen", isEssential && "metro-immersive")} style={{ paddingBottom: isEssential ? 24 : 40 }}>
-      {isEssential ? (
+      {isEssential && !embedded ? (
         <div className="metro-essential-header">
           <button className="metro-round-button" onClick={() => nav.openTab("diario")} aria-label="Torna al diario">
             <ChevronLeft size={23} />

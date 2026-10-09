@@ -1,4 +1,6 @@
 import {
+  lazy,
+  Suspense,
   useCallback,
   useEffect,
   useMemo,
@@ -22,6 +24,8 @@ import TunerScreen from "./screens/TunerScreen";
 import CordeScreen from "./screens/CordeScreen";
 import SettingsScreen from "./screens/SettingsScreen";
 import AllenamentoScreen from "./screens/allenamento/AllenamentoScreen";
+
+const PixelStory = lazy(() => import("./pixel/PixelStory"));
 
 const WELCOME_KEY = "mygithub.welcome-complete";
 
@@ -146,7 +150,7 @@ export default function App() {
             <DiarioScreen />
           </Pane>
           <Pane key={`studio-${songId ?? "list"}`} id="studio" active={tab === "studio"}>
-            {songId ? <SongScreen songId={songId} /> : <BraniScreen />}
+            {st.settings.pixelStory ? <Suspense fallback={<div className="screen">Preparo la tua stanza…</div>}><PixelStory active={tab === "studio"} /></Suspense> : songId ? <SongScreen songId={songId} /> : <BraniScreen />}
           </Pane>
           <Pane id="allenamento" active={tab === "allenamento"}>
             <AllenamentoScreen />

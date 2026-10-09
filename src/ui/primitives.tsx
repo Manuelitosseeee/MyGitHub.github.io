@@ -144,13 +144,16 @@ export function Seg<T extends string>({
 export function Switch({
   on,
   onChange,
+  label,
 }: {
   on: boolean;
   onChange: (v: boolean) => void;
+  label?: string;
 }) {
   return (
     <button
       role="switch"
+      aria-label={label}
       aria-checked={on}
       className={cx("switch", on && "on")}
       onClick={() => onChange(!on)}
