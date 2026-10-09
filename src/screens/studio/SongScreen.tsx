@@ -847,7 +847,7 @@ function SessionsCard({ song }: { song: Song }) {
       ) : (
         <Card>
           {sessions.map((x, i) => {
-            const dur = x.end !== null ? Math.round((x.end - x.start) / 1000) : 0;
+            const dur = x.activeSeconds !== undefined ? Math.round(x.activeSeconds) : x.end !== null ? Math.round((x.end - x.start) / 1000) : 0;
             return (
               <div key={x.id} className="row-link" style={{ padding: "12px 16px" }}>
                 <span className="icon-badge" style={{ background: "var(--acc-soft)", color: "var(--acc)" }}>
