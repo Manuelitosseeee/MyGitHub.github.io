@@ -317,6 +317,15 @@ class Store {
 
   /* ---------- Study sessions (optional, explicit) ---------- */
 
+  async recordPixelSession(id: string, songId: string, start: number, seconds: number): Promise<void> {
+    // Stable session id makes recovery idempotent if the app closes at completion.
+    if (this.state.sessions.some((s) => s.id === id) || !this.songById(songId)) return;
+    const bpm = this.songById(songId)?.lastBpm ?? null;
+    this.addPracticeSeconds(songId, seconds);
+    this.commit("sessions", [...this.state.sessions, { id, songId, start, end: Date.now(), activeSeconds: seconds, startBpm: bpm, finalBpm: bpm }]);
+    await this.writeQueue;
+  }
+
   startSession(songId: string): StudySession | null {
     const song = this.songById(songId);
     if (!song) return null;
