@@ -5,15 +5,15 @@
  * for it (message SKIP_WAITING), so the running metronome is never interrupted
  * by an update the user did not request.
  */
-const CACHE = "scala-v2";
+const CACHE = "mygithub-pick-v3";
 const PRECACHE = [
   "./",
   "./index.html",
   "./manifest.webmanifest",
-  "./icons/icon-192.png",
-  "./icons/icon-512.png",
-  "./icons/icon-maskable-512.png",
-  "./icons/apple-touch-icon.png",
+  "./icons/icon-192.png?v=pick-1",
+  "./icons/icon-512.png?v=pick-1",
+  "./icons/icon-maskable-512.png?v=pick-1",
+  "./icons/apple-touch-icon.png?v=pick-1",
 ];
 
 self.addEventListener("install", (event) => {
