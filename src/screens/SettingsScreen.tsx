@@ -125,7 +125,7 @@ export default function SettingsScreen() {
       <Card className="card-pad">
         <Row icon={<PlayCircle />} title="Trasforma Studio in Pixel Story"
           sub="Studia nella tua stanza pixel art. Acquisti e progressi restano salvati anche disattivando la modalità."
-          control={<Switch on={Boolean(st.settings.pixelStory)} onChange={(value) => store.updateSettings({ pixelStory: value })} />} />
+          control={<Switch label="Trasforma Studio in Pixel Story" on={Boolean(st.settings.pixelStory)} onChange={(value) => store.updateSettings({ pixelStory: value })} />} />
       </Card>
       <SectionTitle>Comportamento</SectionTitle>
       <Card className="card-pad">
