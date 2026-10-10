@@ -549,7 +549,7 @@ class Store {
     const date=dayKey(),existing=this.state.dailyGoals.find(g=>g.songId===songId&&g.date===date);
     if(existing)return existing;
     const m=this.state.milestones.find(x=>x.songId===songId),song=this.songById(songId);
-    if(!m||!song||song.goalBpm===null)return null;
+    if(!m||m.tempoGoal===false||!song||song.goalBpm===null)return null;
     const p=plan(m,song.goalBpm,bestFor(songId,this.state.studyResults),this.state.settings.studyDays??[0,1,2,3,4,5,6],date);
     if(!p.scheduled||p.complete||p.completion===null)return null;
     const goal={id:`${songId}::${date}`,songId,date,from:p.from,target:p.target,path:m.path};

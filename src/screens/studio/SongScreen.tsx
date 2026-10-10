@@ -392,13 +392,13 @@ function GoalSheet({
 function MetronomePanel({ song }: { song: Song }) {
   const nav=useNav();
   const st = useStore();
-  const [dailyGoal] = useState(()=>{const m=st.milestones.find(m=>m.songId===song.id);if(!m||song.goalBpm===null)return null;const p=plan(m,song.goalBpm,bestFor(song.id,st.studyResults),st.settings.studyDays??ALL_DAYS);return p.scheduled&&!p.complete&&p.completion?{id:`${song.id}::${dayKey()}`,songId:song.id,date:dayKey(),from:p.from,target:p.target,path:m.path}:null});
+  const [dailyGoal] = useState(()=>{const m=st.milestones.find(m=>m.songId===song.id);if(!m||m.tempoGoal===false||song.goalBpm===null)return null;const p=plan(m,song.goalBpm,bestFor(song.id,st.studyResults),st.settings.studyDays??ALL_DAYS);return p.scheduled&&!p.complete&&p.completion?{id:`${song.id}::${dayKey()}`,songId:song.id,date:dayKey(),from:p.from,target:p.target,path:m.path}:null});
   useEffect(()=>{store.todayGoal(song.id)},[song.id,st.settings.studyDays,st.milestones,song.goalBpm,dayKey()]);
   const [bpm, setBpmState] = useState<number>(dailyGoal?.from ?? song.lastBpm ?? 60);
   const studyTime=useRef({bpm:0,seconds:0});
   const goal=st.dailyGoals.find(g=>g.songId===song.id&&g.date===dayKey());
   const milestone=st.milestones.find(m=>m.songId===song.id);
-  const future=milestone&&song.goalBpm!==null?plan(milestone,song.goalBpm,bestFor(song.id,st.studyResults),st.settings.studyDays??ALL_DAYS):null;
+  const future=milestone&&milestone.tempoGoal!==false&&song.goalBpm!==null?plan(milestone,song.goalBpm,bestFor(song.id,st.studyResults),st.settings.studyDays??ALL_DAYS):null;
   const [sub, setSub] = useState<Subdivision>(st.settings.metro.subdivision);
   const [sound, setSound] = useState<MetroSound>(st.settings.metro.sound);
   const [volume, setVolume] = useState<number>(st.settings.metro.volume);
