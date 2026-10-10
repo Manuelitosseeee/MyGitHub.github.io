@@ -5,7 +5,7 @@
  * for it (message SKIP_WAITING), so the running metronome is never interrupted
  * by an update the user did not request.
  */
-const CACHE = "mygithub-pixel-v11";
+const CACHE = "mygithub-study-v12";
 const PRECACHE = [
   "./pixel/items/home-rug.png",
   "./pixel/items/home-desk.png",
@@ -150,4 +150,14 @@ self.addEventListener("fetch", (event) => {
       return cached || fetchPromise;
     })
   );
+});
+
+// Real push delivery works while the app is closed, where supported by the OS.
+self.addEventListener("push",event=>{
+ let data={title:"La tua sessione di oggi",body:"Apri MyGitHub per il tuo piano di studio.",tag:"study"};
+ try{if(event.data)data={...data,...event.data.json()}}catch{}
+ event.waitUntil(self.registration.showNotification(data.title,{body:data.body,tag:data.tag,icon:"/icons/icon-192.png?v=pick-1",badge:"/icons/icon-192.png?v=pick-1",data:{url:"/?study=today"}}));
+});
+self.addEventListener("notificationclick",event=>{
+ event.notification.close();event.waitUntil((async()=>{const all=await clients.matchAll({type:"window",includeUncontrolled:true});for(const client of all)if(new URL(client.url).origin===self.location.origin){await client.navigate('/?study=today');return client.focus()}return clients.openWindow('/?study=today')})());
 });
