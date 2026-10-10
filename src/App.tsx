@@ -1,3 +1,4 @@
+import {watchNotificationSync} from "./study/notifications";
 import {
   lazy,
   Suspense,
@@ -53,7 +54,8 @@ const ACCENTS: Record<string, { main: string; soft: string; hi: string }> = {
 
 export default function App() {
   const st = useStore();
-  const initial = isTab(st.settings.lastTab) ? st.settings.lastTab : "diario";
+  useEffect(()=>watchNotificationSync(msg=>console.warn(msg)),[]);
+  const initial = new URLSearchParams(location.search).get("study")==="today" ? "diario" : isTab(st.settings.lastTab) ? st.settings.lastTab : "diario";
   const [tab, setTabState] = useState<TabId>(initial);
   const [songId, setSongId] = useState<string | null>(null);
   const [showWelcome, setShowWelcome] = useState(() => {
@@ -150,7 +152,7 @@ export default function App() {
             <DiarioScreen />
           </Pane>
           <Pane key={`studio-${songId ?? "list"}`} id="studio" active={tab === "studio"}>
-            {st.settings.pixelStory ? <Suspense fallback={<div className="screen">Preparo la tua stanza…</div>}><PixelStory active={tab === "studio"} /></Suspense> : songId ? <SongScreen songId={songId} /> : <BraniScreen />}
+            {songId ? <SongScreen songId={songId} /> : st.settings.pixelStory ? <Suspense fallback={<div className="screen">Preparo la tua stanza…</div>}><PixelStory active={tab === "studio"} /></Suspense> : <BraniScreen />}
           </Pane>
           <Pane id="allenamento" active={tab === "allenamento"}>
             <AllenamentoScreen />
