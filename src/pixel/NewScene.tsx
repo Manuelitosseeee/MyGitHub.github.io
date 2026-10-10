@@ -16,7 +16,7 @@ export default function NewScene(props:{state:PixelState;mapId:MapId;running:boo
  const draw=(now:number)=>{if(!alive)return;raf=requestAnimationFrame(draw);if(now-last<45||document.hidden)return;last=now;const {state:p,running,bpm,flash}=live.current;const owned=ownedOnMap(p,id),key=owned.join('|');
  if(key!==cacheKey){cacheKey=key;composeRoom(rc,base,id,owned,assets,false);}
  const el=cv.current;if(!el)return;const {width:w,height:h}=geom.current;if(w<2||h<2)return;const dpr=Math.min(2,devicePixelRatio||1);if(el.width!==Math.round(w*dpr)||el.height!==Math.round(h*dpr)){el.width=Math.round(w*dpr);el.height=Math.round(h*dpr);}const c=el.getContext('2d');if(!c)return;const cam=camera(w,h),t=now/1000,active=p.session?.status==='running';c.setTransform(dpr,0,0,dpr,0,0);c.imageSmoothingEnabled=false;
- drawRoomEdges(c,base,w,h,cam);
+ drawRoomEdges(c,base,w,h,cam,{home:970,studio:920,shop:500,rehearsal:620,stage:500}[id]);
  // The complete map fits; edge continuation uses only this map's empty background.
  c.translate(cam.x,cam.y);c.scale(cam.scale,cam.scale);c.drawImage(room,0,0);c.save();const pose=handPose(t,active,reduced);c.translate(pose.lean,active&&!reduced?Math.sin(t*1.4)*.6:0);c.drawImage(motion.clean,0,0);drawHands(c,motion,t,active,reduced);c.restore();
  if(owned.includes(itemId(id,id==='home'?'plant':'plants'))&&!reduced){c.save();c.globalAlpha=.06*(1+Math.sin(t*.8));for(const p of ITEM_ART[id][id==='home'?'plant':'plants']??[])drawPart(c,assets,p,Math.sin(t*.6));c.restore();}
