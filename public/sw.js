@@ -5,8 +5,17 @@
  * for it (message SKIP_WAITING), so the running metronome is never interrupted
  * by an update the user did not request.
  */
-const CACHE = "mygithub-pixel-v5";
+const CACHE = "mygithub-pixel-v6";
 const PRECACHE = [
+  "./pixel/studio-full.webp",
+  "./pixel/studio-base.webp",
+  "./pixel/shop-full.webp",
+  "./pixel/shop-base.webp",
+  "./pixel/rehearsal-full.webp",
+  "./pixel/rehearsal-base.webp",
+  "./pixel/stage-full.webp",
+  "./pixel/stage-base.webp",
+
   "./pixel/approved-v2.webp",
   "./pixel/neutral-v2.webp",
   "./pixel/furniture-v2.webp",
