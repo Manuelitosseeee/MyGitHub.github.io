@@ -1,0 +1,20 @@
+{
+  "name": "myguitarhub-study-push",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "esbuild worker.ts --bundle --platform=node --format=esm --external:node:* --banner:js=\"import {createRequire} from 'node:module';const require=createRequire('file:///worker.js');\" --outfile=worker.js",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "web-push": "^3.6.7"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "5.20261010.1",
+    "@types/web-push": "3.6.4",
+    "esbuild": "0.28.2",
+    "typescript": "7.0.2",
+    "wrangler": "4.149.0",
+    "fake-indexeddb": "6.2.5"
+  }
+}
