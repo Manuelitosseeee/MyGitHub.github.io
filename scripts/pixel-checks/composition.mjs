@@ -3,7 +3,7 @@ import {createRequire} from 'node:module';
 import {mkdir,writeFile} from 'node:fs/promises';
 const require=createRequire(import.meta.url),esbuild=require('esbuild'),{createCanvas,loadImage}=require('@napi-rs/canvas');
 async function mod(path){const r=await esbuild.build({entryPoints:[path],bundle:true,platform:'node',format:'esm',write:false});return import('data:text/javascript;base64,'+Buffer.from(r.outputFiles[0].text).toString('base64'));}
-const {composeRoom}=await mod('src/pixel/composition.ts'),model=await mod('src/pixel/model.ts'),art=await mod('src/pixel/art.ts'),{ITEM_ART,assetNames}=await mod('src/pixel/itemArt.ts');
+const {composeRoom}=await mod('src/pixel/composition.ts'),model=await mod('src/pixel/model.ts'),art=await mod('src/pixel/art.ts'),{ITEM_ART,assetNames,drawPart}=await mod('src/pixel/itemArt.ts');
 const sheet=createCanvas(5*251,5*422),sc=sheet.getContext('2d');let row=0,singles=0,combinations=0;
 for(const id of ['home','studio','shop','rehearsal','stage']){
  console.log('checking',id);const base=await loadImage(`public/pixel/${id==='home'?'empty-v2':id+'-base'}.webp`),assets=Object.fromEntries(await Promise.all(assetNames(id).map(async name=>[name,await loadImage(`public/pixel/items/${name}.png`)])));
@@ -14,7 +14,7 @@ for(const id of ['home','studio','shop','rehearsal','stage']){
  const baseline=createCanvas(art.ART_W,art.ART_H),bc=baseline.getContext('2d');composeRoom(bc,base,id,included,assets);const before=bc.getImageData(0,0,art.ART_W,art.ART_H).data;
  for(const item of paid){if(!ITEM_ART[id][id==='home'?item.id:item.id.split(':')[1]])continue;
   composeRoom(c,base,id,[...included,item.id],assets);const after=c.getImageData(0,0,art.ART_W,art.ART_H).data;
-  const support=createCanvas(art.ART_W,art.ART_H),mc=support.getContext('2d');mc.imageSmoothingEnabled=false;for(const p of ITEM_ART[id][id==='home'?item.id:item.id.split(':')[1]])mc.drawImage(assets[p.asset],p.x,p.y,p.w,p.h);const mask=mc.getImageData(0,0,art.ART_W,art.ART_H).data;
+  const support=createCanvas(art.ART_W,art.ART_H),mc=support.getContext('2d');mc.imageSmoothingEnabled=false;for(const p of ITEM_ART[id][id==='home'?item.id:item.id.split(':')[1]])drawPart(mc,assets,p);const mask=mc.getImageData(0,0,art.ART_W,art.ART_H).data;
   for(let k=0;k<before.length;k+=4)if(mask[k+3]===0)for(let j=0;j<4;j++)assert.ok(Math.abs(after[k+j]-before[k+j])<=2,`${item.id} erased or pasted background outside its silhouette`);
   singles++;
  }
