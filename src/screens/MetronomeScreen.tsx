@@ -56,6 +56,9 @@ export default function MetronomeScreen({ embedded = false, onState, stopSignal 
   useEffect(() => { onState?.(running, bpm, met.flash?.key ?? 0); }, [running, bpm, met.flash?.key, onState]);
   useEffect(() => { if (stopSignal > 0) met.stop(); }, [stopSignal]);
 
+  // Both entry points reuse this screen and follow the same persisted preferences.
+  useEffect(() => { if (!running) { setBpmState(p.bpm); setWeights([...p.weights]); setSub(p.subdivision); setSound(p.sound); setVolume(p.volume); } }, [p.bpm, p.weights, p.subdivision, p.sound, p.volume, running]);
+
   const commitTimer = useDebounceCommit();
   const latestBpm = useRef(bpm);
   latestBpm.current = bpm;

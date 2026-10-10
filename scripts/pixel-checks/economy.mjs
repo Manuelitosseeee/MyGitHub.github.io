@@ -19,3 +19,10 @@ assert.equal(m.completed(p),false);for(const i of m.ITEMS.filter(i=>i.required))
 let tiny=m.begin(m.initialPixel(),'song','Tiny',0,'s');for(let i=1;i<=120;i++)tiny=m.tick(tiny,i*500);assert.equal(tiny.balanceCents,100,'Fractional ticks preserve 1 euro/min');
 assert.equal(m.clock(3661000),'01:01:01');assert.deepEqual(m.recover({version:1,balanceCents:-50}),m.initialPixel());
 console.log('PASS: accrual, pauses, resume, purchases, bonus snapshot, recovery, completion, fractional cents, no duplicate rewards');
+
+const artwork=await esbuild.build({entryPoints:['src/pixel/art.ts'],bundle:true,platform:'node',format:'esm',write:false});
+const a=await import('data:text/javascript;base64,'+Buffer.from(artwork.outputFiles[0].text).toString('base64'));
+for(const [w,h] of [[390,844],[430,932],[1440,900],[844,390]]){const c=a.camera(w,h);assert.ok(c.scale>0);assert.ok(c.x>=0&&c.y>=0);assert.ok(c.x+a.ART_W*c.scale<=w+.001);assert.ok(c.y+a.ART_H*c.scale<=h+.001);for(const q of Object.values(a.HOTSPOTS)){assert.ok(c.x+(q[0]+q[2])*c.scale<=w+.001);assert.ok(c.y+(q[1]+q[3])*c.scale<=h+.001);}}
+const old=m.initialPixel();delete old.deskLightOn;old.owned=['desk','lamp','plant'];old.balanceCents=12345;const migrated=m.recover(old);assert.deepEqual(migrated.owned,old.owned);assert.equal(migrated.balanceCents,12345);assert.equal(migrated.deskLightOn,true);
+assert.equal(a.hasAllArt(m.ITEMS.map(i=>i.id)),true);assert.equal(a.hasAllArt(['desk']),false);
+console.log('PASS: portrait/landscape geometry, hotspot bounds, previous purchases and light migration');
