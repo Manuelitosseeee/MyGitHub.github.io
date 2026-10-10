@@ -31,7 +31,7 @@ export const ITEM_ART:Record<MapId,Record<string,Part[]>>={
   guitar:[standing('home-guitar',783,1130,355,40)],
   art:[fit('home-art-note',25,242,125),fit('home-art-guitar',630,342,85),fit('home-art-score',166,605,110)],
   records:[standing('home-records',15,1510,185,150)],
-  curtains:[fit('home-curtains',188,183,403)],
+  curtains:[fit('home-curtains',133,183,403)],
   cat:[standing('home-cat',113,494,62,35)],
   plant:[pot(12,494,105),pot(619,307,105),pot(900,307,100),pot(835,438,105,30,true),pot(885,719,90,30,true),pot(801,1475,205,180),pot(295,1515,205,180)]
  },
