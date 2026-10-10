@@ -24,8 +24,8 @@ for(const id of ['home','studio','shop','rehearsal','stage']){
  }
  const first=id==='stage'?'stage:amp':id==='rehearsal'?'rehearsal:amps':id==='studio'?'studio:rack':id==='shop'?'shop:wall':'shelf';const guitar=id==='shop'?'shop:guitars':id==='rehearsal'?'rehearsal:bass':id==='home'?'guitar':`${id}:guitar`;
  for(const [col,owned]of [included,[...included,first],[...included,guitar],[...included,first,guitar],[...included,...paid.map(i=>i.id)]].entries()){composeRoom(c,base,id,owned,assets);sc.drawImage(cv,col*251,row*422+25,251,392);sc.fillStyle='#fff';sc.font='12px sans-serif';sc.fillText(`${id}: ${['included','amp/furniture','guitar only','both','all'][col]}`,col*251+3,row*422+17);}
- for(const [w,h]of [[390,844],[393,852],[430,932],[844,390],[1363,936]]){const view=createCanvas(w,h),v=view.getContext('2d'),cam=art.camera(w,h);v.translate(cam.x,cam.y);v.scale(cam.scale,cam.scale);v.drawImage(cv,0,0);for(const [x,y]of [[0,0],[w-1,0],[0,h-1],[w-1,h-1]])assert.equal(v.getImageData(x,y,1,1).data[3],255);}
+ for(const [w,h]of [[390,844],[393,852],[430,932],[844,390],[1363,936]]){const view=createCanvas(w,h),v=view.getContext('2d'),cam=art.camera(w,h);art.drawRoomEdges(v,base,w,h,cam);v.translate(cam.x,cam.y);v.scale(cam.scale,cam.scale);v.drawImage(cv,0,0);for(const [x,y]of [[0,0],[w-1,0],[0,h-1],[w-1,h-1]])assert.equal(v.getImageData(x,y,1,1).data[3],255);}
  row++;
 }
 await mkdir('/workspace/scratch/21f787905e4e/composition-qa',{recursive:true});await writeFile('/workspace/scratch/21f787905e4e/composition-qa/isolated-purchases.png',sheet.toBuffer('image/png'));
-console.log(`PASS: ${singles} single purchases affect only their alpha silhouette; ${combinations} ownership combinations; transparent assets and unchanged fullscreen coverage.`);
+console.log(`PASS: ${singles} single purchases affect only their alpha silhouette; ${combinations} ownership combinations; transparent assets and complete-map framing and fullscreen edge coverage.`);

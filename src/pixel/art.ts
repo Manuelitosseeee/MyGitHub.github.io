@@ -12,7 +12,18 @@ export const HOTSPOTS = {
  clock:[690,238,170,75], metro:[657,871,108,124], rain:[263,238,207,296],
  fire:[19,624,116,167], lamp:[853,263,45,49], deskLight:[138,724,145,112], cat:[96,433,69,60],
 } as const;
-// One uniform cover transform: every viewport pixel belongs to the real map.
-export function camera(width:number,height:number){const scale=Math.max(width/ART_W,height/ART_H);return {scale,x:(width-ART_W*scale)/2,y:Math.min(0,Math.max(height-ART_H*scale,height*.55-960*scale))};}
+// Fit the complete composition. Cover would crop the furniture on narrow phones.
+export function camera(width:number,height:number){const scale=Math.min(width/ART_W,height/ART_H);return {scale,x:(width-ART_W*scale)/2,y:(height-ART_H*scale)/2};}
+// Continue only the empty room's edge textures, at their original scale, around
+// the fitted scene. Never stretch furniture, repeat purchased sprites or add a
+// foreign floor. The central composition always remains fully visible.
+export function drawRoomEdges(c:CanvasRenderingContext2D,base:CanvasImageSource,width:number,height:number,cam:ReturnType<typeof camera>,wallColumn=970){
+ const band=64,step=band*cam.scale,rw=ART_W*cam.scale,rh=ART_H*cam.scale;
+ c.save();c.imageSmoothingEnabled=false;
+ for(let y=cam.y-step;y>-step;y-=step)c.drawImage(base,0,0,ART_W,band,cam.x,y,rw,step+1);
+ for(let y=cam.y+rh;y<height;y+=step)c.drawImage(base,0,ART_H-band,ART_W,band,cam.x,y,rw,step+1);
+ if(cam.x>0){c.drawImage(base,wallColumn,0,1,ART_H,0,cam.y,cam.x+1,rh);c.drawImage(base,wallColumn,0,1,ART_H,cam.x+rw,cam.y,width-cam.x-rw+1,rh);}
+ c.restore();
+}
 export function visibleHotspot(cam:ReturnType<typeof camera>,width:number,height:number,q:readonly number[]){const w=Math.min(q[2]*cam.scale,width-24),h=Math.min(q[3]*cam.scale,height-24);return {x:Math.max(12,Math.min(width-w-12,cam.x+q[0]*cam.scale)),y:Math.max(12,Math.min(height-h-12,cam.y+q[1]*cam.scale)),w,h};}
 export function hasAllArt(owned:string[]){return ['rug','desk','shelf','guitar','art','records','plant','curtains','cat'].every(id=>owned.includes(id));}
