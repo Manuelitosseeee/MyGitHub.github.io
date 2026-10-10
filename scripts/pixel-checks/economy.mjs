@@ -22,8 +22,9 @@ console.log('PASS: accrual, pauses, resume, purchases, bonus snapshot, recovery,
 
 const artwork=await esbuild.build({entryPoints:['src/pixel/art.ts'],bundle:true,platform:'node',format:'esm',write:false});
 const a=await import('data:text/javascript;base64,'+Buffer.from(artwork.outputFiles[0].text).toString('base64'));
-for(const [w,h] of [[390,844],[430,932],[393,852],[1440,900],[844,390]]){const c=a.camera(w,h);assert.ok(c.scale>0);assert.ok(c.x<=0&&c.y<=0);assert.ok(c.x+a.ART_W*c.scale>=w-.001);assert.ok(c.y+a.ART_H*c.scale>=h-.001);assert.equal(c.scale,Math.max(w/a.ART_W,h/a.ART_H));const box=a.visibleHotspot(c,w,h,a.HOTSPOTS.clock);assert.ok(box.x>=0&&box.y>=0&&box.x+box.w<=w&&box.y+box.h<=h);}
+for(const [w,h] of [[390,844],[430,932],[393,852],[1440,900],[1363,936],[844,390]]){const c=a.camera(w,h);assert.ok(c.scale>0);assert.ok(c.x<=0&&c.y<=0);assert.ok(c.x+a.ART_W*c.scale>=w-.001);assert.ok(c.y+a.ART_H*c.scale>=h-.001);assert.equal(c.scale,Math.max(w/a.ART_W,h/a.ART_H));const box=a.visibleHotspot(c,w,h,a.HOTSPOTS.clock);assert.ok(box.x>=0&&box.y>=0&&box.x+box.w<=w&&box.y+box.h<=h);}
 
+for(const [w,h]of [[390,844],[1363,936],[1440,900]]){const c=a.camera(w,h);assert.ok(c.y+701*c.scale>=0&&c.y+1209*c.scale<=h,'Character and footrest stay in view');}
 const old=m.initialPixel();delete old.deskLightOn;old.owned=['desk','lamp','plant'];old.balanceCents=12345;const migrated=m.recover(old);assert.deepEqual(migrated.owned,old.owned);assert.equal(migrated.balanceCents,12345);assert.equal(migrated.deskLightOn,true);
 assert.equal(a.hasAllArt(m.ITEMS.map(i=>i.id)),true);assert.equal(a.hasAllArt(['desk']),false);
 console.log('PASS: portrait/landscape geometry, hotspot bounds, previous purchases and light migration');
