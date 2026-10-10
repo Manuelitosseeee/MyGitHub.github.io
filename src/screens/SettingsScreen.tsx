@@ -1,3 +1,4 @@
+import {StudySettings} from "../study/StudySettings";
 import { useState, type ReactNode } from "react";
 import { PlayCircle, RotateCcw, Trash2, Type } from "lucide-react";
 import { useStore, store } from "../data/store";
@@ -154,11 +155,12 @@ export default function SettingsScreen() {
         />
       </Card>
 
+      <StudySettings/>
       <SectionTitle>Dati</SectionTitle>
       <Card className="card-pad">
         <div className="row-title" style={{ fontSize: 15 }}>Ripristina tutto</div>
         <p className="row-sub" style={{ marginBottom: 12 }}>
-          Elimina brani, progressi, sessioni, spartiti, corde, impostazioni e tutti i dati Pixel Story, compresi plettri, acquisti e mappe. L'operazione non è reversibile.
+          Elimina brani, progressi, sessioni, spartiti, corde, impostazioni, calendario, percorsi, promemoria e tutti i dati Pixel Story, compresi plettri, acquisti e mappe. L'operazione non è reversibile.
         </p>
         <button className="btn btn-danger" onClick={() => setResetting(true)}>
           <RotateCcw /> Elimina tutti i dati
