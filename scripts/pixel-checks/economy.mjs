@@ -26,3 +26,10 @@ for(const [w,h] of [[390,844],[430,932],[1440,900],[844,390]]){const c=a.camera(
 const old=m.initialPixel();delete old.deskLightOn;old.owned=['desk','lamp','plant'];old.balanceCents=12345;const migrated=m.recover(old);assert.deepEqual(migrated.owned,old.owned);assert.equal(migrated.balanceCents,12345);assert.equal(migrated.deskLightOn,true);
 assert.equal(a.hasAllArt(m.ITEMS.map(i=>i.id)),true);assert.equal(a.hasAllArt(['desk']),false);
 console.log('PASS: portrait/landscape geometry, hotspot bounds, previous purchases and light migration');
+// Every unlock is economic; no elapsed-time/session requirement.
+let world={...m.initialPixel(),balanceCents:2000000};
+for(const map of m.MAPS){assert.equal(m.mapUnlocked(world,map.id),true);world=m.selectMap(world,map.id);assert.equal(world.mapId,map.id);if(map.id!=='home'){assert.ok(m.ownedOnMap(world,map.id).length>world.owned.length);assert.equal(m.completed(world,map.id),false);}for(const item of m.itemsForMap(map.id)){if(!item.included){const balance=world.balanceCents;world=m.buy(world,item.id);assert.equal(world.balanceCents,balance-item.price*100);}}assert.equal(m.completed(world,map.id),true);}
+assert.equal(world.totalMs,0);assert.equal(world.receipts.length,0);assert.ok(m.bonusFor(world.owned)<=150);
+let locked={...m.initialPixel(),balanceCents:999999};assert.equal(m.selectMap(locked,'stage'),locked);assert.equal(m.buy(locked,'stage:piano'),locked);assert.equal(m.mapUnlocked(locked,'studio'),false);
+let run=m.begin(world,'song','Stage',1000,'all-map-session');assert.equal(run.session.mapId,'stage');assert.equal(m.selectMap(run,'home'),run);run=m.pause(run,61000);const save=m.recover(JSON.parse(JSON.stringify(run)));assert.equal(save.mapId,'stage');assert.equal(save.session.mapId,'stage');assert.deepEqual(save.owned,run.owned);assert.equal(save.balanceCents,run.balanceCents);
+console.log('PASS: all five shops, included furniture, sequential economic unlocks, locked purchases, active-map recovery');
