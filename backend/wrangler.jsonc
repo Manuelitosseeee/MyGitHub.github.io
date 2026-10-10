@@ -1,0 +1,27 @@
+{
+  "name": "myguitarhub-study",
+  "main": "worker.ts",
+  "compatibility_date": "2026-10-10",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "myguitarhub-study-reminders",
+      "database_id": "469ac790-d612-4d10-8f65-4a2f02b8ccc8"
+    }
+  ],
+  "triggers": {
+    "crons": [
+      "* * * * *"
+    ]
+  },
+  "vars": {
+    "VAPID_PUBLIC": "BA6KzEbRFXoDsBN62ZWQBoDWJ7MDstcn9skD6n2OHCpcNcnBkaw2sgi54xAOWMDaNn6z-_TkrEnmbOxGx-PCP8A"
+  }
+}

@@ -1,3 +1,5 @@
+import {GoalEditor} from "../../study/calendar";
+import {dayKey,PATHS,plan,bestFor,resultToday,ALL_DAYS} from "../../study/planner";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   ChevronLeft,
@@ -98,6 +100,8 @@ export default function SongScreen({ songId }: { songId: string }) {
 function SongBody({ song }: { song: Song }) {
   const st = useStore();
   const nav = useNav();
+  const [planning,setPlanning]=useState(false);
+  const milestone=st.milestones.find(m=>m.songId===song.id);
   const [renaming, setRenaming] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
@@ -149,6 +153,8 @@ function SongBody({ song }: { song: Song }) {
         storico del brano.
       </p>
 
+      <button className="btn btn-soft" onClick={()=>setPlanning(true)}>{milestone?"Modifica percorso e scadenza":"Programma un traguardo"}</button>
+      {planning&&<GoalEditor milestone={milestone??null} songId={song.id} onClose={()=>setPlanning(false)}/>}
       <GoalCard song={song} />
       <MetronomePanel song={song} />
       <SheetsCard song={song} />
@@ -384,8 +390,15 @@ function GoalSheet({
 /* ------------------------- Tracked metronome ------------------------- */
 
 function MetronomePanel({ song }: { song: Song }) {
+  const nav=useNav();
   const st = useStore();
-  const [bpm, setBpmState] = useState<number>(song.lastBpm ?? 60);
+  const [dailyGoal] = useState(()=>{const m=st.milestones.find(m=>m.songId===song.id);if(!m||song.goalBpm===null)return null;const p=plan(m,song.goalBpm,bestFor(song.id,st.studyResults),st.settings.studyDays??ALL_DAYS);return p.scheduled&&!p.complete&&p.completion?{id:`${song.id}::${dayKey()}`,songId:song.id,date:dayKey(),from:p.from,target:p.target,path:m.path}:null});
+  useEffect(()=>{store.todayGoal(song.id)},[song.id,st.settings.studyDays,st.milestones,song.goalBpm,dayKey()]);
+  const [bpm, setBpmState] = useState<number>(dailyGoal?.from ?? song.lastBpm ?? 60);
+  const studyTime=useRef({bpm:0,seconds:0});
+  const goal=st.dailyGoals.find(g=>g.songId===song.id&&g.date===dayKey());
+  const milestone=st.milestones.find(m=>m.songId===song.id);
+  const future=milestone&&song.goalBpm!==null?plan(milestone,song.goalBpm,bestFor(song.id,st.studyResults),st.settings.studyDays??ALL_DAYS):null;
   const [sub, setSub] = useState<Subdivision>(st.settings.metro.subdivision);
   const [sound, setSound] = useState<MetroSound>(st.settings.metro.sound);
   const [volume, setVolume] = useState<number>(st.settings.metro.volume);
@@ -505,9 +518,15 @@ function MetronomePanel({ song }: { song: Song }) {
     [song.id]
   );
   useRunClock(running, recordSeconds, recordSeconds);
+  useEffect(()=>{if(!running)return;let last=Date.now();const t=setInterval(()=>{const now=Date.now(),dt=Math.min(2,(now-last)/1000);last=now;if(document.hidden||volume<=0||weights.every(w=>w===0)){studyTime.current={bpm:0,seconds:0};return;}const acc=studyTime.current;if(acc.bpm!==bpm){acc.bpm=bpm;acc.seconds=0;}acc.seconds+=dt;if(acc.seconds>=30)store.recordStudyResult(song.id,bpm,acc.seconds);},1000);return()=>clearInterval(t)},[running,bpm,volume,weights,song.id]);
+  useEffect(()=>{studyTime.current={bpm,seconds:0}},[bpm,running]);
+
 
   return (
     <>
+      {goal&&<p className="row-sub">{PATHS[goal.path].label} · Oggi {goal.from} → {goal.target} BPM{future?.completion?` · Completamento previsto ${new Date(future.completion+'T12:00:00').toLocaleDateString('it-IT')}`:''}</p>}
+      {future?.warning&&<p className="row-sub" role="status">{future.warning}</p>}
+      {goal&&bpm>=goal.target&&<div className="smart-reached" role="status"><b>Obiettivo giornaliero raggiunto!</b><p>Velocità impostata: non certifica l’esecuzione. I progressi si salvano dopo 30 secondi di studio continuo con metronomo attivo.</p><button className="tiny" onClick={()=>{const order=[...store.state.milestones].sort((a,b)=>store.state.settings.studySort==='difficulty'?PATHS[b.path].pace-PATHS[a.path].pace||a.date.localeCompare(b.date):a.date.localeCompare(b.date));const next=order.map(m=>store.songById(m.songId??'')).find(s=>{if(!s||s.id===song.id)return false;const g=store.todayGoal(s.id);return !!g&&resultToday(s.id,store.state.studyResults)<g.target});if(next)nav.openSong(next.id);else nav.openTab('diario')}}>Passa al prossimo brano →</button></div>}
       <SectionTitle>Metronomo del brano</SectionTitle>
       <Card className="metro-study-card">
         <div className="metro-study-stage">

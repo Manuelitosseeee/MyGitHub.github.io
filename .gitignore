@@ -7,3 +7,7 @@ dist
 .DS_Store
 *.tsbuildinfo
 node_modules/.tmp
+
+backend/.dev.vars
+backend/node_modules/
+backend/.wrangler/

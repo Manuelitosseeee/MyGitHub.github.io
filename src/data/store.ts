@@ -1,3 +1,4 @@
+import {bestFor,dayKey,plan,type Milestone} from "../study/planner";
 import { useReducer, useEffect } from "react";
 import { idbGet, idbSet, idbDelete, idbClear } from "../lib/idb";
 import { uid } from "../lib/utils";
@@ -24,6 +25,9 @@ import { VALID_FONTS, VALID_SKINS } from "./skins";
 import { pixel } from "../pixel/state";
 
 export const DEFAULT_SETTINGS: Settings = {
+  studyDays: [0,1,2,3,4,5,6],
+  studySort: "deadline",
+  notifications: {enabled:false,time:"18:00",daily:true,deadlines:true,incomplete:true},
   appearance: {
     mode: "dark",
     accent: "blue",
@@ -61,6 +65,7 @@ export function defaultMetroWeights(beats: number): Array<0 | 1 | 2> {
 
 function emptyState(): DBState {
   return {
+    milestones: [], studyResults: [], dailyGoals: [],
     songs: [],
     events: [],
     practices: [],
@@ -105,6 +110,9 @@ class Store {
         EarAnswer[],
         ProgressionFav[],
       ];
+      base.milestones = await idbGet("milestones") ?? [];
+      base.studyResults = await idbGet("studyResults") ?? [];
+      base.dailyGoals = await idbGet("dailyGoals") ?? [];
       base.songs = (s[0] ?? []) as Song[];
       base.events = (s[1] ?? []) as BpmEvent[];
       base.practices = (s[2] ?? []) as PracticeDay[];
@@ -248,6 +256,7 @@ class Store {
   }
 
   setSongGoal(id: string, goalBpm: number | null): void {
+    this.commit("dailyGoals",this.state.dailyGoals.filter(g=>g.songId!==id));
     this.commit(
       "songs",
       this.state.songs.map((s) => (s.id === id ? { ...s, goalBpm } : s))
@@ -256,6 +265,9 @@ class Store {
 
   /** Hard delete a song with all of its history. */
   deleteSong(id: string): void {
+    this.commit("milestones",this.state.milestones.filter(m=>m.songId!==id));
+    this.commit("studyResults",this.state.studyResults.filter(m=>m.songId!==id));
+    this.commit("dailyGoals",this.state.dailyGoals.filter(m=>m.songId!==id));
     const sheets = this.state.sheets.filter((sh) => sh.songId === id);
     sheets.forEach((sh) => this.removeBlob(sh.id));
     this.commit("sheets", this.state.sheets.filter((sh) => sh.songId !== id));
@@ -523,6 +535,34 @@ class Store {
     );
   }
 
+  saveMilestone(m: Milestone): void {
+    const rest=this.state.milestones.filter(x=>x.id!==m.id && (!m.songId || x.songId!==m.songId));
+    this.commit("milestones",[...rest,m]);
+    if(m.songId)this.commit("dailyGoals",this.state.dailyGoals.filter(x=>x.songId!==m.songId));
+  }
+  deleteMilestone(id:string): void {
+    const m=this.state.milestones.find(x=>x.id===id);
+    this.commit("milestones",this.state.milestones.filter(x=>x.id!==id));
+    if(m?.songId)this.commit("dailyGoals",this.state.dailyGoals.filter(x=>x.songId!==m.songId));
+  }
+  todayGoal(songId:string) {
+    const date=dayKey(),existing=this.state.dailyGoals.find(g=>g.songId===songId&&g.date===date);
+    if(existing)return existing;
+    const m=this.state.milestones.find(x=>x.songId===songId),song=this.songById(songId);
+    if(!m||!song||song.goalBpm===null)return null;
+    const p=plan(m,song.goalBpm,bestFor(songId,this.state.studyResults),this.state.settings.studyDays??[0,1,2,3,4,5,6],date);
+    if(!p.scheduled||p.complete||p.completion===null)return null;
+    const goal={id:`${songId}::${date}`,songId,date,from:p.from,target:p.target,path:m.path};
+    this.commit("dailyGoals",[...this.state.dailyGoals.filter(g=>g.date>=date),goal]);
+    return goal;
+  }
+  recordStudyResult(songId:string,bpm:number,seconds:number,at=Date.now()): void {
+    if(seconds<30||!this.songById(songId)||!Number.isFinite(bpm))return;
+    const date=dayKey(new Date(at)),id=`${songId}::${date}::${bpm}`;
+    if(this.state.studyResults.some(r=>r.id===id))return;
+    this.commit("studyResults",[...this.state.studyResults,{id,songId,date,bpm,seconds,at}]);
+  }
+
   /* ---------- Settings ---------- */
 
   updateSettings(patch: Partial<Settings>): void {
@@ -538,6 +578,7 @@ class Store {
       metro: { ...this.state.settings.metro, ...(patch.metro ?? {}) },
       reminder: { ...this.state.settings.reminder, ...(patch.reminder ?? {}) },
     };
+    if(patch.studyDays)this.commit("dailyGoals",[]);
     this.commit("settings", next);
   }
 
@@ -548,6 +589,8 @@ class Store {
 
   /** Wipe everything (all songs, history, blobs) and reset settings. */
   async resetAll(): Promise<void> {
+    const {removePush}=await import("../study/notifications");
+    await removePush().catch(()=>undefined);
     pixel.reset();
     this.writeQueue = this.writeQueue.then(() => idbClear().catch(() => undefined));
     this.state = emptyState();

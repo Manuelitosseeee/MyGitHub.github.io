@@ -1,3 +1,4 @@
+import {StudyHome} from "../study/StudyHome";
 import { useMemo } from "react";
 import { ChevronRight, Home, Music2, Sparkles } from "lucide-react";
 import { AppGlyph, type AppGlyphName } from "../ui/AppGlyph";
@@ -48,6 +49,7 @@ export default function DiarioScreen() {
         </div>
       </div>
 
+      <StudyHome/>
       <SectionTitle>Questa settimana</SectionTitle>
       <Card className="card-pad">
         <WeekChart bars={week} />
