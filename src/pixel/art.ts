@@ -12,5 +12,7 @@ export const HOTSPOTS = {
  clock:[690,238,170,75], metro:[657,871,108,124], rain:[263,238,207,296],
  fire:[19,624,116,167], lamp:[853,263,45,49], deskLight:[138,724,145,112], cat:[96,433,69,60],
 } as const;
-export function camera(width:number,height:number){const scale=Math.min(width/ART_W,height/ART_H);const spare=height-ART_H*scale;return {scale,x:(width-ART_W*scale)/2,y:Math.min(60,Math.max(0,spare*.25))};}
+// One uniform cover transform: every viewport pixel belongs to the real map.
+export function camera(width:number,height:number){const scale=Math.max(width/ART_W,height/ART_H);return {scale,x:(width-ART_W*scale)/2,y:(height-ART_H*scale)/2};}
+export function visibleHotspot(cam:ReturnType<typeof camera>,width:number,height:number,q:readonly number[]){const w=Math.min(q[2]*cam.scale,width-24),h=Math.min(q[3]*cam.scale,height-24);return {x:Math.max(12,Math.min(width-w-12,cam.x+q[0]*cam.scale)),y:Math.max(12,Math.min(height-h-12,cam.y+q[1]*cam.scale)),w,h};}
 export function hasAllArt(owned:string[]){return ['rug','desk','shelf','guitar','art','records','plant','curtains','cat'].every(id=>owned.includes(id));}
