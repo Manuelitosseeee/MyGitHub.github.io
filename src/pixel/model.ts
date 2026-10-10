@@ -2,19 +2,23 @@ export const PIXEL_KEY = 'mygithub.pixel-story.v1';
 export interface Item { id: string; name: string; price: number; bonus: number; required: boolean; tile?: number; description: string; }
 export const ITEMS: Item[] = [
   { id:'rug', name:'Tappeto intrecciato',price:25,bonus:0,required:true,tile:3,description:'Un angolo caldo per la tua postazione.' },
-  { id:'desk',name:'Scrivania musicale',price:80,bonus:5,required:true,tile:1,description:'Spartiti e lampada da studio · +5% permanente.' },
-  { id:'shelf',name:'Libreria del musicista',price:140,bonus:10,required:true,tile:0,description:'Una collezione di musica · +10% permanente.' },
+  { id:'desk',name:'Scrivania musicale',price:80,bonus:5,required:true,tile:1,description:'Scrivania, sedia e lampada da studio · +5% permanente.' },
+  { id:'shelf',name:'Libreria del musicista',price:140,bonus:10,required:true,tile:0,description:'La libreria originale e le sue collezioni · +10% permanente.' },
   { id:'guitar',name:'Classica in noce',price:220,bonus:20,required:true,tile:2,description:'Una seconda classica · +20% permanente.' },
   { id:'fire',name:'Legna per il camino',price:50,bonus:0,required:true,description:'Accendi il fuoco: fiamme, scintille e luce viva.' },
-  { id:'lamp',name:'Lampada da terra',price:45,bonus:0,required:true,tile:6,description:'Toccala nella stanza per accenderla o spegnerla.' },
-  { id:'plant',name:'Pianta verde',price:20,bonus:0,required:false,tile:4,description:'Un piccolo tocco di verde.' },
-  { id:'art',name:'Quadro musicale',price:15,bonus:0,required:false,tile:5,description:'La tua passione, anche sulle pareti.' },
-  { id:'records',name:'Angolo dei vinili',price:100,bonus:5,required:false,tile:7,description:'Musica da collezionare · +5% permanente.' },
+  { id:'lamp',name:'Lanterna sulla mensola',price:45,bonus:0,required:true,description:'Una luce calda sulla mensola: toccala per accenderla o spegnerla.' },
+  { id:'plant',name:'Piante e foglie della casa',price:20,bonus:0,required:false,tile:4,description:'Piante sul camino, sulla mensola, sulla libreria e vicino ai mobili.' },
+  { id:'art',name:'Quadri musicali',price:15,bonus:0,required:false,tile:5,description:'I tre quadri originali: nota, chitarra e spartito.' },
+  { id:'records',name:'Mobiletto dei libri',price:100,bonus:5,required:false,tile:7,description:'Il mobiletto in primo piano con tutti i suoi libri · +5% permanente.' },
 ];
+ITEMS.push(
+ {id:'curtains',name:'Tende color malva',price:15,bonus:0,required:false,description:'Le tende originali ai lati della finestra.'},
+ {id:'cat',name:'Gattino sul camino',price:10,bonus:0,required:false,description:'Un compagno tranquillo che ogni tanto socchiude gli occhi.'},
+);
 export interface PixelSession { id:string; songId:string; title:string; startedAt:number; activeMs:number; checkpoint:number|null; earnedCents:number; bonus:number; status:'running'|'paused'; }
 export interface Receipt { id:string; songId:string; title:string; startedAt:number; activeMs:number; earnedCents:number; bonus:number; recorded?:boolean; }
-export interface PixelState { version:1; balanceCents:number; owned:string[]; session:PixelSession|null; receipts:Receipt[]; totalMs:number; totalEarnedCents:number; lampOn:boolean; fireOn:boolean; rainOn:boolean; }
-export const initialPixel = ():PixelState => ({version:1,balanceCents:0,owned:[],session:null,receipts:[],totalMs:0,totalEarnedCents:0,lampOn:true,fireOn:true,rainOn:true});
+export interface PixelState { version:1; balanceCents:number; owned:string[]; session:PixelSession|null; receipts:Receipt[]; totalMs:number; totalEarnedCents:number; lampOn:boolean; deskLightOn:boolean; fireOn:boolean; rainOn:boolean; }
+export const initialPixel = ():PixelState => ({version:1,balanceCents:0,owned:[],session:null,receipts:[],totalMs:0,totalEarnedCents:0,lampOn:true,deskLightOn:true,fireOn:true,rainOn:true});
 export const bonusFor = (owned:string[]) => Math.min(50, ITEMS.filter(i=>owned.includes(i.id)).reduce((s,i)=>s+i.bonus,0));
 export const completed = (p:PixelState) => ITEMS.filter(i=>i.required).every(i=>p.owned.includes(i.id));
 export const earnings = (ms:number,bonus:number) => Math.floor(ms * (100 + bonus) / 60000);
