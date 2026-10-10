@@ -17,7 +17,7 @@ export function plan(m:Milestone,final:number,best:number,days:number[],today=da
  const before=studyDates(today,shiftDay(m.date,-cfg.early),days);
  const sessions=m.path==='relax'?available.length:Math.min(Math.ceil(remaining/cfg.pace),Math.max(1,before.length||available.length));
  const increment=m.path==='relax'?Math.floor(remaining/sessions):Math.ceil(remaining/sessions),target=Math.min(final,from+increment);
- const alternative=(Object.keys(PATHS) as Path[]).find(p=>PATHS[p].pace>=increment&&PATHS[p].pace>cfg.pace)??null;
+ const alternative=increment>cfg.pace?((Object.keys(PATHS) as Path[]).find(p=>PATHS[p].pace>=increment&&PATHS[p].pace>cfg.pace)??null):null;
  const warning=increment>cfg.pace?`Servono circa +${increment} BPM per giorno di studio, oltre i +${cfg.pace} indicativi.${alternative?` Prova il percorso ${PATHS[alternative].label}.`:' Sposta la scadenza o aggiungi giorni di studio.'}`:cfg.early&&before.length<Math.ceil(remaining/cfg.pace)?`Anticipo di ${cfg.early} giorni non disponibile: completamento entro la scadenza.`:'';
  return {suggestedDate:increment>cfg.pace?suggestion():null,from,target:days.includes(weekday(today))?target:from,completion:available[sessions-1],increment,warning,alternative,complete:false,scheduled:days.includes(weekday(today))};
 }
