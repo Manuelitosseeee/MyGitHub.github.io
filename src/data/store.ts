@@ -21,6 +21,7 @@ import type {
   AppSkin,
 } from "./types";
 import { VALID_FONTS, VALID_SKINS } from "./skins";
+import { pixel } from "../pixel/state";
 
 export const DEFAULT_SETTINGS: Settings = {
   appearance: {
@@ -547,9 +548,11 @@ class Store {
 
   /** Wipe everything (all songs, history, blobs) and reset settings. */
   async resetAll(): Promise<void> {
+    pixel.reset();
     this.writeQueue = this.writeQueue.then(() => idbClear().catch(() => undefined));
     this.state = emptyState();
     this.emit();
+    await this.writeQueue;
   }
 }
 

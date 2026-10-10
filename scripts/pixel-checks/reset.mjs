@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import {createRequire} from 'node:module';
+const require=createRequire(import.meta.url),esbuild=require('esbuild');
+const data=new Map();globalThis.localStorage={getItem:k=>data.get(k)??null,setItem:(k,v)=>data.set(k,String(v)),removeItem:k=>data.delete(k)};
+const result=await esbuild.build({stdin:{contents:"export {pixel} from './src/pixel/state'; export {store} from './src/data/store'; export {initialPixel,PIXEL_KEY} from './src/pixel/model';",resolveDir:process.cwd()},bundle:true,platform:'node',format:'esm',write:false});
+const {pixel,store,initialPixel,PIXEL_KEY}=await import('data:text/javascript;base64,'+Buffer.from(result.outputFiles[0].text).toString('base64'));
+pixel.update(p=>({...p,mapId:'stage',balanceCents:100000,owned:['rug','stage:amp'],totalMs:60000,receipts:[{id:'r',songId:'s',title:'test',startedAt:0,activeMs:60000,earnedCents:100,bonus:0}],session:{id:'s',mapId:'stage',songId:'free',title:'test',startedAt:0,activeMs:1,checkpoint:null,earnedCents:0,bonus:0,status:'paused'}}));
+assert.ok(data.has(PIXEL_KEY));let notified=0;const unsubscribe=pixel.subscribe(()=>notified++);await store.resetAll();unsubscribe();
+assert.deepEqual(pixel.get(),initialPixel());assert.equal(data.has(PIXEL_KEY),false);assert.equal(notified,1);assert.equal(Boolean(store.state.settings.pixelStory),false);assert.equal(store.state.songs.length,0);
+console.log('PASS: the real settings reset clears Pixel Story storage, balance, ownership, maps, receipts and active session; subscribers update immediately.');

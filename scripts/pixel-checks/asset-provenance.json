@@ -1,0 +1,46 @@
+{
+  "tool": "Built-in image_gen",
+  "transparentBackground": true,
+  "purpose": "Complete unoccluded furniture silhouettes; never crop paid artwork from a finished room.",
+  "references": [
+    {
+      "map": "stage",
+      "reference": "public/pixel/stage-full.webp",
+      "prompt": "3 columns × 2 rows. Row1: microphone with stand and separate open-score music stand as a group; five tiny amber stage-edge lights arranged horizontally; entire black grand piano with bench. Row2: ONLY the rectangular brown guitar amplifier (complete grille, NO guitar or instrument or strings on it); ONLY a complete walnut CLASSICAL guitar on a black stand (NO amplifier behind); two black wedge floor speakers with their cables.",
+      "cols": 3,
+      "rows": 2
+    },
+    {
+      "map": "studio",
+      "reference": "public/pixel/studio-full.webp",
+      "prompt": "3 columns × 3 rows. Row1: complete mixing console table with chair, no screen or loudspeakers; flat red patterned rug without any furniture on it; two loudspeakers with DAW computer screen and headphones as a group. Row2: complete professional tall equipment rack, no guitar or leaves; microphone stands with open-score stand as a group; complete walnut CLASSICAL guitar on its black stand, NO equipment rack behind. Row3: six potted trailing green plants separated, no furniture under them; two black flight cases without plants or rug; tall amber floor lamp, no wall or floor.",
+      "cols": 3,
+      "rows": 3
+    },
+    {
+      "map": "shop",
+      "reference": "public/pixel/shop-full.webp",
+      "prompt": "3 columns × 3 rows. Row1: complete wooden shop counter with cash register and bell, no plant; flat green and ochre ornate rug alone; four separate wall-hung instruments in a row: two different CLASSICAL guitars, sunburst electric guitar, tiny ukulele. Row2: complete amber glass display cabinet with violins and packaged strings, NO trailing leaves; three distinct wooden shelves with books and open sheet music, no plants or guitars; two complete CLASSICAL guitars on black stands as a group, NO plant or shelf or rug behind. Row3: six separated potted trailing plants only; three framed musical pictures side by side; EMPTY transparent unused cell.",
+      "cols": 3,
+      "rows": 3
+    },
+    {
+      "map": "rehearsal",
+      "reference": "public/pixel/rehearsal-full.webp",
+      "prompt": "3 columns × 3 rows. Row1: complete red acoustic drum kit with cymbals, NO rug; two separate red ornate rugs with NO furniture on them; complete black electric piano with bench and tiny amber table lamp, NO plant. Row2: two brown amplifier stacks alone with no bass guitar, no microphone, no cables from other objects; complete black and cream electric bass guitar on stand ONLY, no amplifier or microphone; guitar effects pedalboard and separate microphone on tripod as a group. Row3: three flight cases with no leaves and no rug; five separate potted trailing plants; three framed musical posters side by side.",
+      "cols": 3,
+      "rows": 3
+    },
+    {
+      "map": "home",
+      "reference": "public/pixel/neutral-v2.webp",
+      "prompt": "3 columns × 3 rows. Row1: flat green red ochre ornate rug WITHOUT furniture; wooden writing desk with matching chair, open score and small copper desk lamp (off, no light glow), NO plant or fireplace; tall wooden bookshelf with colorful books and composer bust, NO plant or guitar in front. Row2: complete walnut CLASSICAL guitar on black stand only, no bookshelf behind; six separate potted trailing plants, no furniture under them; three framed musical art pictures side by side. Row3: low wooden cabinet with books and record player, NO plant; pair of mauve window curtains and golden curtain rod, NO window or wall inside; tiny black cat with amber eyes alone.",
+      "cols": 3,
+      "rows": 3
+    }
+  ],
+  "promptConstraints": "Exact reference pixel art, palette and elevated front perspective. Reconstruct hidden portions, each object/group complete, actual alpha transparency including between legs and stands. No backdrop, adjacent objects, character, clock or metronome. Cells separated with generous transparent padding.",
+  "assets": "public/pixel/items/*.png",
+  "composition": "src/pixel/itemArt.ts",
+  "camera": "src/pixel/art.ts unchanged"
+}

@@ -1,0 +1,20 @@
+import type {MapId} from './maps';
+import dimensions from './itemDimensions.json';
+export type SceneAssets=Record<string,CanvasImageSource>;
+export interface Part {asset:string;x:number;y:number;w:number;h:number;z:number;project?:boolean}
+const fit=(asset:string,x:number,y:number,height:number,z=10):Part=>{const d=dimensions[asset as keyof typeof dimensions];return {asset,x,y,w:height*d.width/d.height,h:height,z};};
+const plane=(asset:string,x:number,y:number,w:number,h:number):Part=>({asset,x,y,w,h,z:0,project:true});
+const plant=(x:number,y:number,h:number,z=30)=>fit('plant',x,y,h,z);
+// Each entry is a COMPLETE alpha sprite. No region of a furnished room is used as a purchase.
+export const ITEM_ART:Record<MapId,Record<string,Part[]>>={
+ home:{rug:[plane('home-rug',118,1146,812,160)],desk:[fit('home-desk',0,739,408)],shelf:[fit('home-shelf',640,346,684)],guitar:[fit('home-guitar',807,744,383,40)],art:[fit('home-art-note',30,240,139),fit('home-art-guitar',611,374,133),fit('home-art-score',573,524,140)],records:[fit('home-records',0,1325,242,150)],curtains:[fit('home-curtains',188,183,403)],cat:[fit('home-cat',96,431,62,35)],plant:[plant(0,392,140),plant(549,213,150),plant(903,173,137),plant(784,321,153),plant(923,410,148),plant(912,787,320),plant(0,1198,369,180)]},
+ studio:{console:[fit('studio-console',0,620,380)],rug:[plane('studio-rug',0,1086,1004,244)],monitors:[fit('studio-monitor-left',5,489,134),fit('studio-monitor-screen',155,514,109),fit('studio-monitor-right',579,489,134),fit('studio-headphones',638,634,115)],rack:[fit('studio-rack',754,532,435)],mic:[fit('studio-mic',0,776,394)],guitar:[fit('studio-guitar',813,759,358,40)],plants:[plant(879,190,236),plant(737,409,160),plant(919,789,295,50),plant(0,1112,454,180)],cases:[fit('studio-cases',0,1184,382,150)],lamp:[fit('studio-lamp',950,430,370)]},
+ shop:{counter:[fit('shop-counter',0,593,474)],rug:[plane('shop-rug',164,1129,727,210)],wall:[fit('shop-wall',163,283,351)],cabinet:[fit('shop-cabinet',701,281,815)],shelves:[fit('shop-shelf-1',0,400,180),fit('shop-shelf-2',0,807,280),fit('shop-shelf-3',845,1070,300,130)],guitars:[fit('shop-guitars',10,985,510,140)],plants:[plant(345,136,245),plant(872,126,123),plant(77,316,231),plant(543,459,151),plant(183,595,136),plant(0,1171,396,180)],art:[fit('shop-art-note',51,193,106),fit('shop-art-violin',600,318,114),fit('shop-art-guitar',603,551,140)]},
+ rehearsal:{drums:[fit('rehearsal-drums',0,609,383)],rug:[plane('rehearsal-rug-small',0,965,360,66),plane('rehearsal-rug-large',89,1072,872,266)],keys:[fit('rehearsal-keys',382,520,374)],amps:[fit('rehearsal-amp-left',729,579,359),fit('rehearsal-amp-right',969,674,364)],bass:[fit('rehearsal-bass',820,644,407,40)],pedals:[fit('rehearsal-pedals',750,1010,317,130)],cases:[fit('rehearsal-cases',0,1025,380,140)],plants:[plant(0,288,243),plant(430,531,115),plant(569,270,223),plant(905,195,112),plant(0,1233,334,180)],art:[fit('rehearsal-art-player',201,274,202),fit('rehearsal-art-sunset',344,311,207),fit('rehearsal-art-neck',714,371,189)]},
+ stage:{mic:[fit('stage-mic',24,775,404)],lights:[fit('stage-lights',40,1308,52,160)],piano:[fit('stage-piano',51,512,520)],amp:[fit('stage-amp',776,812,186)],guitar:[fit('stage-guitar',815,763,356,40)],wedges:[fit('stage-wedge-left',0,1137,156,150),fit('stage-wedge-right',864,1137,161,150)]}
+};
+export const character=fit('character',332,699,510,100);
+export const itemId=(map:MapId,item:string)=>map==='home'?item:`${map}:${item}`;
+export function assetNames(map:MapId){return [...new Set(['character',...Object.values(ITEM_ART[map]).flat().map(p=>p.asset)])];}
+export function drawPart(c:CanvasRenderingContext2D,assets:SceneAssets,p:Part,dx=0){const im=assets[p.asset];if(!im)throw new Error(`Missing sprite ${p.asset}`);c.drawImage(im,p.x+dx,p.y,p.w,p.h);}
+export async function loadAssets(map:MapId):Promise<SceneAssets>{const pairs=await Promise.all(assetNames(map).map(name=>new Promise<[string,HTMLImageElement]>((resolve,reject)=>{const im=new Image();im.onload=()=>resolve([name,im]);im.onerror=()=>reject(new Error(`Missing sprite ${name}`));im.src=`/pixel/items/${name}.png`;})));return Object.fromEntries(pairs);}

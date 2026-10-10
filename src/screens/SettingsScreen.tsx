@@ -158,7 +158,7 @@ export default function SettingsScreen() {
       <Card className="card-pad">
         <div className="row-title" style={{ fontSize: 15 }}>Ripristina tutto</div>
         <p className="row-sub" style={{ marginBottom: 12 }}>
-          Elimina brani, progressi, sessioni, spartiti, corde e impostazioni. L'operazione non è reversibile.
+          Elimina brani, progressi, sessioni, spartiti, corde, impostazioni e tutti i dati Pixel Story, compresi plettri, acquisti e mappe. L'operazione non è reversibile.
         </p>
         <button className="btn btn-danger" onClick={() => setResetting(true)}>
           <RotateCcw /> Elimina tutti i dati
@@ -168,12 +168,12 @@ export default function SettingsScreen() {
       <Confirm
         open={resetting}
         onClose={() => setResetting(false)}
-        onConfirm={() => {
-          void store.resetAll();
+        onConfirm={async () => {
+          await store.resetAll();
           toast("Tutti i dati sono stati eliminati");
         }}
         title="Eliminare tutti i dati?"
-        message="Verranno cancellati per sempre brani, BPM registrati, sessioni, spartiti e storico delle corde. Sei sicuro?"
+        message="Verranno cancellati per sempre brani, BPM registrati, sessioni, spartiti, storico delle corde e tutti i progressi Pixel Story: plettri, acquisti, mappe e sessioni. Sei sicuro?"
         confirmLabel="Elimina tutto"
       />
     </div>
