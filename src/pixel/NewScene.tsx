@@ -1,5 +1,5 @@
 import {useEffect,useRef,useState,type CSSProperties} from 'react';
-import {camera,visibleHotspot,ART_W,ART_H} from './art';
+import {camera,drawRoomEdges,visibleHotspot,ART_W,ART_H} from './art';
 import {MAP_ART} from './mapArt';
 import {loadAssets,drawPart,character,ITEM_ART,itemId} from './itemArt';
 import {HOTSPOTS} from './art';
@@ -16,7 +16,8 @@ export default function NewScene(props:{state:PixelState;mapId:MapId;running:boo
  const draw=(now:number)=>{if(!alive)return;raf=requestAnimationFrame(draw);if(now-last<45||document.hidden)return;last=now;const {state:p,running,bpm,flash}=live.current;const owned=ownedOnMap(p,id),key=owned.join('|');
  if(key!==cacheKey){cacheKey=key;composeRoom(rc,base,id,owned,assets,false);}
  const el=cv.current;if(!el)return;const {width:w,height:h}=geom.current;if(w<2||h<2)return;const dpr=Math.min(2,devicePixelRatio||1);if(el.width!==Math.round(w*dpr)||el.height!==Math.round(h*dpr)){el.width=Math.round(w*dpr);el.height=Math.round(h*dpr);}const c=el.getContext('2d');if(!c)return;const cam=camera(w,h),t=now/1000,active=p.session?.status==='running';c.setTransform(dpr,0,0,dpr,0,0);c.imageSmoothingEnabled=false;
- // The map itself covers the screen; never append synthetic wall or floor tiles.
+ drawRoomEdges(c,base,w,h,cam);
+ // The complete map fits; edge continuation uses only this map's empty background.
  c.translate(cam.x,cam.y);c.scale(cam.scale,cam.scale);c.drawImage(room,0,0);c.save();const pose=handPose(t,active,reduced);c.translate(pose.lean,active&&!reduced?Math.sin(t*1.4)*.6:0);c.drawImage(motion.clean,0,0);drawHands(c,motion,t,active,reduced);c.restore();
  if(owned.includes(itemId(id,id==='home'?'plant':'plants'))&&!reduced){c.save();c.globalAlpha=.06*(1+Math.sin(t*.8));for(const p of ITEM_ART[id][id==='home'?'plant':'plants']??[])drawPart(c,assets,p,Math.sin(t*.6));c.restore();}
  if(id==='home'){if(p.rainOn){c.save();c.beginPath();[[269,250,83,111],[368,250,99,111],[269,381,83,146],[368,381,99,146]].forEach(q=>c.rect(...q as [number,number,number,number]));c.clip();for(let i=0;i<44;i++){const x=270+(i*47)%197,y=241+((t*130+i*31)%305);c.globalAlpha=.35+(i%3)*.13;c.fillStyle=i%3?'#7388b0':'#b6b7cf';c.fillRect(x,y,2,10+(i%4)*3);}c.restore();}
