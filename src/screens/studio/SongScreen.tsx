@@ -1,5 +1,5 @@
 import {GoalEditor} from "../../study/calendar";
-import {dayKey,PATHS,plan,bestFor,ALL_DAYS} from "../../study/planner";
+import {dayKey,PATHS,plan,bestFor,resultToday,ALL_DAYS} from "../../study/planner";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   ChevronLeft,
@@ -526,7 +526,7 @@ function MetronomePanel({ song }: { song: Song }) {
     <>
       {goal&&<p className="row-sub">{PATHS[goal.path].label} · Oggi {goal.from} → {goal.target} BPM{future?.completion?` · Completamento previsto ${new Date(future.completion+'T12:00:00').toLocaleDateString('it-IT')}`:''}</p>}
       {future?.warning&&<p className="row-sub" role="status">{future.warning}</p>}
-      {goal&&bpm>=goal.target&&<div className="smart-reached" role="status"><b>Obiettivo giornaliero raggiunto!</b><p>Velocità impostata: non certifica l’esecuzione. I progressi si salvano dopo 30 secondi di studio continuo con metronomo attivo.</p><button className="tiny" onClick={()=>{const next=store.state.songs.find(s=>s.id!==song.id&&store.state.milestones.some(m=>m.songId===s.id)&&!store.state.studyResults.some(r=>r.songId===s.id&&r.date===dayKey()&&r.bpm>=(store.todayGoal(s.id)?.target??Infinity)));if(next)nav.openSong(next.id);else nav.openTab('diario')}}>Passa al prossimo brano →</button></div>}
+      {goal&&bpm>=goal.target&&<div className="smart-reached" role="status"><b>Obiettivo giornaliero raggiunto!</b><p>Velocità impostata: non certifica l’esecuzione. I progressi si salvano dopo 30 secondi di studio continuo con metronomo attivo.</p><button className="tiny" onClick={()=>{const order=[...store.state.milestones].sort((a,b)=>store.state.settings.studySort==='difficulty'?PATHS[b.path].pace-PATHS[a.path].pace||a.date.localeCompare(b.date):a.date.localeCompare(b.date));const next=order.map(m=>store.songById(m.songId??'')).find(s=>{if(!s||s.id===song.id)return false;const g=store.todayGoal(s.id);return !!g&&resultToday(s.id,store.state.studyResults)<g.target});if(next)nav.openSong(next.id);else nav.openTab('diario')}}>Passa al prossimo brano →</button></div>}
       <SectionTitle>Metronomo del brano</SectionTitle>
       <Card className="metro-study-card">
         <div className="metro-study-stage">
