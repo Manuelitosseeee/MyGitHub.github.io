@@ -1,3 +1,4 @@
+import type {Milestone,StudyResult,DailyGoal} from "../study/planner";
 import type { MetroSound, Subdivision, BeatWeight } from "../engine/metronome";
 
 export type Mood = "happy" | "neutral" | "sad";
@@ -170,6 +171,9 @@ export interface ProgressionFav {
 
 export interface Settings {
   pixelStory?: boolean;
+  studyDays?: number[];
+  studySort?: "deadline" | "difficulty";
+  notifications?: {enabled:boolean;time:string;daily:boolean;deadlines:boolean;incomplete:boolean};
   appearance: Appearance;
   metro: MetroPrefs;
   tunerUi: "needle" | "line";
@@ -186,6 +190,9 @@ export interface Settings {
 }
 
 export interface DBState {
+  milestones: Milestone[];
+  studyResults: StudyResult[];
+  dailyGoals: DailyGoal[];
   songs: Song[];
   events: BpmEvent[];
   practices: PracticeDay[];
