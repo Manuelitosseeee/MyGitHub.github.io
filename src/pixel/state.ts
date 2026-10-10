@@ -5,6 +5,10 @@ let error='';
 try {value=recover(JSON.parse(localStorage.getItem(PIXEL_KEY)??'null'));}catch{error='Impossibile leggere i progressi Pixel Story.';}
 const listeners=new Set<()=>void>();
 export const pixel = {
+  reset() {
+    localStorage.removeItem(PIXEL_KEY);
+    value=initialPixel();error='';listeners.forEach(f=>f());
+  },
   get:()=>value,
   getError:()=>error,
   update(fn:(p:PixelState)=>PixelState) {

@@ -1,5 +1,5 @@
 // Live sprite animation, sampled from the approved character, with no replacement illustration.
-export function prepareHands(im:HTMLImageElement){
+export function prepareHands(im:CanvasImageSource){
  const clean=document.createElement('canvas');clean.width=1004;clean.height=1567;const c=clean.getContext('2d')!;c.drawImage(im,0,0,1004,1567);
  const hands=[{x:392,y:891,w:75,h:65,fill:'#e6a249'},{x:579,y:813,w:47,h:66,fill:'#352632'}].map(q=>{
   const sprite=document.createElement('canvas');sprite.width=q.w;sprite.height=q.h;const sc=sprite.getContext('2d')!;const data=c.getImageData(q.x,q.y,q.w,q.h),skin=sc.createImageData(q.w,q.h);

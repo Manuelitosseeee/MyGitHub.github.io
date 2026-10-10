@@ -1,0 +1,214 @@
+{
+  "home-rug": {
+    "width": 436,
+    "height": 276
+  },
+  "home-desk": {
+    "width": 399,
+    "height": 417
+  },
+  "home-shelf": {
+    "width": 330,
+    "height": 438
+  },
+  "home-guitar": {
+    "width": 247,
+    "height": 410
+  },
+  "home-art-note": {
+    "width": 130,
+    "height": 168
+  },
+  "home-art-guitar": {
+    "width": 115,
+    "height": 159
+  },
+  "home-art-score": {
+    "width": 150,
+    "height": 177
+  },
+  "home-records": {
+    "width": 434,
+    "height": 328
+  },
+  "home-curtains": {
+    "width": 381,
+    "height": 341
+  },
+  "home-cat": {
+    "width": 186,
+    "height": 202
+  },
+  "studio-console": {
+    "width": 469,
+    "height": 344
+  },
+  "studio-rug": {
+    "width": 372,
+    "height": 295
+  },
+  "studio-monitor-left": {
+    "width": 120,
+    "height": 145
+  },
+  "studio-monitor-screen": {
+    "width": 155,
+    "height": 125
+  },
+  "studio-monitor-right": {
+    "width": 125,
+    "height": 136
+  },
+  "studio-headphones": {
+    "width": 108,
+    "height": 106
+  },
+  "studio-rack": {
+    "width": 258,
+    "height": 384
+  },
+  "studio-mic": {
+    "width": 454,
+    "height": 405
+  },
+  "studio-guitar": {
+    "width": 229,
+    "height": 388
+  },
+  "studio-cases": {
+    "width": 475,
+    "height": 360
+  },
+  "studio-lamp": {
+    "width": 134,
+    "height": 356
+  },
+  "shop-counter": {
+    "width": 404,
+    "height": 353
+  },
+  "shop-rug": {
+    "width": 385,
+    "height": 301
+  },
+  "shop-wall": {
+    "width": 423,
+    "height": 321
+  },
+  "shop-cabinet": {
+    "width": 336,
+    "height": 410
+  },
+  "shop-shelf-1": {
+    "width": 389,
+    "height": 148
+  },
+  "shop-shelf-2": {
+    "width": 387,
+    "height": 145
+  },
+  "shop-shelf-3": {
+    "width": 383,
+    "height": 129
+  },
+  "shop-guitars": {
+    "width": 339,
+    "height": 375
+  },
+  "shop-art-note": {
+    "width": 131,
+    "height": 160
+  },
+  "shop-art-violin": {
+    "width": 125,
+    "height": 165
+  },
+  "shop-art-guitar": {
+    "width": 135,
+    "height": 166
+  },
+  "rehearsal-drums": {
+    "width": 398,
+    "height": 388
+  },
+  "rehearsal-rug-small": {
+    "width": 390,
+    "height": 204
+  },
+  "rehearsal-rug-large": {
+    "width": 395,
+    "height": 171
+  },
+  "rehearsal-keys": {
+    "width": 412,
+    "height": 378
+  },
+  "rehearsal-amp-left": {
+    "width": 289,
+    "height": 420
+  },
+  "rehearsal-amp-right": {
+    "width": 275,
+    "height": 420
+  },
+  "rehearsal-bass": {
+    "width": 208,
+    "height": 415
+  },
+  "rehearsal-pedals": {
+    "width": 378,
+    "height": 445
+  },
+  "rehearsal-cases": {
+    "width": 404,
+    "height": 383
+  },
+  "rehearsal-art-player": {
+    "width": 130,
+    "height": 233
+  },
+  "rehearsal-art-sunset": {
+    "width": 130,
+    "height": 267
+  },
+  "rehearsal-art-neck": {
+    "width": 164,
+    "height": 242
+  },
+  "stage-mic": {
+    "width": 403,
+    "height": 539
+  },
+  "stage-lights": {
+    "width": 342,
+    "height": 121
+  },
+  "stage-piano": {
+    "width": 464,
+    "height": 534
+  },
+  "stage-amp": {
+    "width": 367,
+    "height": 510
+  },
+  "stage-guitar": {
+    "width": 239,
+    "height": 508
+  },
+  "stage-wedge-left": {
+    "width": 243,
+    "height": 272
+  },
+  "stage-wedge-right": {
+    "width": 245,
+    "height": 305
+  },
+  "plant": {
+    "width": 309,
+    "height": 333
+  },
+  "character": {
+    "width": 1129,
+    "height": 1358
+  }
+}
