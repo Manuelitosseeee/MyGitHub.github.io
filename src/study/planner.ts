@@ -1,5 +1,5 @@
 export type Path = 'relax' | 'medio' | 'impegnativo';
-export interface Milestone {id:string; date:string; title:string; songId:string|null; startBpm:number; path:Path; createdAt:number}
+export interface Milestone {id:string; date:string; title:string; songId:string|null; tempoGoal?:boolean; startBpm:number; path:Path; createdAt:number}
 export interface StudyResult {id:string;songId:string;date:string;bpm:number;seconds:number;at:number}
 export interface DailyGoal {id:string;songId:string;date:string;from:number;target:number;path:Path}
 export const PATHS:Record<Path,{label:string;pace:number;early:number}>={relax:{label:'Relax',pace:1,early:0},medio:{label:'Medio',pace:5,early:10},impegnativo:{label:'Impegnativo',pace:15,early:30}};
