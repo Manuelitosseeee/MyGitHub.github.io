@@ -48,7 +48,7 @@ export const TOOLS: ToolDef[] = [
   {
     id: "brano",
     title: "Allena un Brano",
-    subtitle: "Rallenta un passaggio del tuo file audio e ripetilo a passo sicuro",
+    subtitle: "Rallenta e ripeti un passaggio da file audio o YouTube",
     icon: Upload,
   },
   {
