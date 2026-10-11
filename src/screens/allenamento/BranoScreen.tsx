@@ -19,6 +19,8 @@ import {
 import { getAudioContext, ensureRunning } from "../../engine/audio";
 import { clamp } from "../../lib/utils";
 import { formatDurationClock } from "../../lib/time";
+import YoutubeBrano from "./YoutubeBrano";
+import { parseYoutubeLink } from "../../training/youtube";
 
 /** Limiti di velocità: sotto il 50% l'intonazione peggiora troppo. */
 const MIN_SPEED = 50;
@@ -44,6 +46,9 @@ export default function BranoScreen() {
   const objectUrl = useRef<string | null>(null);
 
   const [file, setFile] = useState<File | null>(null);
+  const [youtubeLink, setYoutubeLink] = useState("");
+  const [youtube, setYoutube] = useState<{ id: string; start: number } | null>(null);
+  const [linkError, setLinkError] = useState("");
   const [name, setName] = useState("");
   const [peaks, setPeaks] = useState<Float32Array | null>(null);
   const [duration, setDuration] = useState(0);
@@ -369,13 +374,14 @@ export default function BranoScreen() {
   const totalReps = steps.length * cfg.reps;
   const doneReps = Math.min(totalReps, trainStep * cfg.reps + trainRep);
 
+  if (youtube) return <YoutubeBrano video={youtube} onClose={() => setYoutube(null)} />;
+
   if (!file) {
     return (
       <div className="train-body">
         <p className="screen-sub" style={{ marginBottom: 18 }}>
-          Carica un brano dal tuo dispositivo e rallenta il passaggio che ti
-          serve. Il file resta sul tuo telefono: non viene inviato da nessuna
-          parte.
+          Carica un file audio oppure incolla un link YouTube per rallentare
+          e ripetere il passaggio che ti serve.
         </p>
         <label className="brano-drop">
           <FileAudio size={30} strokeWidth={1.5} className="text3" />
@@ -394,9 +400,28 @@ export default function BranoScreen() {
             }}
           />
         </label>
+        <Card className="card-pad train-form" style={{ marginTop: 14 }}>
+          <form onSubmit={(e) => {
+            e.preventDefault();
+            const video = parseYoutubeLink(youtubeLink);
+            if (!video) { setLinkError("Inserisci un link valido a un video YouTube."); return; }
+            setLinkError("");
+            pause();
+            setYoutube(video);
+          }}>
+            <label className="train-label" htmlFor="youtube-link">Link YouTube</label>
+            <input id="youtube-link" className="field" type="url" inputMode="url" placeholder="https://www.youtube.com/watch?v=…"
+              value={youtubeLink} onChange={(e) => { setYoutubeLink(e.target.value); setLinkError(""); }}
+              aria-describedby={linkError ? "youtube-link-error" : undefined}
+              style={{ width: "100%", marginBottom: 12 }} />
+            {linkError && <p id="youtube-link-error" role="alert" className="tiny">{linkError}</p>}
+            <button className="btn btn-primary" type="submit" disabled={!youtubeLink.trim()}>Apri video YouTube</button>
+            <p className="tiny text3" style={{ marginTop: 10 }}>YouTube richiede internet. Il video viene riprodotto nel suo lettore.</p>
+          </form>
+        </Card>
         <Card className="card-pad" style={{ marginTop: 14 }}>
           <p className="tiny text3">
-            Tutto avviene sul dispositivo: il rallentamento mantiene
+            Per i file audio tutto avviene sul dispositivo: il rallentamento mantiene
             l&apos;intonazione e il file non viene elaborato da servizi
             esterni.
           </p>
