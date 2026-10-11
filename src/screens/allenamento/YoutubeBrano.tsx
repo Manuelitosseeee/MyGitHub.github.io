@@ -150,7 +150,7 @@ export default function YoutubeBrano({ video, onClose }: { video: YoutubeVideo; 
   return <div className="train-body">
     <div className="harmony-keyline" style={{ marginBottom: 12 }}>
       <span style={{ flex: 1 }}>Video YouTube</span>
-      <button className="harmony-act" aria-label="Cambia brano" onClick={onClose}><X size={16} /></button>
+      <button className="harmony-act" style={{ width: 32, flex: 'none' }} aria-label="Cambia brano" onClick={onClose}><X size={16} /></button>
     </div>
     <div ref={host} style={{ width: '100%', aspectRatio: '16 / 9', minHeight: 200, background: '#101010', borderRadius: 12, overflow: 'hidden' }} />
     {!ready && !error && <p className="tiny text3" role="status">Caricamento del lettore YouTube…</p>}
