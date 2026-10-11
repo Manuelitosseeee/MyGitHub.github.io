@@ -1,7 +1,8 @@
 import { clamp } from "../lib/utils";
 import { getAudioContext } from "./audio";
+import { mechanicalBuffer } from "./mechanicalClick";
 
-export type MetroSound = "classic" | "digital" | "metallic";
+export type MetroSound = "classic" | "digital" | "metallic" | "mechanical";
 export type Subdivision = "none" | "eighth" | "triplet" | "sixteenth";
 export type BeatWeight = 0 | 1 | 2; // silent / normal / accent
 
@@ -230,7 +231,14 @@ export class MetronomeEngine {
     const freqBase = role === "accent" ? (s === "digital" ? 1568 : 1900) : s === "digital" ? 1046 : 1400;
     const dur = s === "classic" ? 0.045 : 0.07;
 
-    if (s === "classic" || s === "metallic") {
+    if (s === "mechanical") {
+      // Dry escapement impact, without noise hiss or an electronic accent beep.
+      const src = c.createBufferSource();
+      src.buffer = mechanicalBuffer(c, role);
+      src.connect(master);
+      src.onended = () => { src.disconnect(); master.disconnect(); };
+      src.start(t0);
+    } else if (s === "classic" || s === "metallic") {
       // Woodblock / noise click
       const len = Math.max(1, Math.floor(c.sampleRate * dur));
       const buf = c.createBuffer(1, len, c.sampleRate);
