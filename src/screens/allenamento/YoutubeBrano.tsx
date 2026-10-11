@@ -43,6 +43,7 @@ export default function YoutubeBrano({ video, onClose }: { video: YoutubeVideo; 
     let interval: number | undefined;
     let timeout: number | undefined;
     let metadata = false;
+    let initialized = false;
     setReady(false); setError(''); setDuration(0); setPlaying(false);
     run.current = null; setTraining(false); rewind.current = null;
     const finishPass = () => {
@@ -81,6 +82,7 @@ export default function YoutubeBrano({ video, onClose }: { video: YoutubeVideo; 
         onReady: () => {
           if (cancelled) return;
           clearTimeout(timeout); setReady(true); setError('');
+          initialized = true;
           const p = player.current!;
           const available = practiceRates(p.getAvailablePlaybackRates(), 0, Infinity);
           setRates(available.length ? available : [1]);
@@ -97,13 +99,14 @@ export default function YoutubeBrano({ video, onClose }: { video: YoutubeVideo; 
         onError: event => {
           if (cancelled) return;
           clearTimeout(timeout); setError(youtubeError(event.data)); setReady(false);
+          initialized = false;
           run.current = null; setTraining(false); setPlaying(false);
         },
         onAutoplayBlocked: () => { if (!cancelled) { run.current = null; setTraining(false); setPlaying(false); setError('Premi Play direttamente nel video per avviare la riproduzione.'); } },
       } });
       interval = window.setInterval(() => {
         const p = player.current;
-        if (!p || cancelled) return;
+        if (!p || cancelled || !initialized) return;
         const d = p.getDuration(), t = p.getCurrentTime();
         if (d > 0 && Number.isFinite(d)) {
           setDuration(d);
