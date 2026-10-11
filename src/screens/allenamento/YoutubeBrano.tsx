@@ -14,6 +14,7 @@ export default function YoutubeBrano({ video, onClose }: { video: YoutubeVideo; 
   const [duration, setDuration] = useState(0);
   const [time, setTime] = useState(0);
   const [playing, setPlaying] = useState(false);
+  const [buffering, setBuffering] = useState(false);
   const [rates, setRates] = useState<number[]>([1]);
   const [speed, setSpeed] = useState(1);
   const [volume, setVolume] = useState(90);
@@ -44,7 +45,7 @@ export default function YoutubeBrano({ video, onClose }: { video: YoutubeVideo; 
     let timeout: number | undefined;
     let metadata = false;
     let initialized = false;
-    setReady(false); setError(''); setDuration(0); setPlaying(false);
+    setReady(false); setError(''); setDuration(0); setPlaying(false); setBuffering(false);
     run.current = null; setTraining(false); rewind.current = null;
     const finishPass = () => {
       const p = player.current;
@@ -92,7 +93,8 @@ export default function YoutubeBrano({ video, onClose }: { video: YoutubeVideo; 
         },
         onStateChange: event => {
           if (cancelled) return;
-          setPlaying(event.data === 1);
+          setPlaying(event.data === 1 || event.data === 3);
+          setBuffering(event.data === 3);
           if (event.data === 0) finishPass();
         },
         onPlaybackRateChange: event => { if (!cancelled) setSpeed(event.data); },
@@ -101,8 +103,9 @@ export default function YoutubeBrano({ video, onClose }: { video: YoutubeVideo; 
           clearTimeout(timeout); setError(youtubeError(event.data)); setReady(false);
           initialized = false;
           run.current = null; setTraining(false); setPlaying(false);
+          setBuffering(false);
         },
-        onAutoplayBlocked: () => { if (!cancelled) { run.current = null; setTraining(false); setPlaying(false); setError('Premi Play direttamente nel video per avviare la riproduzione.'); } },
+        onAutoplayBlocked: () => { if (!cancelled) { run.current = null; setTraining(false); setPlaying(false); setBuffering(false); setError('Premi Play direttamente nel video per avviare la riproduzione.'); } },
       } });
       interval = window.setInterval(() => {
         const p = player.current;
@@ -154,6 +157,7 @@ export default function YoutubeBrano({ video, onClose }: { video: YoutubeVideo; 
     </div>
     <div ref={host} style={{ width: '100%', aspectRatio: '16 / 9', minHeight: 200, background: '#101010', borderRadius: 12, overflow: 'hidden' }} />
     {!ready && !error && <p className="tiny text3" role="status">Caricamento del lettore YouTube…</p>}
+    {buffering && <p className="tiny text3" role="status">Caricamento del video…</p>}
     {error && <Card className="card-pad" style={{ marginTop: 12 }}><p role="alert">{error}</p>
       <button className="btn btn-soft" onClick={() => setRetry(n => n + 1)}>Riprova</button></Card>}
     <div className="brano-times"><span>{formatDurationClock(time)}</span><span>A {formatDurationClock(a)} · B {formatDurationClock(b)}</span><span>{formatDurationClock(duration)}</span></div>
