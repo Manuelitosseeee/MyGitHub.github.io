@@ -28,6 +28,7 @@ const SOUNDS: Array<{ id: MetroSound; label: string }> = [
   { id: "classic", label: "Legno" },
   { id: "digital", label: "Digitale" },
   { id: "metallic", label: "Metallo" },
+  { id: "mechanical", label: "Meccanico" },
 ];
 
 const SUBS: Array<{ id: Subdivision; label: string }> = [
