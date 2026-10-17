@@ -11,7 +11,8 @@
     "typecheck": "tsc -b --noEmit",
     "icons": "node scripts/gen-icons.mjs",
     "test": "node --import tsx --test tests/recordings.test.ts",
-    "test:recordings:e2e": "node tests/recordings.e2e.mjs"
+    "test:recordings:e2e": "node tests/recordings.e2e.mjs",
+    "test:navigation:e2e": "node tests/mobile-navigation.e2e.mjs"
   },
   "dependencies": {
     "lucide-react": "^0.460.0",

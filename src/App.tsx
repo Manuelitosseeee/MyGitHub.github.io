@@ -10,7 +10,8 @@ import {
   type ReactNode,
 } from "react";
 import { AppGlyph, type AppGlyphName } from "./ui/AppGlyph";
-import { ChevronRight, FileText } from "lucide-react";
+import { ChevronRight, FileText, MoreHorizontal } from "lucide-react";
+import "./ui/mobile-navigation.css";
 import { store, useStore } from "./data/store";
 import { skinBaseFont } from "./data/skins";
 import { NavContext, TABS, type TabId } from "./nav";
@@ -296,8 +297,42 @@ function Pane({ id, active, children }: { id: string; active: boolean; children:
   );
 }
 
+const MOBILE_TABS: Array<{ id: TabId; label: string }> = [
+  { id: "diario", label: "Diario" },
+  { id: "studio", label: "Studio" },
+  { id: "metronomo", label: "Metronomo" },
+  { id: "registrazioni", label: "Registrazioni" },
+];
+const MORE_TABS: Array<{ id: TabId; label: string }> = [
+  { id: "allenamento", label: "Allenamento" },
+  { id: "accordatore", label: "Accordatore" },
+  { id: "corde", label: "Corde" },
+  { id: "impostazioni", label: "Impostazioni" },
+];
+
 function TabBar({ active, onSelect }: { active: TabId; onSelect: (t: TabId) => void }) {
   const bar = useRef<HTMLElement>(null);
+  const moreButton = useRef<HTMLButtonElement>(null);
+  const menu = useRef<HTMLDivElement>(null);
+  const [moreOpen, setMoreOpen] = useState(false);
+  const primaryIndex = MOBILE_TABS.findIndex((tab) => tab.id === active);
+  const selectedIndex = moreOpen || primaryIndex < 0 ? 4 : primaryIndex;
+  const closeMore = () => { setMoreOpen(false); moreButton.current?.focus(); };
+
+  useEffect(() => { setMoreOpen(false); }, [active]);
+  useEffect(() => {
+    const media = window.matchMedia("(max-width: 700px)");
+    const resize = () => { if (!media.matches) setMoreOpen(false); };
+    media.addEventListener("change", resize);
+    return () => media.removeEventListener("change", resize);
+  }, []);
+  useEffect(() => {
+    if (!moreOpen) return;
+    menu.current?.querySelector<HTMLButtonElement>('[role="menuitem"]')?.focus();
+    const escape = (event: KeyboardEvent) => { if (event.key === "Escape") { event.preventDefault(); closeMore(); } };
+    window.addEventListener("keydown", escape);
+    return () => window.removeEventListener("keydown", escape);
+  }, [moreOpen]);
   useEffect(() => {
     const nav = bar.current;
     const item = nav?.querySelector<HTMLElement>('[aria-current="page"]');
@@ -307,23 +342,52 @@ function TabBar({ active, onSelect }: { active: TabId; onSelect: (t: TabId) => v
       nav.scrollTo({ left: item.offsetLeft + item.offsetWidth - nav.clientWidth });
     }
   }, [active]);
-  return (
-    <nav ref={bar} className="tabbar" aria-label="Navigazione principale">
-      {TABS.map((t) => {
-        const icon = TAB_ICONS[t.id];
-        return (
-          <button
-            key={t.id}
-            className={cx("tab-btn", t.center && "tab-center", active === t.id && "active")}
-            onClick={() => onSelect(t.id)}
-            aria-current={active === t.id ? "page" : undefined}
-            aria-label={t.id === "registrazioni" ? "Registrazioni" : t.label}
-          >
-            <AppGlyph name={icon} size={22} strokeWidth={1.65} />
-            <span className="lbl">{t.label}</span>
-          </button>
-        );
-      })}
+
+  return <>
+    <nav ref={bar} className="tabbar desktop-tabbar" aria-label="Navigazione principale">
+      {TABS.map((tab) => <button key={tab.id}
+        className={cx("tab-btn", tab.center && "tab-center", active === tab.id && "active")}
+        onClick={() => onSelect(tab.id)} aria-current={active === tab.id ? "page" : undefined}
+        aria-label={tab.id === "registrazioni" ? "Registrazioni" : tab.label}>
+        <AppGlyph name={TAB_ICONS[tab.id]} size={22} strokeWidth={1.65} />
+        <span className="lbl">{tab.label}</span>
+      </button>)}
     </nav>
-  );
+    <div className="mobile-navigation">
+      {moreOpen && <>
+        <button className="mobile-more-dismiss" aria-label="Chiudi menu Altro" tabIndex={-1} onClick={closeMore} />
+        <div ref={menu} id="mobile-more-menu" className="mobile-more-menu" role="menu" aria-label="Altre funzioni"
+          onKeyDown={(event) => {
+            if (!["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) return;
+            event.preventDefault();
+            const items = Array.from(menu.current?.querySelectorAll<HTMLButtonElement>('[role="menuitem"]') ?? []);
+            const current = items.indexOf(document.activeElement as HTMLButtonElement);
+            const index = event.key === "Home" ? 0 : event.key === "End" ? items.length - 1
+              : (current + (event.key === "ArrowDown" ? 1 : -1) + items.length) % items.length;
+            items[index]?.focus();
+          }}>
+          {MORE_TABS.map((tab) => <button key={tab.id} role="menuitem"
+            className={cx("mobile-more-item", active === tab.id && "active")}
+            aria-current={active === tab.id ? "page" : undefined}
+            onClick={() => { setMoreOpen(false); onSelect(tab.id); moreButton.current?.focus(); }}>
+            <AppGlyph name={TAB_ICONS[tab.id]} size={22} />
+            <span>{tab.label}</span><ChevronRight size={17} className="mobile-more-chevron" />
+          </button>)}
+        </div>
+      </>}
+      <nav className="mobile-nav-pill" aria-label="Navigazione principale mobile">
+        <span className="mobile-nav-highlight" aria-hidden="true" style={{ transform: `translateX(${selectedIndex * 100}%)` }} />
+        {MOBILE_TABS.map((tab, index) => <button key={tab.id} className={cx("mobile-nav-button", selectedIndex === index && "active")}
+          aria-label={tab.label} title={tab.label} aria-current={active === tab.id ? "page" : undefined}
+          onClick={() => { setMoreOpen(false); onSelect(tab.id); }}>
+          {tab.id === "diario" && selectedIndex === 0
+            ? <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor" aria-hidden="true"><path d="m3.3 10.2 7.5-6.7a1.8 1.8 0 0 1 2.4 0l7.5 6.7v9.3a1.2 1.2 0 0 1-1.2 1.2H15v-6a3 3 0 0 0-6 0v6H4.5a1.2 1.2 0 0 1-1.2-1.2z" /></svg>
+            : <AppGlyph name={tab.id === "metronomo" ? "metronome" : TAB_ICONS[tab.id]} size={26} strokeWidth={1.75} />}
+        </button>)}
+        <button ref={moreButton} className={cx("mobile-nav-button", selectedIndex === 4 && "active")}
+          aria-label="Altro" title="Altro" aria-haspopup="menu" aria-expanded={moreOpen} aria-controls="mobile-more-menu"
+          onClick={() => setMoreOpen((open) => !open)}><MoreHorizontal size={27} strokeWidth={2.6} /></button>
+      </nav>
+    </div>
+  </>;
 }

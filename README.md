@@ -81,3 +81,9 @@ npm run test:recordings:e2e
 I test unitari coprono durata senza pause, chunk finale, rilascio del microfono, cancellazione durante il permesso, tentativi successivi, rifacimento, persistenza atomica, note multilinea, eliminazione e ripristino anche con un salvataggio in corso. Il test nel browser usa MediaRecorder reale con il dispositivo audio di prova di Chromium; verifica riascolto, seek, A–B, download, reload, errori e layout mobile/desktop. Non sostituisce una prova su un iPhone fisico.
 
 Backup prima della funzione: ramo `backup/pre-recordings-20261017`, commit `1e61f49ce1ed4052bc03f1692334c9145a5040e1`.
+
+## Navigazione mobile
+
+Su schermi fino a 700 px la barra flottante mostra cinque sole icone: Diario, Studio, Metronomo (al centro), Registrazioni e Altro. Allenamento, Accordatore, Corde e Impostazioni rimangono accessibili nel menu Altro. Selezione a pillola grigia, icone allineate e nessuna etichetta sovrapposta. Il bordo inferiore dista 6 px dall’area sicura del dispositivo, conteggiata una sola volta; lo spazio necessario è riservato nel contenuto scorrevole. Desktop e sessioni Pixel Story a schermo intero mantengono la loro navigazione.
+
+Test dedicato: `npm run test:navigation:e2e`, dopo `npx playwright install chromium`. Verifica cinque destinazioni, quattro voci nel menu, tastiera/Escape/tocco esterno, allineamento e margini a 320/375/390/430/700 px, area sicura e desktop. Backup: ramo `backup/pre-mobile-nav-20261017`.
