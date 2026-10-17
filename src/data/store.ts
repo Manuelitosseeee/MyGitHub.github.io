@@ -1,11 +1,12 @@
 import {bestFor,dayKey,plan,type Milestone} from "../study/planner";
 import { useReducer, useEffect } from "react";
-import { idbGet, idbSet, idbDelete, idbClear } from "../lib/idb";
+import { idbGet, idbSet, idbDelete, idbClear, idbBatch } from "../lib/idb";
 import { uid } from "../lib/utils";
 import { localDayKey } from "../lib/time";
 import type {
   DBState,
   Song,
+  RecordingMeta,
   BpmEvent,
   PracticeDay,
   StudySession,
@@ -67,6 +68,7 @@ function emptyState(): DBState {
   return {
     milestones: [], studyResults: [], dailyGoals: [],
     songs: [],
+    recordings: [],
     events: [],
     practices: [],
     sessions: [],
@@ -83,6 +85,7 @@ class Store {
   private listeners = new Set<() => void>();
   private ready = false;
   private writeQueue: Promise<void> = Promise.resolve();
+  private resetRevision = 0;
 
   /** Load everything from IndexedDB (call once before rendering). */
   async init(): Promise<void> {
@@ -113,6 +116,7 @@ class Store {
       base.milestones = await idbGet("milestones") ?? [];
       base.studyResults = await idbGet("studyResults") ?? [];
       base.dailyGoals = await idbGet("dailyGoals") ?? [];
+      base.recordings = await idbGet<RecordingMeta[]>("recordings") ?? [];
       base.songs = (s[0] ?? []) as Song[];
       base.events = (s[1] ?? []) as BpmEvent[];
       base.practices = (s[2] ?? []) as PracticeDay[];
@@ -265,6 +269,13 @@ class Store {
 
   /** Hard delete a song with all of its history. */
   deleteSong(id: string): void {
+    // A library edit must never destroy an independently saved performance.
+    const title = this.songById(id)?.title;
+    void this.writeRecordings((recordings) => ({
+      recordings: recordings.map((recording) => recording.songId === id
+        ? { ...recording, songId: null, title: title ?? recording.title }
+        : recording),
+    })).catch(() => undefined);
     this.commit("milestones",this.state.milestones.filter(m=>m.songId!==id));
     this.commit("studyResults",this.state.studyResults.filter(m=>m.songId!==id));
     this.commit("dailyGoals",this.state.dailyGoals.filter(m=>m.songId!==id));
@@ -563,6 +574,56 @@ class Store {
     this.commit("studyResults",[...this.state.studyResults,{id,songId,date,bpm,seconds,at}]);
   }
 
+  /* ---------- Recordings: atomic, error-reporting persistence ---------- */
+
+  private writeRecordings(change: (recordings: RecordingMeta[]) => {
+    recordings: RecordingMeta[];
+    blobs?: Array<{ key: string; value?: unknown; remove?: boolean }>;
+  }): Promise<void> {
+    const revision = this.resetRevision;
+    const operation = this.writeQueue.then(async () => {
+      if (revision !== this.resetRevision) throw new Error("Dati ripristinati");
+      const next = change(this.state.recordings);
+      await idbBatch([{ key: "recordings", value: next.recordings }, ...(next.blobs ?? [])]);
+      if (revision !== this.resetRevision) throw new Error("Dati ripristinati");
+      this.state = { ...this.state, recordings: next.recordings };
+      this.emit();
+    });
+    // Callers see failures; a failed write must not block later saves/reset.
+    this.writeQueue = operation.catch(() => undefined);
+    return operation;
+  }
+
+  async addRecording(input: { songId: string | null; title: string; duration: number; blob: Blob; notes?: string }): Promise<RecordingMeta> {
+    if (!input.title.trim() || !input.blob.size || !Number.isFinite(input.duration) || input.duration <= 0) {
+      throw new Error("La registrazione è vuota o non valida");
+    }
+    const recording: RecordingMeta = {
+      id: uid("rec"), songId: input.songId, title: input.title.trim(),
+      createdAt: Date.now(), duration: input.duration, size: input.blob.size,
+      mimeType: input.blob.type, notes: input.notes ?? "",
+    };
+    await this.writeRecordings((recordings) => ({
+      recordings: [recording, ...recordings],
+      blobs: [{ key: `blob:${recording.id}`, value: input.blob }],
+    }));
+    return recording;
+  }
+
+  async updateRecordingNotes(id: string, notes: string): Promise<void> {
+    await this.writeRecordings((recordings) => {
+      if (!recordings.some((recording) => recording.id === id)) throw new Error("Registrazione non trovata");
+      return { recordings: recordings.map((recording) => recording.id === id ? { ...recording, notes } : recording) };
+    });
+  }
+
+  async deleteRecording(id: string): Promise<void> {
+    await this.writeRecordings((recordings) => ({
+      recordings: recordings.filter((recording) => recording.id !== id),
+      blobs: [{ key: `blob:${id}`, remove: true }],
+    }));
+  }
+
   /* ---------- Settings ---------- */
 
   updateSettings(patch: Partial<Settings>): void {
@@ -589,6 +650,8 @@ class Store {
 
   /** Wipe everything (all songs, history, blobs) and reset settings. */
   async resetAll(): Promise<void> {
+    this.resetRevision++;
+    window.dispatchEvent(new Event("mygithub:reset-data"));
     const {removePush}=await import("../study/notifications");
     await removePush().catch(()=>undefined);
     pixel.reset();

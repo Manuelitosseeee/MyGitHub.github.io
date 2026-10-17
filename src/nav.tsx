@@ -7,6 +7,7 @@ export type TabId =
   | "metronomo"
   | "accordatore"
   | "corde"
+  | "registrazioni"
   | "impostazioni";
 
 /** `center: true` = voce centrale della barra, resa leggermente più grande. */
@@ -23,6 +24,7 @@ export const TABS: TabDef[] = [
   { id: "metronomo", label: "Metronomo" },
   { id: "accordatore", label: "Accordatore" },
   { id: "corde", label: "Corde" },
+  { id: "registrazioni", label: "Registraz." },
   { id: "impostazioni", label: "Impost." },
 ];
 

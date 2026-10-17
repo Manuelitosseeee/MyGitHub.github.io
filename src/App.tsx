@@ -27,6 +27,7 @@ import SettingsScreen from "./screens/SettingsScreen";
 import AllenamentoScreen from "./screens/allenamento/AllenamentoScreen";
 
 const PixelStory = lazy(() => import("./pixel/PixelStory"));
+const RecordingsScreen = lazy(() => import("./screens/RecordingsScreen"));
 
 const WELCOME_KEY = "mygithub.welcome-complete";
 
@@ -37,6 +38,7 @@ const TAB_ICONS: Record<TabId, AppGlyphName> = {
   metronomo: "metronome-tab",
   accordatore: "tuner",
   corde: "strings",
+  registrazioni: "recordings",
   impostazioni: "settings",
 };
 
@@ -169,6 +171,11 @@ export default function App() {
           <Pane id="impostazioni" active={tab === "impostazioni"}>
             <SettingsScreen />
           </Pane>
+          <Pane id="registrazioni" active={tab === "registrazioni"}>
+            <Suspense fallback={<div className="screen">Carico le registrazioni…</div>}>
+              <RecordingsScreen active={tab === "registrazioni"} />
+            </Suspense>
+          </Pane>
         </div>
         <TabBar active={tab} onSelect={openTab} />
       </div>
@@ -290,8 +297,18 @@ function Pane({ id, active, children }: { id: string; active: boolean; children:
 }
 
 function TabBar({ active, onSelect }: { active: TabId; onSelect: (t: TabId) => void }) {
+  const bar = useRef<HTMLElement>(null);
+  useEffect(() => {
+    const nav = bar.current;
+    const item = nav?.querySelector<HTMLElement>('[aria-current="page"]');
+    if (!nav || !item) return;
+    if (item.offsetLeft < nav.scrollLeft) nav.scrollTo({ left: item.offsetLeft });
+    else if (item.offsetLeft + item.offsetWidth > nav.scrollLeft + nav.clientWidth) {
+      nav.scrollTo({ left: item.offsetLeft + item.offsetWidth - nav.clientWidth });
+    }
+  }, [active]);
   return (
-    <nav className="tabbar" aria-label="Navigazione principale">
+    <nav ref={bar} className="tabbar" aria-label="Navigazione principale">
       {TABS.map((t) => {
         const icon = TAB_ICONS[t.id];
         return (
@@ -300,6 +317,7 @@ function TabBar({ active, onSelect }: { active: TabId; onSelect: (t: TabId) => v
             className={cx("tab-btn", t.center && "tab-center", active === t.id && "active")}
             onClick={() => onSelect(t.id)}
             aria-current={active === t.id ? "page" : undefined}
+            aria-label={t.id === "registrazioni" ? "Registrazioni" : t.label}
           >
             <AppGlyph name={icon} size={22} strokeWidth={1.65} />
             <span className="lbl">{t.label}</span>

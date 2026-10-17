@@ -175,7 +175,7 @@ export default function SettingsScreen() {
           toast("Tutti i dati sono stati eliminati");
         }}
         title="Eliminare tutti i dati?"
-        message="Verranno cancellati per sempre brani, BPM registrati, sessioni, spartiti, storico delle corde e tutti i progressi Pixel Story: plettri, acquisti, mappe e sessioni. Sei sicuro?"
+        message="Verranno cancellati per sempre brani, BPM registrati, sessioni, spartiti, registrazioni audio e relative note, storico delle corde e tutti i progressi Pixel Story: plettri, acquisti, mappe e sessioni. Sei sicuro?"
         confirmLabel="Elimina tutto"
       />
     </div>
