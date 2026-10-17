@@ -24,7 +24,7 @@ try {
   const page = await context.newPage();
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto(base);
-  await page.locator('.tabbar').waitFor();
+  await page.getByRole('navigation', { name: 'Navigazione principale mobile', exact: true }).waitFor();
   await page.evaluate(async () => {
     const { store } = await import('/src/data/store.ts');
     store.addSong('Por una cabeza'); store.addSong('Romance');
