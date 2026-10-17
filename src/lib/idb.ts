@@ -64,3 +64,25 @@ export async function idbDelete(key: string): Promise<void> {
 export async function idbClear(): Promise<void> {
   return tx("readwrite", (s) => s.clear());
 }
+
+/** Metadata and its audio must either both be saved or both be rolled back. */
+export async function idbBatch(operations: Array<{ key: string; value?: unknown; remove?: boolean }>): Promise<void> {
+  const db = await open();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(STORE, "readwrite");
+    const storage = transaction.objectStore(STORE);
+    transaction.oncomplete = () => resolve();
+    transaction.onerror = () => reject(transaction.error ?? new Error("Salvataggio non riuscito"));
+    transaction.onabort = () => reject(transaction.error ?? new Error("Salvataggio annullato"));
+    try {
+      for (const operation of operations) {
+        if (operation.remove) storage.delete(operation.key);
+        else storage.put(operation.value, operation.key);
+      }
+    } catch (error) {
+      // A synchronous DataCloneError must roll back earlier queued writes too.
+      transaction.abort();
+      reject(error);
+    }
+  });
+}

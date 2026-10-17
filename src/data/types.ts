@@ -44,6 +44,19 @@ export interface StudySession {
 
 export type SheetKind = "image" | "pdf";
 
+/** Audio lives in IndexedDB as blob:<id>, not inside the metadata collection. */
+export interface RecordingMeta {
+  id: string;
+  songId: string | null;
+  /** Also preserves the name if the library song is subsequently deleted. */
+  title: string;
+  createdAt: number;
+  duration: number;
+  mimeType: string;
+  size: number;
+  notes: string;
+}
+
 /** Sheet music attachment (image or PDF) for a song. Blob is stored separately. */
 export interface SheetMeta {
   id: string;
@@ -194,6 +207,7 @@ export interface DBState {
   studyResults: StudyResult[];
   dailyGoals: DailyGoal[];
   songs: Song[];
+  recordings: RecordingMeta[];
   events: BpmEvent[];
   practices: PracticeDay[];
   sessions: StudySession[];

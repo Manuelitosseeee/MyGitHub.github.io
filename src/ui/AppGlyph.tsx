@@ -9,6 +9,7 @@ export type AppGlyphName =
   | "tuner"
   | "strings"
   | "strings-coil"
+  | "recordings"
   | "settings";
 
 type AppGlyphProps = SVGProps<SVGSVGElement> & {
@@ -97,6 +98,12 @@ export function AppGlyph({
         <>
           <path d="M12 2.9 14 4l2.3-.4 1.2 2 2.2.9v2.4l1.4 1.9-1.1 2.2.4 2.3-2 1.2-.9 2.2h-2.4l-1.9 1.4-2.2-1.1-2.3.4-1.2-2-2.2-.9v-2.4L3.9 12l1.1-2.2-.4-2.3 2-1.2.9-2.2h2.4z" />
           <circle cx="12" cy="12" r="3.1" />
+        </>
+      ) : null}
+      {name === "recordings" ? (
+        <>
+          <rect x="9" y="3" width="6" height="12" rx="3" />
+          <path d="M6 10v2a6 6 0 0 0 12 0v-2M12 18v3M9 21h6" />
         </>
       ) : null}
     </svg>
