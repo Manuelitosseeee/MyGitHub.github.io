@@ -8,6 +8,15 @@ function getCtor(): Ctor | null {
   return w.AudioContext ?? w.webkitAudioContext ?? null;
 }
 
+/** iOS: media playback must not follow the Ring/Silent switch. Feature
+ * detection keeps older browsers working; never request microphone access. */
+export function configurePlaybackSession(): void {
+  try {
+    const nav = navigator as Navigator & { audioSession?: { type: string } };
+    if (nav.audioSession) nav.audioSession.type = "playback";
+  } catch { /* HTML audio retains its normal playback category as fallback. */ }
+}
+
 let ctx: AudioContext | null = null;
 
 export function getAudioContext(): AudioContext | null {

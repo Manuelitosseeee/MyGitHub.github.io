@@ -1,3 +1,4 @@
+import "../../study/studio-controls.css";
 import {GoalEditor} from "../../study/calendar";
 import {dayKey,PATHS,plan,bestFor,resultToday,ALL_DAYS} from "../../study/planner";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -857,6 +858,8 @@ function SessionsCard({ song }: { song: Song }) {
   return (
     <>
       <SectionTitle>Sessioni di studio</SectionTitle>
+      <details className="tracking-disclosure day-tracking">
+      <summary>Storico delle sessioni <span className="row-sub">{sessions.length}</span></summary>
       {sessions.length === 0 ? (
         <Card className="card-pad">
           <div className="row-sub">
@@ -899,6 +902,7 @@ function SessionsCard({ song }: { song: Song }) {
           })}
         </Card>
       )}
+      </details>
       <Confirm
         open={toDelete !== null}
         onClose={() => setToDelete(null)}

@@ -1,3 +1,4 @@
+import "../study/studio-controls.css";
 import {StudyHome} from "../study/StudyHome";
 import { useMemo } from "react";
 import { ChevronRight, Home, Music2, Sparkles } from "lucide-react";
@@ -171,8 +172,8 @@ export default function DiarioScreen() {
 function DayCard({ entry, highlight }: { entry: DayEntry; highlight?: boolean }) {
   const nav = useNav();
   return (
-    <Card>
-      <div className="day-header">
+    <details className="tracking-disclosure day-tracking">
+      <summary aria-label={`Attività del ${relativeDayLabel(entry.date)}`}>
         <div className="d" style={{ color: highlight ? "var(--acc)" : undefined }}>
           {relativeDayLabel(entry.date)}
         </div>
@@ -180,19 +181,10 @@ function DayCard({ entry, highlight }: { entry: DayEntry; highlight?: boolean })
           {entry.songCount} {entry.songCount === 1 ? "brano" : "brani"} ·{" "}
           {formatDuration(entry.totalSeconds)}
         </div>
-      </div>
+      </summary>
       {entry.entries.map((e) => (
-        <button
-          key={e.songId}
-          className="list-item"
-          style={{
-            width: "100%",
-            display: "block",
-            textAlign: "left",
-            padding: "11px 16px 12px",
-          }}
-          onClick={() => nav.openSong(e.songId)}
-        >
+        <div key={e.songId} className="list-item">
+        <button className="tracking-open-song" onClick={() => nav.openSong(e.songId)}>
           <div className="song-mini-top">
             <span className="row-title" style={{ fontSize: 15.5 }}>
               {e.title}
@@ -209,8 +201,12 @@ function DayCard({ entry, highlight }: { entry: DayEntry; highlight?: boolean })
             ) : null}
             <ChevronRight size={16} className="chev" style={{ marginLeft: "auto" }} />
           </div>
+        </button>
           {e.bpmPath.length > 0 ? (
-            <Journey points={e.bpmPath} />
+            <details className="tracking-disclosure song-tracking">
+              <summary>Percorso BPM · {e.bpmPath.length} {e.bpmPath.length === 1 ? 'registrazione' : 'registrazioni'}</summary>
+              <Journey points={e.bpmPath} />
+            </details>
           ) : (
             <span className="tiny text3">
               {formatDuration(e.seconds)} di pratica con il metronomo
@@ -222,9 +218,9 @@ function DayCard({ entry, highlight }: { entry: DayEntry; highlight?: boolean })
               BPM · obiettivo {e.goalBpm} BPM
             </div>
           ) : null}
-        </button>
+        </div>
       ))}
-    </Card>
+    </details>
   );
 }
 
