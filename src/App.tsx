@@ -113,7 +113,7 @@ export default function App() {
 
   const openTab = useCallback((t: TabId) => {
     setTabState(t);
-    if (t !== "studio") setSongId(null);
+    // Keep an open song mounted when changing tabs: its metronome may keep playing.
     store.setTab(t);
   }, []);
 
@@ -155,7 +155,7 @@ export default function App() {
             <DiarioScreen />
           </Pane>
           <Pane key={`studio-${songId ?? "list"}`} id="studio" active={tab === "studio"}>
-            {songId ? <SongScreen songId={songId} /> : st.settings.pixelStory ? <Suspense fallback={<div className="screen">Preparo la tua stanza…</div>}><PixelStory active={tab === "studio"} /></Suspense> : <BraniScreen />}
+            {songId ? <SongScreen songId={songId} /> : <StudioLibrary active={tab === "studio"} pixelMode={Boolean(st.settings.pixelStory)} />}
           </Pane>
           <Pane id="allenamento" active={tab === "allenamento"}>
             <AllenamentoScreen />
@@ -195,6 +195,15 @@ export default function App() {
       <Toaster />
     </NavContext.Provider>
   );
+}
+
+function StudioLibrary({ active, pixelMode }: { active: boolean; pixelMode: boolean }) {
+  const [loaded, setLoaded] = useState(pixelMode);
+  useEffect(() => { if (pixelMode) setLoaded(true); }, [pixelMode]);
+  return <>
+    <div hidden={pixelMode}><BraniScreen /></div>
+    {(loaded || pixelMode) && <div hidden={!pixelMode}><Suspense fallback={<div className="screen">Preparo la tua stanza…</div>}><PixelStory active={active && pixelMode} /></Suspense></div>}
+  </>;
 }
 
 function WelcomeScreen({ onStart }: { onStart: () => void }) {

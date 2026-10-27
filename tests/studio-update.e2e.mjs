@@ -1,0 +1,125 @@
+import { chromium, expect } from '@playwright/test';
+import { createServer } from 'vite';
+import fs from 'node:fs/promises';
+const custom = process.env.STUDIO_TEST_BROWSER;
+const server = await createServer({ server: {host:'127.0.0.1',port:5173,strictPort:false} });
+await server.listen();
+let browser;
+try {
+  browser = await chromium.launch({headless:true,...(custom?{executablePath:custom,args:['--no-sandbox','--disable-dev-shm-usage','--use-gl=angle','--use-angle=swiftshader'],env:{...process.env,LD_LIBRARY_PATH:process.env.STUDIO_TEST_LIB??''}}:{})});
+  const context=await browser.newContext({viewport:{width:390,height:844}});
+  await context.addInitScript(()=>{
+    localStorage.setItem('mygithub.welcome-complete','true');
+    Object.defineProperty(navigator,'audioSession',{value:{type:'auto'},configurable:true});
+  });
+  const page=await context.newPage(),errors=[];
+  page.on('pageerror',e=>errors.push(e.message));
+  const base=`http://127.0.0.1:${server.httpServer.address().port}`;
+  await page.goto(base);
+  await expect(page.locator('.pane.diario .screen-title')).toBeVisible();
+  await page.evaluate(async()=>{
+    const {store}=await import('/src/data/store.ts');const song=store.addSong('Test percorso completo',160);
+    for(let i=0;i<45;i++)store.songMetroEvent(song.id,65+i);
+  });
+  const nav=page.getByRole('navigation',{name:'Navigazione principale mobile',exact:true});
+  const day=page.locator('.day-tracking').first();
+  await expect(day).toBeVisible();await expect(day).not.toHaveAttribute('open','');
+  const collapsed=await day.evaluate(e=>e.getBoundingClientRect().height);
+  await day.locator(':scope > summary').click();
+  const path=day.locator('.song-tracking').first();
+  await expect(path).toBeVisible();await expect(path.locator('.bpm-journey')).toBeHidden();
+  await path.locator('summary').click();await expect(path.locator('.bpm-journey')).toBeVisible();
+  await expect(path.locator('.bpm-chip')).toHaveCount(45);
+  await path.locator('summary').click();await day.locator(':scope > summary').click();
+  expect(await day.evaluate(e=>e.getBoundingClientRect().height)).toBeCloseTo(collapsed,2);
+  await nav.getByRole('button',{name:'Studio',exact:true}).click();
+  await page.getByRole('switch',{name:'Pixel Story in Studio'}).click();
+  await expect(page.locator('.px-lobby')).toBeVisible();
+  await expect(page.locator('.px-map-picker button')).toHaveCount(5);
+  const styles=await page.evaluate(()=>{
+    const get=s=>{const c=getComputedStyle(document.querySelector(s));return{background:c.backgroundColor,color:c.color,border:c.borderTopColor,radius:c.borderTopLeftRadius,borderImage:c.borderImageSource,font:c.fontFamily}};
+    return{home:get('.pane.diario .card'),wallet:get('.px-wallet'),map:get('.px-map-picker button'),heading:get('.px-lobby h1'),body:get('.pane.diario'),pixel:get('.px-root')};
+  });
+  expect(styles.wallet.background).toBe(styles.home.background);expect(styles.wallet.radius).toBe(styles.home.radius);
+  expect(styles.pixel.background).toBe(styles.body.background);expect(styles.wallet.borderImage).toBe('none');
+  expect(styles.map.borderImage).toBe('none');expect(styles.map.radius).toBe('19px');expect(styles.map.color).toBe(styles.heading.color);
+  await page.getByRole('button',{name:'Negozio e arredi',exact:true}).click();
+  await expect(page.getByRole('dialog',{name:/Negozio/})).toBeVisible();
+  expect(await page.locator('.px-shop-grid article').first().evaluate(e=>getComputedStyle(e).borderImageSource)).toBe('none');
+  await page.getByRole('button',{name:'Chiudi finestra'}).click();
+  const saved=await page.evaluate(()=>localStorage.getItem('mygithub.pixel-story.v1'));
+  await page.getByRole('switch',{name:'Pixel Story in Studio'}).click();
+  await expect(page.locator('.pane.studio .screen-title')).toHaveText('Studio');
+  expect(await page.evaluate(()=>localStorage.getItem('mygithub.pixel-story.v1'))).toBe(saved);
+  // Standard metronome: one actual audio element, surviving tab navigation.
+  await nav.getByRole('button',{name:'Metronomo',exact:true}).click();
+  await page.getByRole('button',{name:'Avvia il metronomo',exact:true}).click();
+  await expect(page.getByRole('button',{name:'Ferma il metronomo',exact:true})).toBeVisible();
+  expect(await page.evaluate(()=>navigator.audioSession.type)).toBe('playback');
+  expect(await page.locator('audio[data-metronome]').count()).toBe(1);
+  const start=await page.locator('audio[data-metronome]').evaluate(e=>e.currentTime);
+  await nav.getByRole('button',{name:'Diario',exact:true}).click();await page.waitForTimeout(1300);
+  expect(await page.locator('audio[data-metronome]').evaluate(e=>e.currentTime)).toBeGreaterThan(start+.8);
+  // Suppress *all* page interval callbacks: audible media still advances.
+  await page.evaluate(()=>{window.__originalInterval=window.setInterval;window.__originalClear=window.clearInterval;for(let i=1;i<5000;i++)window.clearInterval(i);window.setInterval=()=>0;});
+  const before=await page.locator('audio[data-metronome]').evaluate(e=>e.currentTime);
+  await page.waitForTimeout(1400);
+  expect(await page.locator('audio[data-metronome]').evaluate(e=>e.currentTime)).toBeGreaterThan(before+.9);
+  await page.evaluate(()=>{window.setInterval=window.__originalInterval;window.clearInterval=window.__originalClear;});
+  await nav.getByRole('button',{name:'Metronomo',exact:true}).click();
+  await page.getByRole('button',{name:'Accelera di un BPM',exact:true}).click();
+  await expect(page.getByRole('button',{name:'Ferma il metronomo',exact:true})).toBeVisible();
+  await page.getByRole('button',{name:'Ferma il metronomo',exact:true}).click();
+  await expect(page.locator('audio[data-metronome]')).toHaveCount(0);
+  // Start the main metronome again: Pixel must take over its exclusive slot.
+  await page.getByRole('button',{name:'Avvia il metronomo',exact:true}).click();
+  await nav.getByRole('button',{name:'Studio',exact:true}).click();
+  await page.getByRole('switch',{name:'Pixel Story in Studio'}).click();
+  await page.getByRole('button',{name:'Entra e inizia a studiare'}).click();
+  const viewport=await page.locator('.px-stage').evaluate(e=>({w:e.getBoundingClientRect().width,h:e.getBoundingClientRect().height}));
+  expect(viewport).toEqual({w:390,h:844});
+  await page.locator('.px-stage').getByRole('button',{name:/metronomo/i}).click();
+  const metro=page.getByRole('dialog',{name:'Metronomo originale'});
+  await expect(metro).toBeVisible();
+  await metro.getByRole('button',{name:/^Avvia( il metronomo)?$/}).click();
+  await expect(metro.getByRole('button',{name:/^Ferma( il metronomo)?$/})).toBeVisible();
+  expect(await page.locator('audio[data-metronome]').count()).toBe(1);
+  await expect(page.locator('.pane.metronomo').getByRole('button',{name:'Avvia il metronomo',exact:true,includeHidden:true})).toHaveCount(1);
+  await metro.getByRole('button',{name:'Chiudi metronomo'}).click();
+  await expect(metro).toBeHidden();
+  expect(await page.locator('audio[data-metronome]').evaluate(e=>e.paused)).toBe(false);
+  // Native media interruption must stop the UI and release the audio source.
+  await page.evaluate(()=>document.querySelector('audio[data-metronome]').pause());
+  await expect(page.locator('audio[data-metronome]')).toHaveCount(0);
+  await page.locator('.px-stage').getByRole('button',{name:/metronomo/i}).click();
+  await expect(metro.getByRole('button',{name:/^Avvia( il metronomo)?$/})).toBeVisible();
+  await metro.getByRole('button',{name:'Chiudi metronomo'}).click();
+  await page.locator('.px-stage .px-back').click();
+  await page.getByRole('button',{name:'Metti in pausa',exact:true}).click();
+  await fs.mkdir('../studio-update-qa',{recursive:true});
+  await page.screenshot({path:'../studio-update-qa/pixel-mobile.png',fullPage:true});
+  await page.getByRole('switch',{name:'Pixel Story in Studio'}).click();
+  await page.reload();
+  await expect(page.getByRole('switch',{name:'Pixel Story in Studio'})).toHaveAttribute('aria-checked','false');
+  await page.getByRole('switch',{name:'Pixel Story in Studio'}).click();
+  await expect(page.locator('.px-session-card')).toBeVisible();
+  for(const width of [320,390,1440]){
+    await page.setViewportSize({width,height:900});
+    expect(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth)).toBe(false);
+  }
+  await page.setViewportSize({width:390,height:844});
+  await page.getByRole('switch',{name:'Pixel Story in Studio'}).click();
+  await page.locator('.pane.studio').getByRole('button',{name:/Test percorso completo/}).click();
+  await expect(page.locator('.pane.studio .screen-title')).toHaveText('Test percorso completo');
+  await page.locator('.pane.studio').getByRole('button',{name:'Avvia il metronomo',exact:true}).click();
+  await expect(page.locator('audio[data-metronome]')).toHaveCount(1);
+  await nav.getByRole('button',{name:'Diario',exact:true}).click();
+  const songTime=await page.locator('audio[data-metronome]').evaluate(e=>e.currentTime);
+  await page.waitForTimeout(1000);
+  expect(await page.locator('audio[data-metronome]').evaluate(e=>e.currentTime)).toBeGreaterThan(songTime+.6);
+  await nav.getByRole('button',{name:'Studio',exact:true}).click();
+  await expect(page.locator('.pane.studio').getByRole('button',{name:'Ferma il metronomo',exact:true})).toBeVisible();
+  await page.locator('.pane.studio').getByRole('button',{name:'Ferma il metronomo',exact:true}).click();
+  expect(errors).toEqual([]);
+  console.log(JSON.stringify({success:true,checks:['45 BPM events retained in collapsible day and song paths','Studio switch preserves Pixel data','Home tokens match wallet/map/shop; no gold frame','five maps and fullscreen camera retained','single media source with playback audio session','audio continues between tabs and with JS interval timers stopped','live BPM change and explicit stop','Pixel original popup continues while closed','OS pause reflected in UI','song metronome survives tab navigation','switch and paused session persist after reload','320/390/1440 layouts'],styles,errors},null,2));
+} finally {await browser?.close();await server.close();}

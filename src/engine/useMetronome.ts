@@ -5,7 +5,6 @@ import {
   releaseExclusive,
   type MetronomeConfig,
 } from "./metronome";
-import { ensureRunning } from "./audio";
 
 export interface BeatFlash {
   beat: number; // beat index within the bar that just sounded
@@ -34,10 +33,12 @@ export function useMetronome(
   const buildRef = useRef(buildConfig);
   buildRef.current = buildConfig;
   const flashKey = useRef(0);
+  const operation = useRef(0);
   const wakeRef = useRef<{ release: () => void } | null>(null);
 
   useEffect(() => {
     return () => {
+      operation.current++;
       const e = engineRef.current;
       if (e) {
         if (e.running) e.stop();
@@ -48,11 +49,13 @@ export function useMetronome(
   }, []);
 
   const start = useCallback(async () => {
+    const ticket = ++operation.current;
     let engine = engineRef.current;
     if (!engine) {
       engine = new MetronomeEngine(kind, buildRef.current());
       engineRef.current = engine;
       engine.onExternalStop = () => {
+        operation.current++;
         setRunning(false);
         wakeRef.current?.release();
         wakeRef.current = null;
@@ -69,17 +72,17 @@ export function useMetronome(
       };
     }
     acquireExclusive(engine);
-    const ok = await ensureRunning();
-    if (!ok) return false;
-    if (!engine.start()) return false;
+    engine.update(buildRef.current());
+    if (!await engine.start() || ticket !== operation.current) return false;
     setRunning(true);
     if (!wakeRef.current) {
-      requestWakeLockSilently(wakeRef);
+      requestWakeLockSilently(wakeRef, () => engine.running);
     }
     return true;
   }, [kind]);
 
   const stop = useCallback(() => {
+    operation.current++;
     const e = engineRef.current;
     if (e && e.running) e.stop();
     wakeRef.current?.release();
@@ -91,7 +94,8 @@ export function useMetronome(
 }
 
 async function requestWakeLockSilently(
-  ref: { current: { release: () => void } | null }
+  ref: { current: { release: () => void } | null },
+  isRunning: () => boolean
 ): Promise<void> {
   try {
     const nav = navigator as Navigator & {
@@ -99,6 +103,7 @@ async function requestWakeLockSilently(
     };
     if (!nav.wakeLock) return;
     const lock = await nav.wakeLock.request("screen");
+    if (!isRunning()) { lock.release(); return; }
     ref.current = lock;
   } catch {
     /* not available — fine */

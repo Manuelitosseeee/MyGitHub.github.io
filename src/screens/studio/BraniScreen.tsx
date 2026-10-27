@@ -1,3 +1,4 @@
+import { PixelStorySwitch } from "../../study/PixelStorySwitch";
 import { useRef, useState } from "react";
 import { ListMusic, Plus, Target, Music2, Flag, ChevronRight } from "lucide-react";
 import { useStore, store } from "../../data/store";
@@ -18,6 +19,8 @@ export default function BraniScreen() {
         La tua libreria di studio. Ogni brano ha un metronomo dedicato che
         registra automaticamente i BPM che provi.
       </p>
+
+      <PixelStorySwitch />
 
       <button
         className="btn btn-primary"

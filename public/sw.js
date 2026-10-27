@@ -5,7 +5,7 @@
  * for it (message SKIP_WAITING), so the running metronome is never interrupted
  * by an update the user did not request.
  */
-const CACHE = "mygithub-mobile-nav-v14";
+const CACHE = "mygithub-studio-audio-v15";
 const PRECACHE = [
   "./pixel/items/home-rug.png",
   "./pixel/items/home-desk.png",
