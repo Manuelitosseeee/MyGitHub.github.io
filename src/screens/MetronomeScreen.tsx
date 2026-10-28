@@ -66,14 +66,13 @@ export default function MetronomeScreen({ embedded = false, onState, stopSignal 
 
   useEffect(() => {
     if (!running || !p.autoIncrease) return;
-    const startedAt = Date.now();
-    let lastStep = 0;
+    let nextAt = performance.now() + p.autoIntervalSeconds * 1000;
     const timer = window.setInterval(() => {
-      const dueStep = Math.floor((Date.now() - startedAt) / (p.autoIntervalSeconds * 1000));
-      if (dueStep <= lastStep) return;
-      const increments = dueStep - lastStep;
-      lastStep = dueStep;
-      const nextBpm = clamp(latestBpm.current + increments * p.autoBpmStep, MIN, MAX);
+      const now = performance.now();
+      if (now < nextAt) return;
+      // A delayed background timer must never apply a burst of missed steps.
+      nextAt = now + p.autoIntervalSeconds * 1000;
+      const nextBpm = clamp(latestBpm.current + p.autoBpmStep, MIN, MAX);
       if (nextBpm === latestBpm.current) return;
       latestBpm.current = nextBpm;
       setBpmState(nextBpm);
@@ -86,7 +85,7 @@ export default function MetronomeScreen({ embedded = false, onState, stopSignal 
   const updateAuto = (patch: Partial<typeof p>) => persist(patch);
 
   const persist = (patch: Partial<typeof p>) => {
-    store.updateSettings({ metro: { ...st.settings.metro, ...patch } });
+    store.updateSettings({ metro: { ...store.state.settings.metro, ...patch } });
   };
 
   const setBpm = (v: number, opts?: { commit?: boolean }) => {
@@ -528,18 +527,27 @@ function AutoTempoNumberField({
   onCommit: (value: number) => void;
 }) {
   const [text, setText] = useState(String(value));
-  useEffect(() => setText(String(value)), [value]);
+  const editing = useRef(false);
+  useEffect(() => { if (!editing.current) setText(String(value)); }, [value]);
   return (
     <input
-      type="number"
+      type="text"
+      inputMode="numeric"
+      pattern="[0-9]*"
       className="field"
-      min={min}
-      max={max}
+      autoComplete="off"
+      onFocus={() => { editing.current = true; }}
+      onKeyDown={event => {
+        if (event.key === 'Enter') event.currentTarget.blur();
+        if (event.key === 'Escape') { setText(String(value)); event.currentTarget.value = String(value); event.currentTarget.blur(); }
+      }}
       value={text}
-      onChange={(event) => setText(event.target.value)}
-      onBlur={() => {
-        const parsed = Number(text);
-        const next = Number.isFinite(parsed) && text !== ""
+      onChange={(event) => { if (/^\d*$/.test(event.target.value)) setText(event.target.value); }}
+      onBlur={event => {
+        editing.current = false;
+        const raw = event.currentTarget.value;
+        const parsed = Number(raw);
+        const next = Number.isFinite(parsed) && raw !== ""
           ? clamp(Math.round(parsed), min, max)
           : value;
         setText(String(next));

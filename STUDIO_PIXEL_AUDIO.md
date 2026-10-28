@@ -24,3 +24,25 @@ Non è stato utilizzato un iPhone fisico. L'audio multimediale e Audio Session p
 Prima di considerare validato sul dispositivo: avviare con tocco, provare suoneria spenta (volume multimediale alzato), cambio app e schermo bloccato per 5 minuti, popup Pixel chiuso, pausa da comandi multimediali, cambio BPM/volume/suono/suddivisioni. Provare sia Safari sia PWA installata.
 
 Riferimenti primari: https://bugs.webkit.org/show_bug.cgi?id=237322 e https://w3c.github.io/audio-session/ .
+
+
+## Correzione continuità e accelerazione — 28 ottobre 2026
+
+Nei browser con AudioWorklet i click ora sono generati nel thread audio da
+`public/metronome-processor.js`, con tre campioni per il timbro selezionato.
+Il clock conserva la fase cambiando BPM, senza cambiare sorgente, fare seek o
+riavviare Play. Un MediaStreamAudioDestination instrada il risultato allo stesso
+elemento audio multimediale. Il vecchio loop PCM resta solo come fallback.
+Il clock supporta accenti, suddivisioni, silenzi, volume e modifiche live.
+
+L'accelerazione applica al massimo un incremento per intervallo: dopo un ritardo
+non somma tutti gli incrementi saltati. Le modifiche a intervallo/step riavviano
+il conto dell'intervallo. I campi accettano una bozza testuale e applicano il
+valore su uscita o Invio; Escape annulla, il vuoto ripristina il valore precedente.
+Gli indicatori del battito usano transform e uno spazio fisso, evitando reflow.
+
+Verifica aggiuntiva: `node --test tests/metronome-clock.test.cjs` (65 secondi
+simulati a 44.1/48 kHz, errore massimo di un campione, centinaia di variazioni),
+`node tests/metro-stability.e2e.mjs` (browser mobile emulato: geometria stabile,
+accelerazione senza cambio elemento/sorgente, nessun recupero a raffica,
+campi 20/2/3600/1, popup Pixel stabile). iPhone fisico non verificato.

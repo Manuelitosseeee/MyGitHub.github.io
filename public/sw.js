@@ -5,8 +5,9 @@
  * for it (message SKIP_WAITING), so the running metronome is never interrupted
  * by an update the user did not request.
  */
-const CACHE = "mygithub-studio-audio-v15";
+const CACHE = "mygithub-metro-stability-v16";
 const PRECACHE = [
+  "./metronome-processor.js",
   "./pixel/items/home-rug.png",
   "./pixel/items/home-desk.png",
   "./pixel/items/home-shelf.png",
