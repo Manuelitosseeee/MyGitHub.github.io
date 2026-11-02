@@ -1,0 +1,28 @@
+name: MyGuitarHub live visual browser tests
+on:
+  push:
+    branches: [feature/amici-pixel-story-20261102]
+  workflow_dispatch:
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
+      - name: Install browser engines
+        run: npx playwright install --with-deps chromium webkit
+      - name: Test Cloudflare live site
+        run: node tests/amici-live-browser.mjs
+      - name: Save screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: amici-browser-screenshots
+          path: screenshots/
+          retention-days: 3
