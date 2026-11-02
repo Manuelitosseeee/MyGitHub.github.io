@@ -1,0 +1,40 @@
+name: Smoke test MyGuitarHub Cloudflare Worker
+on:
+  push:
+    branches: [feature/amici-pixel-story-20261102]
+  workflow_dispatch:
+jobs:
+  live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Verify Cloudflare frontend and friends API
+        env:
+          SITE: https://myguitarhub-amici-preview.manuelitosmurf.workers.dev
+        run: |
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          const base=process.env.SITE;
+          async function check(path,status=200,type) {
+            const response=await fetch(base+path,{signal:AbortSignal.timeout(18000)});
+            console.log('GET',path,'=>',response.status,response.headers.get('content-type'));
+            assert.equal(response.status,status,await response.text().then(x=>x.slice(0,250)));
+            if(type)assert.match(response.headers.get('content-type')??'',type);
+            return response;
+          }
+          const health=await (await check('/__health',200,/json/)).json();
+          assert.equal(health.ok,true);
+          assert.equal(health.backend,true);
+          const html=await (await check('/',200,/html/)).text();
+          assert.match(html,/assets\/index-[^"\s]+\.js/);
+          const files=[...html.matchAll(/(?:src|href)="(\/assets\/[^"]+)"/g)].map(x=>x[1]);
+          assert.ok(files.length>=1);
+          for(const file of files.slice(0,5))await check(file,200,file.endsWith('.css')?/css/:/javascript/);
+          await check('/pixel/items/character.png',200,/image\/png/);
+          await check('/api/friends/profile',401,/json/);
+          await check('/friends-handler.mjs',404);
+          const invalid=await fetch(base+'/api/friends/identity',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({nickname:'!!',token:'invalid'})});
+          console.log('POST invalid identity =>',invalid.status);
+          assert.equal(invalid.status,400);
+          console.log('SUCCESS: Cloudflare host, frontend JS/CSS, pixel asset, private D1 API.');
+          NODE
