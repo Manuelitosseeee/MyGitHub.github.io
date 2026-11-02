@@ -1,0 +1,42 @@
+name: Build asset MyGuitarHub Amici per Worker
+on:
+  push:
+    branches: [feature/amici-pixel-story-20261102]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+      - name: Verify and build
+        run: |
+          npm ci
+          npm run typecheck
+          npm run test:friends
+          npm run build
+      - name: Build Cloudflare API entry
+        run: |
+          npx esbuild 'functions/api/friends/[[path]].ts' --bundle --format=esm --platform=browser --target=es2022 --outfile=/tmp/myguitarhub-friends-handler.mjs
+      - name: Publish compiled assets to isolated branch
+        run: |
+          cp -a dist /tmp/myguitarhub-dist
+          cp /tmp/myguitarhub-friends-handler.mjs /tmp/myguitarhub-dist/friends-handler.mjs
+          touch /tmp/myguitarhub-dist/.nojekyll
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout --orphan amici-static
+          git rm -r --cached . >/dev/null || true
+          find . -mindepth 1 -maxdepth 1 ! -name '.git' -exec rm -rf {} +
+          cp -a /tmp/myguitarhub-dist/. .
+          git add -A
+          git commit -m "build: compiled MyGuitarHub Amici ${{ github.sha }}"
+          git push origin HEAD:refs/heads/amici-static --force
