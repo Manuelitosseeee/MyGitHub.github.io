@@ -18,7 +18,7 @@ jobs:
           async function check(path,status=200,type) {
             const response=await fetch(base+path,{signal:AbortSignal.timeout(18000)});
             console.log('GET',path,'=>',response.status,response.headers.get('content-type'));
-            assert.equal(response.status,status,await response.text().then(x=>x.slice(0,250)));
+            if(response.status!==status){const preview=(await response.clone().text()).slice(0,250);assert.equal(response.status,status,preview);}
             if(type)assert.match(response.headers.get('content-type')??'',type);
             return response;
           }
