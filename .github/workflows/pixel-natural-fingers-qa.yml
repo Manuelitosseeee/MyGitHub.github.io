@@ -1,0 +1,27 @@
+name: Pixel Story natural fingers QA
+on:
+  push:
+    branches:
+      - fix/pixel-connected-fingers-dark-strings-20261102
+  workflow_dispatch:
+jobs:
+  pixel:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium webkit
+      - run: node tests/pixel-natural-fingers.e2e.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pixel-natural-fingers-shots
+          path: pixel-finger-fix-qa/
+          retention-days: 4
