@@ -5,7 +5,7 @@ import {loadAssets,drawPart,character,ITEM_ART,itemId,drawForeground} from './it
 import {HOTSPOTS} from './art';
 import {mapInfo,type MapId} from './maps';
 import {clock,ownedOnMap,type PixelState} from './model';
-import {prepareHands,drawHands,handPose} from './motion';
+import {prepareHands,drawHands} from './motion';
 import {drawSleepFace} from './motion';
 import {composeRoom} from './composition';
 function glow(c:CanvasRenderingContext2D,x:number,y:number,r:number,alpha:number,color='255,172,62'){c.save();c.globalCompositeOperation='screen';const g=c.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,`rgba(${color},${alpha})`);g.addColorStop(1,`rgba(${color},0)`);c.fillStyle=g;c.fillRect(x-r,y-r,r*2,r*2);c.restore();}
@@ -19,7 +19,7 @@ export default function NewScene(props:{state:PixelState;mapId:MapId;running:boo
  const el=cv.current;if(!el)return;const {width:w,height:h}=geom.current;if(w<2||h<2)return;const dpr=Math.min(2,devicePixelRatio||1);if(el.width!==Math.round(w*dpr)||el.height!==Math.round(h*dpr)){el.width=Math.round(w*dpr);el.height=Math.round(h*dpr);}const c=el.getContext('2d');if(!c)return;const cam=camera(w,h),t=Date.now()/1000,active=p.session?.status==='running';c.setTransform(dpr,0,0,dpr,0,0);c.imageSmoothingEnabled=false;
  drawRoomEdges(c,base,w,h,cam,{home:970,studio:920,shop:500,rehearsal:620,stage:500}[id]);
  // The complete map fits; edge continuation uses only this map's empty background.
- c.translate(cam.x,cam.y);c.scale(cam.scale,cam.scale);c.drawImage(room,0,0);c.save();const pose=handPose(t,active,reduced);c.translate(pose.lean,active&&!reduced?Math.sin(t*1.4)*.6:0);c.drawImage(motion.clean,0,0);drawHands(c,motion,t,active,reduced);if(!active)drawSleepFace(c,t,reduced);c.restore();drawForeground(c,assets,id,owned);
+ c.translate(cam.x,cam.y);c.scale(cam.scale,cam.scale);c.drawImage(room,0,0);c.save();/* The approved head is never translated or re-painted while studying. */c.drawImage(motion.clean,0,0);drawHands(c,motion,t,active,reduced);if(!active)drawSleepFace(c,t,reduced);c.restore();drawForeground(c,assets,id,owned);
  if(owned.includes(itemId(id,id==='home'?'plant':'plants'))&&!reduced){c.save();c.globalAlpha=.06*(1+Math.sin(t*.8));for(const p of ITEM_ART[id][id==='home'?'plant':'plants']??[])drawPart(c,assets,p,Math.sin(t*.6));c.restore();}
  if(id==='home'){if(p.rainOn){c.save();c.beginPath();[[269,250,83,111],[368,250,99,111],[269,381,83,146],[368,381,99,146]].forEach(q=>c.rect(...q as [number,number,number,number]));c.clip();for(let i=0;i<44;i++){const x=270+(i*47)%197,y=241+((t*130+i*31)%305);c.globalAlpha=.35+(i%3)*.13;c.fillStyle=i%3?'#7388b0':'#b6b7cf';c.fillRect(x,y,2,10+(i%4)*3);}c.restore();}
  if(owned.includes('fire')&&p.fireOn){c.save();c.beginPath();c.rect(24,634,99,150);c.clip();for(let i=0;i<5;i++){const x=36+i*19,hf=40+(Math.sin((reduced?0:t)*5+i*1.8)+1)*28;for(let y=0;y<hf;y+=7){const ww=Math.max(7,28-Math.floor(y/hf*4)*7);c.fillStyle=y<hf*.45?'#ff9229':y<hf*.8?'#ffbe37':'#ffe176';c.fillRect(x-ww/2+Math.round(Math.sin(t*4+i+y*.04))*5,778-y,ww,7);}}c.restore();glow(c,79,719,240,.11+.025*Math.sin(t*6));}
