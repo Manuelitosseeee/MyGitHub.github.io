@@ -37,6 +37,7 @@ for(const [engine,browserType] of [['chromium',chromium],['webkit',webkit]]){
    });
    await page.goto(origin+'/?tab=amici',{waitUntil:'domcontentloaded'});
    await page.locator('.pane.amici.active .friends-screen .friend-row').waitFor({timeout:20000});
+   await page.locator('#boot').waitFor({state:'hidden',timeout:10000});
    for(const textSize of ['m','xl']){
     await page.evaluate(size=>document.documentElement.dataset.fs=size,textSize);
     await page.waitForTimeout(80);
