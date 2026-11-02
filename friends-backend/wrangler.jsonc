@@ -1,0 +1,1 @@
+{"name":"myguitarhub-friends","main":"worker.js","compatibility_date":"2026-11-02","compatibility_flags":["nodejs_compat"],"observability":{"enabled":true},"d1_databases":[{"binding":"DB","database_name":"myguitarhub-friends-2026","database_id":"69c36d62-4eaf-49ea-b20d-89f8012ffabd"}]}

@@ -1,3 +1,5 @@
+import FriendsScreen from "./social/FriendsScreen";
+import SocialBridge from "./social/SocialBridge";
 import {watchNotificationSync} from "./study/notifications";
 import {
   lazy,
@@ -33,6 +35,7 @@ const RecordingsScreen = lazy(() => import("./screens/RecordingsScreen"));
 const WELCOME_KEY = "mygithub.welcome-complete";
 
 const TAB_ICONS: Record<TabId, AppGlyphName> = {
+  amici: "friends",
   diario: "home",
   studio: "studio",
   allenamento: "training",
@@ -58,7 +61,7 @@ const ACCENTS: Record<string, { main: string; soft: string; hi: string }> = {
 export default function App() {
   const st = useStore();
   useEffect(()=>watchNotificationSync(msg=>console.warn(msg)),[]);
-  const initial = new URLSearchParams(location.search).get("study")==="today" ? "diario" : isTab(st.settings.lastTab) ? st.settings.lastTab : "diario";
+  const initial = (new URLSearchParams(location.search).has("invite") || new URLSearchParams(location.search).has("friend")) ? "amici" : new URLSearchParams(location.search).get("study")==="today" ? "diario" : isTab(st.settings.lastTab) ? st.settings.lastTab : "diario";
   const [tab, setTabState] = useState<TabId>(initial);
   const [songId, setSongId] = useState<string | null>(null);
   const [showWelcome, setShowWelcome] = useState(() => {
@@ -77,7 +80,7 @@ export default function App() {
     }
     setShowWelcome(false);
     setSongId(null);
-    setTabState("diario");
+    setTabState(new URLSearchParams(location.search).has("invite") ? "amici" : "diario");
     store.setTab("diario");
   }, []);
 
@@ -149,8 +152,10 @@ export default function App() {
 
   return (
     <NavContext.Provider value={api}>
+      <SocialBridge />
       <div className="app">
         <div className="panes">
+          <Pane id="amici" active={tab === "amici"}><FriendsScreen active={tab === "amici"}/></Pane>
           <Pane id="diario" active={tab === "diario"}>
             <DiarioScreen />
           </Pane>
@@ -313,6 +318,7 @@ const MOBILE_TABS: Array<{ id: TabId; label: string }> = [
   { id: "registrazioni", label: "Registrazioni" },
 ];
 const MORE_TABS: Array<{ id: TabId; label: string }> = [
+  { id: "amici", label: "Amici" },
   { id: "allenamento", label: "Allenamento" },
   { id: "accordatore", label: "Accordatore" },
   { id: "corde", label: "Corde" },

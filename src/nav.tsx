@@ -1,6 +1,7 @@
 import { createContext, useContext } from "react";
 
 export type TabId =
+  | "amici"
   | "diario"
   | "studio"
   | "allenamento"
@@ -18,6 +19,7 @@ export interface TabDef {
 }
 
 export const TABS: TabDef[] = [
+  { id: "amici", label: "Amici" },
   { id: "diario", label: "Diario" },
   { id: "studio", label: "Studio" },
   { id: "allenamento", label: "Allenam.", center: true },
