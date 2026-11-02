@@ -35,7 +35,8 @@ for(const [engineName,engine] of browserSet){
    const friendInput=page.getByLabel("Nickname dell'amico");
    await friendInput.focus();
    for(const letter of 'sample_account_01'){
-    await friendInput.press(letter==='_'?'Shift+-':letter);
+    if(letter==='_') await page.keyboard.insertText('_');
+    else await friendInput.press(letter);
     assert.equal(await friendInput.evaluate(el=>document.activeElement===el),true,'Nickname input lost focus while typing');
    }
    assert.equal(await friendInput.inputValue(),'sample_account_01');
