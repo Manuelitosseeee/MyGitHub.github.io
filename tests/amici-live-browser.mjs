@@ -31,7 +31,7 @@ for(const [engineName,engine] of browserSet){
    await page.getByRole('button',{name:'Crea nickname'}).click();
    await page.getByRole('button',{name:/Aggiungi amico/}).waitFor({timeout:20000});
    await page.getByRole('button',{name:/Aggiungi amico/}).click();
-   await page.getByText('Tramite nickname').click();
+   await page.getByRole('button',{name:/Tramite nickname/}).click();
    await page.getByLabel("Nickname dell'amico").fill('sample_account_01');
    await page.screenshot({path:'screenshots/chromium-invite-modal.png',fullPage:true});
    const modal=await page.locator('[role="dialog"]').count();
