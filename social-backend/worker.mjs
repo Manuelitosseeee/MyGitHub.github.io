@@ -24,7 +24,7 @@ export default {async fetch(request,env) {
  if(request.method==='OPTIONS')return new Response(null,{status:204,headers});
  const url=new URL(request.url),path=url.pathname,now=Date.now(),db=env.DB;
  if(path==='/health')return json({ok:true,version:1});
- const auth=request.headers.get('Authorization')??'',token=auth.startsWith('Bearer ')?auth.slice(7):'';
+ const auth=request.headers.get('Authorization')??'',token=auth.startsWith('Bearer ')?auth.slice(7):(path==='/widget/image'&&request.method==='GET'?(url.searchParams.get('token')??''):'');
  if(!/^[a-f0-9]{64}$/.test(token))fail(401,'Configura il tuo nickname su questo dispositivo.');
  const tokenHash=await hash(token);
  // Rate limits are shared across isolates. Buckets are bounded by periodic cleanup.
@@ -36,7 +36,7 @@ export default {async fetch(request,env) {
  let body={};
  if(request.method==='POST'){
   const reader=request.body?.getReader();let size=0,chunks=[];
-  if(reader){while(true){const {value,done}=await reader.read();if(done)break;size+=value.byteLength;if(size>16384){await reader.cancel();fail(413,'Richiesta troppo grande.');}chunks.push(value);}}
+  if(reader){while(true){const {value,done}=await reader.read();if(done)break;size+=value.byteLength;if(size>(path==='/widget/snapshot'?300000:16384)){await reader.cancel();fail(413,'Richiesta troppo grande.');}chunks.push(value);}}
   const bytes=new Uint8Array(size);let offset=0;for(const chunk of chunks){bytes.set(chunk,offset);offset+=chunk.length;}
   try{body=JSON.parse(new TextDecoder().decode(bytes));}catch{fail(400,'Richiesta non valida.');}
   if(!body||typeof body!=='object'||Array.isArray(body))fail(400,'Richiesta non valida.');
@@ -50,13 +50,32 @@ export default {async fetch(request,env) {
   else {const id=crypto.randomUUID();try{await db.prepare('INSERT INTO social_users(id,nickname,token_hash,created_at) VALUES (?,?,?,?)').bind(id,nickname,tokenHash,now).run();}catch{fail(409,'Nickname già occupato. Riprova.');}me={id};}
   return json({id:me.id,nickname});
  }
+ if(path==='/widget/image'&&request.method==='GET'){
+  const row=await db.prepare("SELECT u.id,u.presence,u.seen_at FROM social_widget_tokens w JOIN social_links l ON l.id=w.link_id AND l.status='accepted' JOIN social_users u ON u.id=w.target WHERE w.hash=? AND ((l.lo=w.viewer AND l.hi=w.target) OR (l.hi=w.viewer AND l.lo=w.target))").bind(tokenHash).first();
+  if(!row)fail(403,'Accesso widget revocato.');
+  const snap=await db.prepare('SELECT lit,dark FROM social_widget_snapshots WHERE user_id=?').bind(row.id).first();
+  if(!snap)fail(404,'La stanza non è ancora stata sincronizzata per i widget.');
+  let p=null;try{p=row.presence?JSON.parse(row.presence):null;}catch{}
+  const active=now-row.seen_at<90000&&p?.studying===true;
+  const encoded=active?snap.lit:snap.dark;
+  if(typeof encoded!=='string'||!/^data:image\/webp;base64,[a-zA-Z0-9+/=]+$/.test(encoded))fail(500,'Immagine non valida.');
+  const raw=atob(encoded.slice('data:image/webp;base64,'.length));
+  const bytes=new Uint8Array(raw.length);for(let i=0;i<raw.length;i++)bytes[i]=raw.charCodeAt(i);
+  return new Response(bytes,{status:200,headers:{...headers,'Content-Type':'image/webp','X-Widget-State':active?'studying':'resting','Cache-Control':'no-store, max-age=0'}});
+ }
  if(path==='/widget'&&request.method==='GET'){
   const row=await db.prepare("SELECT u.* FROM social_widget_tokens w JOIN social_links l ON l.id=w.link_id AND l.status='accepted' JOIN social_users u ON u.id=w.target WHERE w.hash=? AND ((l.lo=w.viewer AND l.hi=w.target) OR (l.hi=w.viewer AND l.lo=w.target))").bind(tokenHash).first();
   if(!row)fail(403,'Amicizia rimossa o accesso revocato.');return json(publicUser(row,now));
  }
  if(!me)fail(401,'Profilo non trovato. Ripristina il codice del tuo profilo.');
+ if(path==='/widget/snapshot'&&request.method==='POST'){
+  const valid=v=>typeof v==='string'&&v.length<=135000&&/^data:image\/webp;base64,[a-zA-Z0-9+/=]+$/.test(v)&&v.length>300;
+  if(!valid(body.lit)||!valid(body.dark))fail(400,'Immagini stanza non valide.');
+  await db.prepare('INSERT INTO social_widget_snapshots(user_id,lit,dark,updated_at) VALUES (?,?,?,?) ON CONFLICT(user_id) DO UPDATE SET lit=excluded.lit,dark=excluded.dark,updated_at=excluded.updated_at').bind(me.id,body.lit,body.dark,now).run();
+  return json({ok:true,updatedAt:now});
+ }
  if(path==='/profile/delete'&&request.method==='POST'){
-  await db.batch([db.prepare('DELETE FROM social_widget_tokens WHERE viewer=? OR target=?').bind(me.id,me.id),db.prepare('DELETE FROM social_links WHERE lo=? OR hi=?').bind(me.id,me.id),db.prepare('DELETE FROM social_users WHERE id=?').bind(me.id)]);return json({ok:true});
+  await db.batch([db.prepare('DELETE FROM social_widget_tokens WHERE viewer=? OR target=?').bind(me.id,me.id),db.prepare('DELETE FROM social_links WHERE lo=? OR hi=?').bind(me.id,me.id),db.prepare('DELETE FROM social_widget_snapshots WHERE user_id=?').bind(me.id),db.prepare('DELETE FROM social_users WHERE id=?').bind(me.id)]);return json({ok:true});
  }
  if(path==='/me'&&request.method==='GET')return json({id:me.id,nickname:me.nickname});
  if(path==='/friends'&&request.method==='GET'){
