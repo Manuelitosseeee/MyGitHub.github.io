@@ -32,7 +32,13 @@ for(const [engineName,engine] of browserSet){
    await page.getByRole('button',{name:/Aggiungi amico/}).waitFor({timeout:20000});
    await page.getByRole('button',{name:/Aggiungi amico/}).click();
    await page.getByRole('button',{name:/Tramite nickname/}).click();
-   await page.getByLabel("Nickname dell'amico").fill('sample_account_01');
+   const friendInput=page.getByLabel("Nickname dell'amico");
+   await friendInput.focus();
+   for(const letter of 'sample_account_01'){
+    await friendInput.press(letter==='_'?'Shift+-':letter);
+    assert.equal(await friendInput.evaluate(el=>document.activeElement===el),true,'Nickname input lost focus while typing');
+   }
+   assert.equal(await friendInput.inputValue(),'sample_account_01');
    await page.screenshot({path:'screenshots/chromium-invite-modal.png',fullPage:true});
    const modal=await page.locator('[role="dialog"]').count();
    assert.equal(modal,1);
