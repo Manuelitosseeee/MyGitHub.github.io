@@ -7,9 +7,6 @@
 const DIGITS=[
  {side:'pick',x:508,y:921,w:18,h:18,index:0},
  {side:'pick',x:518,y:929,w:15,h:13,index:1},
- {side:'fret',x:629,y:842,w:19,h:13,index:0},
- {side:'fret',x:625,y:853,w:18,h:13,index:1},
- {side:'fret',x:620,y:864,w:17,h:12,index:2},
 ] as const;
 type Finger=(typeof DIGITS)[number]&{sprite:HTMLCanvasElement};
 export interface GuitarMotion{clean:HTMLCanvasElement;digits:Finger[];}
@@ -46,19 +43,23 @@ export function handPose(t:number,active:boolean,reduced:boolean){
  return {pick:Math.sin(beat*Math.PI*2)*3.4,fret,lean:0,vibration:(1-beat)**3,beat};
 }
 function vibratingStrings(c:CanvasRenderingContext2D,t:number,intensity:number){
- if(intensity<.015)return;
+ if(intensity<.025)return;
  c.save();
- // The vibration is clipped to the sound hole, never the body or face.
- c.beginPath();c.moveTo(509,945);c.lineTo(540,910);
- c.lineTo(562,914);c.lineTo(542,946);c.closePath();c.clip();
- c.lineWidth=1.15;c.lineCap='round';
+ // The real strings are already bright in the source image: adding pale lines
+ // made the sound hole flash white. Multiplication can only gently darken them.
+ c.beginPath();c.moveTo(529,944);c.lineTo(541,919);
+ c.lineTo(561,917);c.lineTo(550,944);c.closePath();c.clip();
+ c.globalCompositeOperation='multiply';
+ c.lineCap='round';c.lineWidth=.85;
+ c.globalAlpha=.32*intensity;
  for(let string=0;string<6;string++){
-  const shift=(string-2.5)*1.9,amplitude=(1.1+string%3*.5)*intensity;
-  c.strokeStyle=string%2?'rgba(254,230,191,.64)':'rgba(240,226,207,.53)';
+  const shift=(string-2.5)*1.7;
+  const amplitude=(.6+(string%3)*.14)*intensity;
+  c.strokeStyle=string%2?'#a88052':'#c0a06a';
   c.beginPath();
   for(let step=0;step<=13;step++){
-   const u=step/13,x=504+49*u+shift,y=951-39*u+shift*.66;
-   const wave=Math.sin(u*Math.PI*5-t*41+string*.7)*Math.sin(u*Math.PI)*amplitude;
+   const u=step/13,x=522+43*u+shift,y=953-43*u+shift*.65;
+   const wave=Math.sin(u*Math.PI*5-t*36+string*.7)*Math.sin(u*Math.PI)*amplitude;
    if(step===0)c.moveTo(x+wave,y+wave);else c.lineTo(x+wave,y+wave);
   }
   c.stroke();
@@ -77,32 +78,27 @@ export function drawHands(c:CanvasRenderingContext2D,m:GuitarMotion,t:number,act
   const dy=Math.round((1-Math.cos(phase))*1.3);
   c.drawImage(digit.sprite,digit.x+dx,digit.y+dy);
  }
- const stroke=Math.sin(pose.beat*Math.PI*2);
- c.fillStyle='#ffbf88';
- c.fillRect(Math.round(522+stroke*3),Math.round(933+stroke*2),5,3);
- c.fillStyle='#d97b59';
- c.fillRect(Math.round(525+stroke*3),Math.round(936+stroke*2),3,2);
- // Three fingertips physically touch/release the angled fingerboard.
- const anchors=[
-  {x:647,y:848,tipX:639,tipY:847},
-  {x:643,y:859,tipX:633,tipY:858},
-  {x:640,y:870,tipX:627,tipY:867},
- ];
- for(const digit of m.digits){
-  if(digit.side!=='fret')continue;
-  const press=Math.max(0,Math.sin(t*4.5+digit.index*1.7));
-  const dx=Math.round(pose.fret*.35-press*1.25);
-  const dy=Math.round(-pose.fret*.4+press*1.5);
-  const a=anchors[digit.index];
-  c.save();c.strokeStyle='#faaf78';c.lineWidth=5;c.lineCap='round';
-  c.beginPath();c.moveTo(a.x,a.y);
-  c.lineTo(a.tipX+dx,a.tipY+dy);c.stroke();c.restore();
-  c.drawImage(digit.sprite,digit.x+dx,digit.y+dy);
-  const x=Math.round(digit.x+4+dx-2*press);
-  const y=Math.round(digit.y+5+dy+press);
-  c.fillStyle='#ffc28c';c.fillRect(x,y,5,3);
-  c.fillStyle='#cf7c60';c.fillRect(x+1,y+3,3,1);
+ // The left hand is kept as one intact piece of the approved sprite.
+ // The old overlapping 17–19 px finger cutouts looked like disconnected
+ // extra fingers. Instead, move only 1–3 connected fingertip pixels toward
+ // the strings, anchored directly to already-painted skin.
+ const contacts=[
+  {x:650,y:845,offset:0},
+  {x:644,y:853,offset:1.55},
+  {x:640,y:861,offset:3.1},
+ ] as const;
+ for(const finger of contacts){
+  const press=Math.max(0,Math.sin(t*3.55+finger.offset));
+  const reach=Math.round(press*3);
+  if(reach===0)continue;
+  c.save();
+  c.fillStyle='#d68b66';c.fillRect(finger.x,finger.y,1,2);
+  c.fillStyle='#f6b681';
+  for(let i=1;i<=reach;i++)c.fillRect(finger.x-i,finger.y,1,2);
+  c.fillStyle='#c57855';c.fillRect(finger.x-reach,finger.y+1,1,1);
+  c.restore();
  }
+
 }
 
 // Canvas-native facial poses preserve the original approved character and seat.
