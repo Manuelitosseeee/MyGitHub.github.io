@@ -120,6 +120,11 @@ self.addEventListener("fetch", (event) => {
   if (req.method !== "GET") return;
   const url = new URL(req.url);
   if (url.origin !== self.location.origin) return;
+  // Never cache private identity, friends or presence API responses.
+  if (url.pathname.startsWith("/api/")) {
+    event.respondWith(fetch(req));
+    return;
+  }
 
   // Network-first for navigations so new deploys are picked up; fall back to cache offline.
   if (req.mode === "navigate") {

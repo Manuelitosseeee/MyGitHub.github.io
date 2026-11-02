@@ -1,0 +1,48 @@
+/** Offline integration test using Node's built-in SQLite, with the same SQL as Cloudflare D1. */
+import {createRequire} from 'node:module';
+import {readFileSync,writeFileSync,unlinkSync} from 'node:fs';
+import {join,dirname} from 'node:path';
+import {fileURLToPath,pathToFileURL} from 'node:url';
+import assert from 'node:assert/strict';
+import {DatabaseSync} from 'node:sqlite';
+const require=createRequire(import.meta.url);
+const ts=require('typescript');
+const root=join(dirname(fileURLToPath(import.meta.url)),'..');
+const source=readFileSync(join(root,'functions/api/friends/[[path]].ts'),'utf8');
+const out=join(root,'tests/.friends-api-transpiled.mjs');
+writeFileSync(out,ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText);
+const {onRequest}=await import(pathToFileURL(out).href+'?t='+Date.now());unlinkSync(out);
+const db=new DatabaseSync(':memory:');db.exec(readFileSync(join(root,'migrations/0001_friends.sql'),'utf8'));
+const D1={prepare(sql){return {bind(...params){const stmt=db.prepare(sql);return {async first(){return stmt.get(...params)??null;},async run(){const res=stmt.run(...params);return {meta:{changes:res.changes}};},async all(){return {results:stmt.all(...params)};}};}};}};
+const token=x=>'gh1.'+x.repeat(43);
+async function call(path,method='GET',userToken,body){const headers=new Headers(body?{'content-type':'application/json'}:{});if(userToken)headers.set('authorization','Bearer '+userToken);const request=new Request('https://myguitarhub.pages.dev/api/friends/'+path,{method,headers,body:body?JSON.stringify(body):undefined});const result=await onRequest({request,env:{FRIENDS_DB:D1},params:{path:path.split('/')}});let data;try{data=await result.json();}catch{data={}}return {status:result.status,...data};}
+const a=await call('identity','POST',undefined,{nickname:'Chitarrista01',token:token('a')});assert.equal(a.status,201);
+const b=await call('identity','POST',undefined,{nickname:'Chitarrista02',token:token('b')});assert.equal(b.status,201);
+assert.equal((await call('identity','POST',undefined,{nickname:'Chitarrista01',token:token('c')})).status,409);
+assert.equal((await call('list')).status,401);
+assert.equal((await call('profile','GET',token('z'))).status,401);
+assert.equal((await call('requests','POST',token('a'),{nickname:'Chitarrista01'})).status,400);
+assert.equal((await call('requests','POST',token('a'),{nickname:'NonEsiste123'})).status,404);
+assert.equal((await call('invite','POST',token('z'))).status,401);
+assert.equal((await call('accept-invite','POST',token('a'),{code:'xyz'})).status,400);
+
+assert.equal((await call('requests','POST',token('a'),{nickname:'Chitarrista02'})).sent,true);
+const inbox=await call('requests','GET',token('b'));assert.equal(inbox.requests.length,1);
+assert.equal((await call('friend/'+b.id,'GET',token('a'))).status,403);
+assert.equal((await call('requests','POST',token('a'),{nickname:'Chitarrista02'})).sent,true);
+assert.equal((await call('requests','GET',token('b'))).requests.length,1);
+assert.equal((await call('requests/'+inbox.requests[0].id+'/accept','POST',token('b'))).ok,true);
+const f=await call('list','GET',token('a'));assert.equal(f.friends.length,1);assert.equal(f.friends[0].nickname,'Chitarrista02');
+assert.equal((await call('presence','POST',token('a'),{studying:true,room:{mapId:'home',owned:['desk','lamp'],lampOn:true,fireOn:true},weekKey:'2026-11-02',weekSeconds:3400})).ok,true);
+const pf=await call('friend/'+a.id,'GET',token('b'));assert.equal(pf.friend.studying,true);assert.equal(pf.friend.weekSeconds,3400);assert.deepEqual(pf.friend.room.owned,['desk','lamp']);
+assert.equal((await call('friend/'+a.id,'DELETE',token('b'))).ok,true);assert.equal((await call('friend/'+a.id,'GET',token('b'))).status,403);
+const inv=await call('invite','POST',token('a'));assert.ok(inv.url.includes('friend_invite='));const code=new URL(inv.url).searchParams.get('friend_invite');
+assert.equal((await call('accept-invite','POST',token('b'),{code})).ok,true);assert.equal((await call('accept-invite','POST',token('b'),{code})).status,410);
+assert.equal((await call('list','GET',token('a'))).friends.length,1);
+const ownInvite=await call('invite','POST',token('a'));const ownCode=new URL(ownInvite.url).searchParams.get('friend_invite');assert.equal((await call('accept-invite','POST',token('a'),{code:ownCode})).status,400);
+assert.equal((await call('presence','POST',token('a'),{studying:true,room:{mapId:'bad',owned:['desk','bad!*','desk'],activeMs:-4},weekKey:'broken',weekSeconds:-2})).ok,true);
+const clean=(await call('friend/'+a.id,'GET',token('b'))).friend;assert.equal(clean.room.mapId,'home');assert.deepEqual(clean.room.owned,['desk']);assert.equal(clean.weekSeconds,0);
+assert.equal((await call('presence','POST',token('a'),{studying:true,room:null,weekKey:'2026-11-02'})).status,400);
+assert.equal((await call('profile','PATCH',token('b'),{nickname:'NuovoNome'})).nickname,'NuovoNome');
+assert.equal((await call('requests','POST',token('a'),{nickname:'NuovoNome'})).status,409);
+db.close();console.log('PASS: auth, duplicate/invalid/self requests, access isolation, idempotence, input sanitization, presence, revoke, one-use/self invites, rename');

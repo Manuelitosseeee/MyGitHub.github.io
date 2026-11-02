@@ -7,5 +7,5 @@ export function prepareHands(im:CanvasImageSource){
   sc.putImageData(skin,0,0);return {...q,sprite};
  });return {clean,hands};
 }
-export function handPose(t:number,active:boolean,reduced:boolean){if(!active||reduced)return {pick:0,fret:0,lean:0};const cycle=t%14;return {pick:cycle<7?Math.sin(t*5)*2:0,fret:cycle>8&&cycle<11?Math.sin((cycle-8)*Math.PI/3)*3:0,lean:Math.sin(t*.7)*.8};}
+export function handPose(t:number,active:boolean,reduced:boolean){if(!active||reduced)return {pick:0,fret:0,lean:0};const cycle=t%14;return {pick:cycle<7?Math.sin(t*7.5)*5:0,fret:cycle>8&&cycle<11?Math.sin((cycle-8)*Math.PI/3)*13:0,lean:Math.sin(t*.7)*.8};}
 export function drawHands(c:CanvasRenderingContext2D,m:ReturnType<typeof prepareHands>,t:number,active:boolean,reduced:boolean){const p=handPose(t,active,reduced);m.hands.forEach((h,i)=>c.drawImage(h.sprite,h.x+(i?p.fret*.45:0),h.y+(i?-p.fret:p.pick)));}

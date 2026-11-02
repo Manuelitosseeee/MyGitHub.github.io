@@ -26,6 +26,8 @@ import TunerScreen from "./screens/TunerScreen";
 import CordeScreen from "./screens/CordeScreen";
 import SettingsScreen from "./screens/SettingsScreen";
 import AllenamentoScreen from "./screens/allenamento/AllenamentoScreen";
+import {FriendPresenceSync} from "./friends/sync";
+import FriendsScreen from "./friends/FriendsScreen";
 
 const PixelStory = lazy(() => import("./pixel/PixelStory"));
 const RecordingsScreen = lazy(() => import("./screens/RecordingsScreen"));
@@ -41,6 +43,8 @@ const TAB_ICONS: Record<TabId, AppGlyphName> = {
   corde: "strings",
   registrazioni: "recordings",
   impostazioni: "settings",
+  amici: "friends",
+  nickname: "nickname",
 };
 
 function isTab(v: string): v is TabId {
@@ -58,7 +62,8 @@ const ACCENTS: Record<string, { main: string; soft: string; hi: string }> = {
 export default function App() {
   const st = useStore();
   useEffect(()=>watchNotificationSync(msg=>console.warn(msg)),[]);
-  const initial = new URLSearchParams(location.search).get("study")==="today" ? "diario" : isTab(st.settings.lastTab) ? st.settings.lastTab : "diario";
+  const initial = new URLSearchParams(location.search).has('friend_invite') || new URLSearchParams(location.search).has('friend_id') ? 'amici'
+    : new URLSearchParams(location.search).get("study")==="today" ? "diario" : isTab(st.settings.lastTab) ? st.settings.lastTab : "diario";
   const [tab, setTabState] = useState<TabId>(initial);
   const [songId, setSongId] = useState<string | null>(null);
   const [showWelcome, setShowWelcome] = useState(() => {
@@ -77,8 +82,9 @@ export default function App() {
     }
     setShowWelcome(false);
     setSongId(null);
-    setTabState("diario");
-    store.setTab("diario");
+    const destination = new URLSearchParams(location.search).has('friend_invite') || new URLSearchParams(location.search).has('friend_id') ? 'amici' : 'diario';
+    setTabState(destination);
+    store.setTab(destination);
   }, []);
 
   // appearance: light/dark mode + accent color + font + text size
@@ -150,6 +156,7 @@ export default function App() {
   return (
     <NavContext.Provider value={api}>
       <div className="app">
+        <FriendPresenceSync />
         <div className="panes">
           <Pane id="diario" active={tab === "diario"}>
             <DiarioScreen />
@@ -172,6 +179,8 @@ export default function App() {
           <Pane id="impostazioni" active={tab === "impostazioni"}>
             <SettingsScreen />
           </Pane>
+          <Pane id="amici" active={tab === "amici"}>{tab === "amici" ? <FriendsScreen /> : null}</Pane>
+          <Pane id="nickname" active={tab === "nickname"}>{tab === "nickname" ? <FriendsScreen mode="nickname" /> : null}</Pane>
           <Pane id="registrazioni" active={tab === "registrazioni"}>
             <Suspense fallback={<div className="screen">Carico le registrazioni…</div>}>
               <RecordingsScreen active={tab === "registrazioni"} />
@@ -317,6 +326,8 @@ const MORE_TABS: Array<{ id: TabId; label: string }> = [
   { id: "accordatore", label: "Accordatore" },
   { id: "corde", label: "Corde" },
   { id: "impostazioni", label: "Impostazioni" },
+  { id: "amici", label: "Amici" },
+  { id: "nickname", label: "Nickname" },
 ];
 
 function TabBar({ active, onSelect }: { active: TabId; onSelect: (t: TabId) => void }) {

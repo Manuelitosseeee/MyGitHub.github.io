@@ -8,7 +8,9 @@ export type TabId =
   | "accordatore"
   | "corde"
   | "registrazioni"
-  | "impostazioni";
+  | "impostazioni"
+  | "amici"
+  | "nickname";
 
 /** `center: true` = voce centrale della barra, resa leggermente più grande. */
 export interface TabDef {
@@ -26,6 +28,8 @@ export const TABS: TabDef[] = [
   { id: "corde", label: "Corde" },
   { id: "registrazioni", label: "Registraz." },
   { id: "impostazioni", label: "Impost." },
+  { id: "amici", label: "Amici" },
+  { id: "nickname", label: "Nickname" },
 ];
 
 export interface NavApi {

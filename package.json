@@ -14,7 +14,8 @@
     "test:recordings:e2e": "node tests/recordings.e2e.mjs",
     "test:navigation:e2e": "node tests/mobile-navigation.e2e.mjs",
     "test:metronome": "node --import tsx --test tests/metronome-background.test.ts",
-    "test:studio:e2e": "node tests/studio-update.e2e.mjs"
+    "test:studio:e2e": "node tests/studio-update.e2e.mjs",
+    "test:friends": "node tests/friends-api.test.mjs"
   },
   "dependencies": {
     "lucide-react": "^0.460.0",

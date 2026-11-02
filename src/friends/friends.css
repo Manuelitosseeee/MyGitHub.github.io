@@ -1,0 +1,42 @@
+.friend-page{padding-bottom:105px;max-width:900px;margin:0 auto;color:var(--text);}
+.friend-heading{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:23px}
+.friend-heading .screen-sub{margin:4px 0 0}.friend-mail,.friend-reload{width:45px;height:45px;display:grid;place-items:center;border:1px solid var(--border,#505050);border-radius:14px;background:var(--card,#202020);color:var(--text);position:relative;cursor:pointer}
+.friend-mail>span{position:absolute;top:-6px;right:-6px;min-width:20px;border-radius:50%;background:var(--acc,#eee);color:#101010;font-size:12px;padding:3px 5px;font-weight:800}
+.friend-panel,.friend-item{border:1px solid var(--border,#484848);background:var(--card,#212121);border-radius:19px;box-shadow:0 2px 18px rgba(0,0,0,.08)}
+.friend-panel{padding:23px;margin-bottom:18px}.friend-panel h2{font-size:20px;margin:8px 0 10px}.friend-panel p,.friend-modal p{font-size:14px;line-height:1.6;opacity:.82}
+.friend-panel form,.friend-modal form{display:flex;flex-direction:column;gap:12px;margin-top:16px}.friend-page label,.friend-modal label{font-size:13px;font-weight:730}
+.friend-page input,.friend-modal input{width:100%;padding:12px 14px;min-height:49px;border-radius:12px;border:1px solid var(--border,#555);color:var(--text,#fff);background:var(--bg,#191919);font:inherit;font-size:15px;outline:none}.friend-page input:focus,.friend-modal input:focus{border-color:var(--acc,#ccc)}
+.friend-page button,.friend-modal button{cursor:pointer;font:inherit}.friend-page button:disabled,.friend-modal button:disabled{opacity:.5;cursor:default}
+.friend-primary,.friend-secondary,.friend-buttons button,.friend-modal>button{min-height:43px;border:1px solid var(--border,#555);border-radius:11px;padding:10px 15px;display:inline-flex;align-items:center;justify-content:center;gap:9px;font-weight:750;color:var(--text,#fff);background:var(--bg,#272727)}
+.friend-primary{background:var(--acc,#eee);color:var(--bg,#101010);border-color:transparent}.friend-secondary{margin-top:12px;width:100%;background:transparent}
+.friend-register{max-width:540px;margin:45px auto}.friend-register-icon{display:grid;place-items:center;height:70px;width:70px;background:var(--acc-soft,#3d3d3d);border-radius:18px;color:var(--acc,#eee)}
+.friend-eyebrow{font-size:11px!important;letter-spacing:2px}.friend-profile{display:flex;align-items:center;gap:14px;margin:16px 0 25px}.friend-profile strong{display:block;font-size:22px}.friend-profile small{display:block;opacity:.62;margin-top:5px}
+.friend-avatar{height:79px;width:73px;flex-shrink:0;border-radius:11px;overflow:hidden;display:grid;place-items:center;border:1px solid #5b4734;background:linear-gradient(135deg,#5c3927,#a5734c 60%,#38241d);position:relative}
+.friend-avatar img{width:116%;height:116%;object-fit:contain;object-position:center 14%;image-rendering:pixelated;filter:drop-shadow(0 5px 3px rgba(0,0,0,.25))}
+.friend-asleep{background:linear-gradient(135deg,#393b3e,#77797b 75%,#202123);border-color:#606064}.friend-asleep img{filter:grayscale(1) brightness(.57)}
+.friend-actions{display:flex;gap:12px;align-items:center;margin-bottom:18px}.friend-actions .friend-primary{flex:1}.friend-empty{text-align:center;padding:45px 20px}.friend-empty svg{color:var(--acc,#eee)}
+.friend-list{display:grid;gap:11px}.friend-item{display:flex;align-items:center;padding:11px 12px;gap:10px;min-width:0}
+.friend-item-main{display:flex;flex:1;gap:13px;align-items:center;text-align:left;background:none;border:0;color:inherit;min-width:0;padding:0}.friend-item-copy{display:flex;flex-direction:column;min-width:0;gap:6px}.friend-item-copy strong{font-size:16px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.friend-item-copy small{font-size:12px;opacity:.72}
+.friend-remove{border:1px solid var(--border,#555);color:var(--text,#fff);border-radius:10px;padding:9px 11px;background:transparent;font-size:12px!important;flex-shrink:0}
+.friend-back{background:transparent;border:0;color:inherit;display:inline-flex;align-items:center;gap:8px;padding:8px 0 18px;font-weight:740}
+.friend-detail-title{display:flex;align-items:center;justify-content:space-between;gap:12px}.friend-detail-title h2{margin:0}.friend-dot{height:12px;width:12px;background:#999;border-radius:100%}.friend-dot-on{background:#54ba73;box-shadow:0 0 0 5px #54ba7329}
+.friend-scene-shell.px-root{padding:0;min-height:0;border-radius:16px;overflow:hidden;margin-top:16px;aspect-ratio:1004 / 1567;background:#2e2027;max-width:520px;margin-left:auto;margin-right:auto}
+.friend-scene-shell .px-scene{width:100%;height:100%;max-height:none}.friend-no-room{min-height:180px;display:grid;place-items:center;text-align:center;padding:25px;background:var(--bg,#171717);border-radius:13px;margin-top:18px;opacity:.7}
+.friend-hours{border-top:1px solid var(--border,#555);display:flex;justify-content:space-between;gap:10px;align-items:center;padding:20px 0 6px;margin-top:18px}.friend-hours span{font-size:13px;opacity:.7}.friend-hours strong{font-size:18px;text-align:right}.friend-updated{font-size:11px;opacity:.55;margin-top:14px}
+.friend-error,.friend-notice{border-radius:13px;border:1px solid #ab5d55;padding:12px 15px;margin:12px 0;background:#7f30301d;font-size:13px}.friend-notice{border-color:var(--border,#666);background:var(--acc-soft,#333)}
+.friend-muted{font-size:12px!important;opacity:.68}.friend-invitation{border-color:var(--acc,#ccc)}.friend-buttons{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}.friend-buttons button{flex:1}.friend-buttons .friend-danger{background:#9a4440;color:white;border-color:#9a4440}
+.friend-overlay{position:fixed;inset:0;z-index:210;background:#000a;display:flex;align-items:center;justify-content:center;padding:20px;padding-bottom:max(20px,env(safe-area-inset-bottom))}
+.friend-modal{background:var(--card,#202020);color:var(--text,#eee);border:1px solid var(--border,#555);box-shadow:0 18px 80px #0007;border-radius:22px;width:min(100%,480px);max-height:85dvh;overflow:auto;padding:22px;outline:none}
+.friend-modal header{display:flex;justify-content:space-between;align-items:center;margin-bottom:17px;gap:12px}.friend-modal header h2{font-size:19px;margin:0}.friend-modal header button{background:none;border:0;color:inherit;padding:7px;display:grid;place-items:center}
+.friend-add-options{display:grid;gap:10px}.friend-add-options>button{display:flex;gap:16px;align-items:center;text-align:left;border-radius:14px;padding:14px;background:var(--bg,#161616);border:1px solid var(--border,#444);color:inherit}
+.friend-add-options>button span{display:flex;flex-direction:column;gap:5px}.friend-add-options small{opacity:.63;font-size:12px}
+.friend-request-list{display:grid;gap:13px}.friend-request-list article{padding:11px;border-radius:13px;background:var(--bg,#181818)}.friend-request-list article>span{font-weight:780}.friend-request-list article>div{display:flex;gap:8px;margin-top:12px}.friend-request-list button{font-size:12px;padding:8px 9px;border-radius:9px;border:1px solid var(--border,#555);background:transparent;color:inherit;display:flex;gap:5px;align-items:center}.friend-request-list .friend-primary{background:var(--acc,#eee);color:var(--bg,#111)}
+.friend-install-info{margin:15px 0;padding:14px;border-radius:13px;background:var(--bg,#161616)}.friend-install-info strong{font-size:14px}.friend-install-info p{font-size:12px;line-height:1.6}
+@media(max-width:420px){.friend-panel{padding:16px}.friend-avatar{width:61px;height:69px}.friend-item{padding:9px;gap:8px}.friend-item-main{gap:9px}.friend-item-copy strong{font-size:13px}.friend-remove{padding:8px 7px;font-size:11px!important}.friend-hours{flex-direction:column;align-items:flex-start}.friend-hours strong{text-align:left}}
+
+/* Safe touch targets, long invite links and visible keyboard focus on compact phones. */
+.friend-modal input[readonly]{font-size:12px;overflow-wrap:anywhere;user-select:all}
+.friend-item-copy,.friend-profile,.friend-actions{min-width:0}
+.friend-page button:focus-visible,.friend-modal button:focus-visible,.friend-page input:focus-visible,.friend-modal input:focus-visible{outline:3px solid var(--acc,#fac372);outline-offset:3px}
+.friend-page button{touch-action:manipulation}
+@media(max-width:345px){.friend-item-main{gap:6px}.friend-item-copy strong{font-size:12px}.friend-item-copy small{font-size:10px}.friend-remove{font-size:10px!important;padding:7px 5px}.friend-avatar{width:52px;height:59px}}

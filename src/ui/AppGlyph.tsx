@@ -10,7 +10,9 @@ export type AppGlyphName =
   | "strings"
   | "strings-coil"
   | "recordings"
-  | "settings";
+  | "settings"
+  | "friends"
+  | "nickname";
 
 type AppGlyphProps = SVGProps<SVGSVGElement> & {
   name: AppGlyphName;
@@ -100,6 +102,8 @@ export function AppGlyph({
           <circle cx="12" cy="12" r="3.1" />
         </>
       ) : null}
+      {name === "friends" ? (<><circle cx="8.5" cy="8.6" r="3"/><path d="M2.4 19v-1.8a6 6 0 0 1 12 0V19M17 11.4a3 3 0 0 0-.7-5.8M16 15.2a4.8 4.8 0 0 1 5.2 4.5"/></>) : null}
+      {name === "nickname" ? (<><circle cx="12" cy="8.5" r="4"/><path d="M4 20.5v-1.2a8 8 0 0 1 16 0v1.2"/></>) : null}
       {name === "recordings" ? (
         <>
           <rect x="9" y="3" width="6" height="12" rx="3" />
