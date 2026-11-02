@@ -10,7 +10,7 @@ jobs:
     steps:
       - name: Verify Cloudflare frontend and friends API
         env:
-          SITE: https://myguitarhub-amici-preview.manuelitosmurf.workers.dev
+          SITE: https://myguitarhub-amici.manuelitosmurf.workers.dev
         run: |
           node --input-type=module <<'NODE'
           import assert from 'node:assert/strict';
