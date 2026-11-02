@@ -14,8 +14,10 @@ import './friends.css';
 type Dialog='add'|'inbox'|'remove'|'how'|'welcome'|null;
 function Pop({title,onClose,children}:{title:string;onClose:()=>void;children:ReactNode}){
  const ref=useRef<HTMLDivElement>(null);
+ const onCloseRef=useRef(onClose);
+ onCloseRef.current=onClose;
  useEffect(()=>{const before=document.activeElement as HTMLElement;ref.current?.focus();const escape=(e:KeyboardEvent)=>{
- if(e.key==='Escape'){e.preventDefault();onClose();}
+ if(e.key==='Escape'){e.preventDefault();onCloseRef.current();}
  if(e.key==='Tab'){
   const focusables=Array.from(ref.current?.querySelectorAll<HTMLElement>('button:not(:disabled), input:not(:disabled), a[href]')??[]);
   if(!focusables.length)return;
@@ -23,7 +25,7 @@ function Pop({title,onClose,children}:{title:string;onClose:()=>void;children:Re
   if(e.shiftKey&&(document.activeElement===first||document.activeElement===ref.current)){e.preventDefault();last.focus();}
   else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
  }
-};document.addEventListener('keydown',escape);return()=>{document.removeEventListener('keydown',escape);before?.focus();};},[onClose]);
+};document.addEventListener('keydown',escape);return()=>{document.removeEventListener('keydown',escape);before?.focus();};},[]);
  return createPortal(<div className="friend-overlay" onMouseDown={e=>{if(e.target===e.currentTarget)onClose();}}><div className="friend-modal" role="dialog" aria-modal="true" aria-label={title} ref={ref} tabIndex={-1}><header><h2>{title}</h2><button aria-label="Chiudi" onClick={onClose}><X size={21}/></button></header>{children}</div></div>,document.body);
 }
 function Avatar({studying}:{studying:boolean}){return <div className={'friend-avatar '+(studying?'friend-awake':'friend-asleep')}><img src="/pixel/items/character.png" alt="Il chitarrista originale di Pixel Story"/></div>;}
