@@ -30,9 +30,13 @@ import AllenamentoScreen from "./screens/allenamento/AllenamentoScreen";
 const PixelStory = lazy(() => import("./pixel/PixelStory"));
 const RecordingsScreen = lazy(() => import("./screens/RecordingsScreen"));
 
+const FriendsScreen = lazy(() => import("./friends/FriendsScreen"));
+import {watchPresence} from "./friends/client";
+
 const WELCOME_KEY = "mygithub.welcome-complete";
 
 const TAB_ICONS: Record<TabId, AppGlyphName> = {
+  amici: "friends",
   diario: "home",
   studio: "studio",
   allenamento: "training",
@@ -57,8 +61,10 @@ const ACCENTS: Record<string, { main: string; soft: string; hi: string }> = {
 
 export default function App() {
   const st = useStore();
+  const [socialError,setSocialError]=useState('');
+  useEffect(()=>watchPresence(setSocialError),[]);
   useEffect(()=>watchNotificationSync(msg=>console.warn(msg)),[]);
-  const initial = new URLSearchParams(location.search).get("study")==="today" ? "diario" : isTab(st.settings.lastTab) ? st.settings.lastTab : "diario";
+  const initial = new URLSearchParams(location.search).get("tab")==="amici" || location.hash.includes("invite=") ? "amici" : new URLSearchParams(location.search).get("study")==="today" ? "diario" : isTab(st.settings.lastTab) ? st.settings.lastTab : "diario";
   const [tab, setTabState] = useState<TabId>(initial);
   const [songId, setSongId] = useState<string | null>(null);
   const [showWelcome, setShowWelcome] = useState(() => {
@@ -77,8 +83,9 @@ export default function App() {
     }
     setShowWelcome(false);
     setSongId(null);
-    setTabState("diario");
-    store.setTab("diario");
+    const destination = new URLSearchParams(location.search).get("tab")==="amici" || location.hash.includes("invite=") ? "amici" : "diario";
+    setTabState(destination);
+    store.setTab(destination);
   }, []);
 
   // appearance: light/dark mode + accent color + font + text size
@@ -169,6 +176,7 @@ export default function App() {
           <Pane id="corde" active={tab === "corde"}>
             <CordeScreen />
           </Pane>
+          <Pane id="amici" active={tab === "amici"}><Suspense fallback={<div className="screen">Carico Amici…</div>}><FriendsScreen active={tab === "amici"}/></Suspense>{socialError && <p className="social-sync-warning" role="status">Stanza non sincronizzata: {socialError}</p>}</Pane>
           <Pane id="impostazioni" active={tab === "impostazioni"}>
             <SettingsScreen />
           </Pane>
@@ -316,6 +324,7 @@ const MORE_TABS: Array<{ id: TabId; label: string }> = [
   { id: "allenamento", label: "Allenamento" },
   { id: "accordatore", label: "Accordatore" },
   { id: "corde", label: "Corde" },
+  { id: "amici", label: "Amici" },
   { id: "impostazioni", label: "Impostazioni" },
 ];
 

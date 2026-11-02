@@ -1,0 +1,56 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {DatabaseSync} from 'node:sqlite';
+import {readFileSync} from 'node:fs';
+import worker from '../social-backend/worker.mjs';
+function database(){
+ const sql=new DatabaseSync(':memory:');sql.exec('PRAGMA foreign_keys=ON');sql.exec(readFileSync(new URL('../social-backend/schema.sql',import.meta.url),'utf8'));
+ const prepared=(query,params=[])=>({bind(...p){return prepared(query,p);},async first(){return sql.prepare(query).get(...params)??null;},async all(){return {results:sql.prepare(query).all(...params)};},async run(){return {meta:sql.prepare(query).run(...params)};}});
+ return {sql,DB:{prepare:prepared,async batch(statements){sql.exec('BEGIN');try{const results=[];for(const s of statements)results.push(await s.run());sql.exec('COMMIT');return results;}catch(e){sql.exec('ROLLBACK');throw e;}}}};
+}
+test('friends: identity, consent, live state, invitations, private widget access and revocation',async()=>{
+ const {DB,sql}=database(),env={DB};const a='a'.repeat(64),b='b'.repeat(64),c='c'.repeat(64);
+ const call=async(token,path,body,origin='https://myguitarhub.pages.dev')=>{
+ const response=await worker.fetch(new Request('https://social.test'+path,{method:body===undefined?'GET':'POST',headers:{Origin:origin,Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:body===undefined?undefined:JSON.stringify(body)}),env);
+ return {status:response.status,data:await response.json(),headers:response.headers};};
+ assert.equal((await call('', '/friends')).status,401);
+ assert.equal((await call(a,'/profile',{nickname:'a<script>'})).status,400);
+ const alice=(await call(a,'/profile',{nickname:'Guitarist01'})).data;
+ assert.equal((await call(b,'/profile',{nickname:'guitarist01'})).status,409);
+ await call(b,'/profile',{nickname:'Friend02'});await call(c,'/profile',{nickname:'Stranger03'});
+ assert.equal((await call(a,'/profile',{nickname:'Guitarist01'})).data.id,alice.id);
+ assert.equal((await call(a,'/request',{nickname:'Guitarist01'})).status,400);
+ assert.equal((await call(a,'/request',{nickname:'missing'})).status,404);
+ await call(a,'/request',{nickname:'friend02'});await call(a,'/request',{nickname:'Friend02'});
+ let list=(await call(b,'/friends')).data;assert.equal(list.requests.length,1);assert.equal(list.friends.length,0);assert.equal(list.requests[0].incoming,true);
+ let linkId=list.requests[0].linkId;
+ assert.equal((await call(a,'/respond',{linkId,accept:true})).status,404);
+ assert.equal((await call(c,'/respond',{linkId,accept:true})).status,404);
+ await call(b,'/respond',{linkId,accept:false});assert.equal((await call(a,'/friends')).data.requests.length,0);
+ await call(a,'/request',{nickname:'Friend02'});linkId=(await call(b,'/friends')).data.requests[0].linkId;
+ await call(b,'/respond',{linkId,accept:true});
+ assert.equal((await call(a,'/friends')).data.friends.length,1);assert.equal((await call(b,'/friends')).data.friends.length,1);
+ const p={mapId:'home',owned:['desk','lamp'],studying:true,activeMs:120000,weekSeconds:7200,weekStart:'2026-11-02',lampOn:true,deskLightOn:true,fireOn:false,rainOn:true,secret:'must not leak'};
+ assert.equal((await call(a,'/presence',p)).status,200);
+ let friend=(await call(b,'/friends')).data.friends[0];assert.equal(friend.presence.weekSeconds,7200);assert.equal(friend.presence.secret,undefined);assert.equal(friend.token_hash,undefined);assert.equal(friend.fresh,true);
+ const widget=(await call(b,'/widget-token',{linkId})).data.token;assert.equal((await call(widget,'/widget')).status,200);
+ assert.equal((await call(c,'/widget-token',{linkId})).status,403);
+ assert.equal((await call(a,'/widget')).status,403);
+ sql.prepare('UPDATE social_users SET seen_at=0 WHERE id=?').run(alice.id);assert.equal((await call(widget,'/widget')).data.fresh,false);
+ await call(c,'/remove',{linkId});assert.equal((await call(b,'/friends')).data.friends.length,1);
+ await call(a,'/remove',{linkId});assert.equal((await call(b,'/friends')).data.friends.length,0);assert.equal((await call(widget,'/widget')).status,403);
+ const inv1=(await call(a,'/invite',{})).data.invitation;
+ assert.equal((await call(b,'/invite/preview',{invitation:inv1})).data.nickname,'Guitarist01');
+ assert.equal((await call(a,'/invite/accept',{invitation:inv1})).status,400);
+ const inv2=(await call(a,'/invite',{})).data.invitation;
+ assert.equal((await call(b,'/invite/accept',{invitation:inv1})).status,404);
+ await call(b,'/invite/accept',{invitation:inv2});assert.equal((await call(a,'/friends')).data.friends.length,1);
+ assert.equal((await call(widget,'/widget')).status,403,'old widget stays revoked after re-friending');
+ sql.prepare('UPDATE social_users SET invite_expires=0 WHERE id=?').run(alice.id);assert.equal((await call(c,'/invite/accept',{invitation:inv2})).status,404);
+ assert.equal((await call(c,'/presence',{...p,mapId:'invalid'})).status,400);
+ assert.equal((await call(c,'/presence',{...p,weekSeconds:Infinity})).status,400);
+ assert.equal((await call(c,'/friends',undefined,'https://evil.test')).status,403);
+ assert.equal((await call(c,'/friends')).headers.get('cache-control'),'no-store');
+ const tooBig=await worker.fetch(new Request('https://social.test/presence',{method:'POST',headers:{Authorization:`Bearer ${c}`},body:JSON.stringify({data:'x'.repeat(17000)})}),env);assert.equal(tooBig.status,413);
+ sql.close();
+});
