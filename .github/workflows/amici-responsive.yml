@@ -1,0 +1,26 @@
+name: Amici responsive visual QA
+on:
+  push:
+    branches: [fix/amici-mobile-layout-20261102]
+  workflow_dispatch:
+jobs:
+  visual:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium webkit
+      - run: node tests/amici-responsive.e2e.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: amici-responsive-screenshots
+          path: amici-layout-screenshots/
+          retention-days: 4
