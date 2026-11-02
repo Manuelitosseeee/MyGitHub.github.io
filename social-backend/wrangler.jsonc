@@ -1,0 +1,8 @@
+{
+  "name": "myguitarhub-social-v1",
+  "main": "worker.mjs",
+  "compatibility_date": "2026-11-02",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": {"enabled": true, "head_sampling_rate": 0.1},
+  "d1_databases": [{"binding":"DB","database_name":"myguitarhub-social-v1","database_id":"1fd7d008-b481-4d8a-bd87-7ef2b9ca36c0"}]
+}

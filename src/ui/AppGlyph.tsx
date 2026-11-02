@@ -1,6 +1,7 @@
 import type { SVGProps } from "react";
 
 export type AppGlyphName =
+  | "friends"
   | "home"
   | "studio"
   | "training"
@@ -38,6 +39,7 @@ export function AppGlyph({
       focusable="false"
       {...props}
     >
+      {name === "friends" ? <><circle cx="9" cy="8" r="3"/><path d="M3 21v-3a6 6 0 0 1 12 0v3M16 5a3 3 0 0 1 0 6m2 4a5 5 0 0 1 3 4v2"/></> : null}
       {name === "home" ? (
         <>
           <path d="m3.2 10.6 8.8-7.4 8.8 7.4" />

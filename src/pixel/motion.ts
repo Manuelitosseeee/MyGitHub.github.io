@@ -7,5 +7,17 @@ export function prepareHands(im:CanvasImageSource){
   sc.putImageData(skin,0,0);return {...q,sprite};
  });return {clean,hands};
 }
-export function handPose(t:number,active:boolean,reduced:boolean){if(!active||reduced)return {pick:0,fret:0,lean:0};const cycle=t%14;return {pick:cycle<7?Math.sin(t*5)*2:0,fret:cycle>8&&cycle<11?Math.sin((cycle-8)*Math.PI/3)*3:0,lean:Math.sin(t*.7)*.8};}
+export function handPose(t:number,active:boolean,reduced:boolean){if(!active||reduced)return {pick:0,fret:0,lean:0};return {pick:Math.sin(t*7)*4,fret:Math.sin(t*.7)*8,lean:Math.sin(t*.7)*.8};}
 export function drawHands(c:CanvasRenderingContext2D,m:ReturnType<typeof prepareHands>,t:number,active:boolean,reduced:boolean){const p=handPose(t,active,reduced);m.hands.forEach((h,i)=>c.drawImage(h.sprite,h.x+(i?p.fret*.45:0),h.y+(i?-p.fret:p.pick)));}
+
+// Canvas-native facial poses preserve the original approved character and seat.
+export function drawSleepFace(c:CanvasRenderingContext2D,t:number,reduced:boolean){
+ c.save();
+ // Coordinates follow the character's original fit() transform in itemArt.ts.
+ c.translate(332,699);c.scale(510/1358,510/1358);
+ c.fillStyle='#ffbe8b';c.fillRect(574,326,34,51);c.fillRect(639,320,32,57);
+ c.fillStyle='#3b2831';c.fillRect(578,353,26,7);c.fillRect(642,351,24,7);
+ c.strokeStyle='#633c35';c.lineWidth=6;c.beginPath();c.ellipse(626,400,9,12,0,0,Math.PI*2);c.stroke();
+ const phase=reduced?.5:(t%3)/3;c.globalAlpha=1-phase*.8;c.strokeStyle='#e7e4ee';c.lineWidth=4;
+ c.beginPath();c.ellipse(679+phase*24,383-phase*44,7+phase*16,8+phase*18,-.3,0,Math.PI*2);c.stroke();c.restore();
+}
