@@ -16,7 +16,7 @@ for(const [engineName,engine] of browserSet){
   const page=await context.newPage();const errors=[];
   page.on('pageerror',e=>errors.push(e.message));
   await page.goto(site,{waitUntil:'domcontentloaded',timeout:25000});
-  await page.waitForSelector('.tabbar, .mobile-navigation',{timeout:15000});
+  await page.waitForSelector(w<=700?'.mobile-nav-pill':'.desktop-tabbar',{state:'visible',timeout:15000});
   if(w<=700){await page.getByRole('button',{name:'Altro'}).click();await page.getByRole('menuitem',{name:'Amici'}).click();}
   else await page.locator('.desktop-tabbar button').filter({hasText:'Amici'}).click();
   await page.getByText('Crea il tuo nickname').waitFor({timeout:20000});
